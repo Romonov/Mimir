@@ -7,27 +7,32 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mimir
+namespace Mimir.Common
 {
-    class Main
+    class SocketWorker
     {
-        public static Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        public Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-        public static bool Init(int port, int listen)
+        public Socket GetSocket()
+        {
+            return socket;
+        }
+
+        public bool Init(int port, int listen)
         {
             socket.Bind(new IPEndPoint(IPAddress.Any, port));
-            Logger.Info($"Socket created, bind to localhost:{port}, Max connection is {listen}.");
+            Logger.Info($"Push socket created, bind to localhost:{port}.");
             socket.Listen(listen);
             return true;
         }
 
-        public static void Start()
+        public void Start()
         {
             socket.BeginAccept(new AsyncCallback(OnAccept), socket);
-            Logger.Info("Socket is listing now.");
+            Logger.Info("Push socket is listing now.");
         }
 
-        static void OnAccept(IAsyncResult ar)
+        public void OnAccept(IAsyncResult ar)
         {
             try
             {
@@ -35,7 +40,7 @@ namespace Mimir
                 Socket new_client = _socket.EndAccept(ar);
                 _socket.BeginAccept(new AsyncCallback(OnAccept), _socket);
 
-                byte[] recv_buffer = new byte[1024 * 1024 * 100];
+                byte[] recv_buffer = new byte[1024 * 1024 * 10];
                 int real_recv = new_client.Receive(recv_buffer);
                 string recv_request = Encoding.ASCII.GetString(recv_buffer, 0, real_recv);
 
