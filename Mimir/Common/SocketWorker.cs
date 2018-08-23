@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace Mimir.Common
         public bool Init(int port, int listen)
         {
             socket.Bind(new IPEndPoint(IPAddress.Any, port));
-            Logger.Info($"Push socket created, bind to localhost:{port}.");
+            Logger.Info($"Socket created, bind to localhost:{port}.");
             socket.Listen(listen);
             return true;
         }
@@ -29,7 +30,7 @@ namespace Mimir.Common
         public void Start()
         {
             socket.BeginAccept(new AsyncCallback(OnAccept), socket);
-            Logger.Info("Push socket is listing now.");
+            Logger.Info("Socket is listing now.");
         }
 
         public void OnAccept(IAsyncResult ar)
@@ -42,7 +43,11 @@ namespace Mimir.Common
 
                 byte[] recv_buffer = new byte[1024 * 1024 * 10];
                 int real_recv = new_client.Receive(recv_buffer);
-                string recv_request = Encoding.ASCII.GetString(recv_buffer, 0, real_recv);
+
+                SslStream sslStream = new SslStream(new NetworkStream(new_client, true), false);
+                sslStream.AuthenticateAsServer(Program.serverCertificate);
+
+                string recv_request = Encoding.Default.GetString(recv_buffer, 0, real_recv);
 
                 if (recv_request != "")
                 {
