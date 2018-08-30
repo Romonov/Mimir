@@ -41,18 +41,33 @@ namespace Mimir.Common
                 Socket new_client = _socket.EndAccept(ar);
                 _socket.BeginAccept(new AsyncCallback(OnAccept), _socket);
 
-                byte[] recv_buffer = new byte[1024 * 1024 * 10];
-                int real_recv = new_client.Receive(recv_buffer);
-
                 SslStream sslStream = new SslStream(new NetworkStream(new_client, true), false);
                 sslStream.AuthenticateAsServer(Program.serverCertificate);
 
-                string recv_request = Encoding.Default.GetString(recv_buffer, 0, real_recv);
+                sslStream.ReadTimeout = 5000;
+                sslStream.WriteTimeout = 5000;
 
-                if (recv_request != "")
+                byte[] recv_buffer = new byte[1024 * 1024 * 10];
+                StringBuilder messageData = new StringBuilder();
+                int real_recv = 0;
+
+                if (Program.UseSsl)
                 {
-                    Logger.Info($"Recived request from {new_client.RemoteEndPoint}\n{recv_request}");
-                    Processor.Process(recv_request, new_client);
+                    real_recv = sslStream.Read(recv_buffer, 0, recv_buffer.Length);
+                    Decoder decoder = Encoding.UTF8.GetDecoder();
+                    char[] chars = new char[decoder.GetCharCount(recv_buffer, 0, real_recv)];
+                    decoder.GetChars(recv_buffer, 0, real_recv, chars, 0);
+                    messageData.Append(chars);
+                }
+                else
+                {
+                    string recv_request = Encoding.Default.GetString(recv_buffer, 0, real_recv);
+                }
+
+                if (messageData.ToString() != "")
+                {
+                    Logger.Info($"Recived request from {new_client.RemoteEndPoint}\n{messageData.ToString()}");
+                    Processor.Process(messageData.ToString(), new_client, sslStream);
                 }
             }
             catch (Exception e)
@@ -60,5 +75,28 @@ namespace Mimir.Common
                 Logger.Error(e.Message);
             }
         }
+
+        string ReadMessage(SslStream sslStream)
+        {
+            byte[] buffer = new byte[2048];
+            StringBuilder messageData = new StringBuilder();
+            int bytes = -1;
+            do
+            {
+                bytes = sslStream.Read(buffer, 0, buffer.Length);
+                Decoder decoder = Encoding.UTF8.GetDecoder();
+                char[] chars = new char[decoder.GetCharCount(buffer, 0, bytes)];
+                decoder.GetChars(buffer, 0, bytes, chars, 0);
+                messageData.Append(chars);
+                if (messageData.ToString().IndexOf("") != -1)
+                {
+                    break;
+                }
+            }
+            while (bytes != 0);
+
+            return messageData.ToString();
+        }
+
     }
 }

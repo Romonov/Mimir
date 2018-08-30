@@ -1,5 +1,6 @@
 ﻿using RUL;
 using RUL.HTTP;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 
@@ -7,7 +8,7 @@ namespace Mimir.Common
 {
     class Processor
     {
-        public static void Process(string req, Socket socket)
+        public static void Process(string req, Socket socket, SslStream sslStream)
         {
             HttpMsg msg = HttpProtocol.Solve(req);
 
@@ -23,7 +24,7 @@ namespace Mimir.Common
                 {
                     case "/":
                         status = 200;
-                        contect = "";
+                        contect = "Hi";
                         break;
                     default:
                         status = 404;
@@ -56,11 +57,21 @@ namespace Mimir.Common
             Logger.Info($"Response header: {response}");
             Logger.Info($"Response contect: {contect}");
 
-            socket.Send(bresponse);
-            socket.Send(bcontect);
+            if (Program.UseSsl)
+            {
+                sslStream.Write(bresponse);
+                sslStream.Write(bcontect);
+                sslStream.Flush();
+            }
+            else
+            {
+                socket.Send(bresponse);
+                socket.Send(bcontect);
+            }
 
             if (msg.Connection != Connection.KeepAlive)
             {
+                sslStream.Close();
                 socket.Close();
             }
 

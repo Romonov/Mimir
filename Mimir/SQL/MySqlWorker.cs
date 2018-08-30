@@ -60,6 +60,8 @@ namespace Mimir.SQL
                 {
                     Logger.Info("MySQL connection has refreshed.");
                 }
+
+                reader.Close();
             }
         }
     }

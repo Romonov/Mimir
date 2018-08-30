@@ -2,15 +2,8 @@
 using Mimir.SQL;
 using RUL;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection.Emit;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mimir
 {
@@ -18,10 +11,24 @@ namespace Mimir
     {
         public const string Version = "1.0.0";
 
-        public static int Port = 45679;
+        public static string Path = Directory.GetCurrentDirectory();
+
+        public static int Port = 443;
         public static int MaxConnection = 233;
 
-        public static bool isRunning = false;
+        public static bool IsRunning = false;
+
+        public static bool UseSsl = true;
+        public static bool SslUseCABundle = true;
+
+        public static string SslCAName = "ca_bundle.crt";
+        public static string SslCAContent = "";
+        public static string SslCertName = "certificate.crt";
+        public static string SslCertContent = "";
+        public static string SslKeyName = "private.key";
+        public static string SslKeyContent = "";
+        public static string SslPfxName = "ssl.pfx";
+        public static string SslPfxPassword = "123";
 
         public static string SQLIP = "localhost";
         public static string SQLUsername = "root";
@@ -43,6 +50,13 @@ namespace Mimir
                 Console.Read();
                 return;
             }
+
+            /*
+            X509Store store = new X509Store(StoreName.Root);
+            store.Open(OpenFlags.ReadWrite);
+            X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindBySubjectName, "Mimir", false);
+            serverCertificate = certs[0];
+            */
 
             Logger.Info("Welcome!");
 
@@ -66,28 +80,17 @@ namespace Mimir
         bool Init()
         {
             Logger.Info("Loading configs...");
-
             string configPath = Directory.GetCurrentDirectory() + @"\config.ini";
+
             try
             {
-                
                 if (!File.Exists(configPath))
                 {
-                    INI.Write(configPath, "General", "Port", Port.ToString());
-                    INI.Write(configPath, "General", "MaxConnection", MaxConnection.ToString());
-
-                    INI.Write(configPath, "SQL", "IP", SQLIP);
-                    INI.Write(configPath, "SQL", "Username", SQLUsername);
-                    INI.Write(configPath, "SQL", "Password", SQLPassword);
+                    INIWorker.Write();
                 }
                 else
                 {
-                    Port = int.Parse(INI.Read(configPath, "General", "Port"));
-                    MaxConnection = int.Parse(INI.Read(configPath, "General", "MaxConnection"));
-
-                    SQLIP = INI.Read(configPath, "SQL", "IP");
-                    SQLUsername = INI.Read(configPath, "SQL", "Username");
-                    SQLPassword = INI.Read(configPath, "SQL", "Password");
+                    INIWorker.Read();
                 }
             }
             catch (Exception e)
@@ -95,18 +98,33 @@ namespace Mimir
                 Logger.Error(e.Message);
                 File.Delete(configPath);
 
-                INI.Write(configPath, "General", "Port", Port.ToString());
-                INI.Write(configPath, "General", "MaxConnection", MaxConnection.ToString());
-
-                INI.Write(configPath, "SQL", "IP", SQLIP);
-                INI.Write(configPath, "SQL", "Username", SQLUsername);
-                INI.Write(configPath, "SQL", "Password", SQLPassword);
+                INIWorker.Write();
 
                 return false;
             }
             finally
             {
                 Logger.Info("Configs loaded!");
+            }
+
+            if (UseSsl && !Directory.Exists($@"{Path}\Cert"))
+            {
+                Directory.CreateDirectory($@"{Path}\Cert");
+            }
+
+            if (UseSsl)
+            {
+                if ((SslUseCABundle && !File.Exists($@"{Path}\Cert\{SslCAName}"))
+                    || !File.Exists($@"{Path}\Cert\{SslCertName}")
+                    || !File.Exists($@"{Path}\Cert\{SslKeyName}"))
+                {
+                    Logger.Error("Cert file is missing, disabling ssl mode!");
+                    UseSsl = false;
+                }
+                else
+                {
+                    serverCertificate = new X509Certificate($@"F:\Mimir\Mimir\Mimir\bin\Debug\Cert\{SslPfxName}", "123");
+                }
             }
 
             try
@@ -122,7 +140,7 @@ namespace Mimir
                 return false;
             }            
 
-            isRunning = true;
+            IsRunning = true;
 
             return true;
         }
