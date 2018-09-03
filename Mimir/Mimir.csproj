@@ -57,6 +57,12 @@
     <Compile Include="Common\SocketWorker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Response\AuthServer\Authenticate.cs" />
+    <Compile Include="Response\AuthServer\Invalidate.cs" />
+    <Compile Include="Response\AuthServer\Refresh.cs" />
+    <Compile Include="Response\AuthServer\Signout.cs" />
+    <Compile Include="Response\AuthServer\Validate.cs" />
+    <Compile Include="Response\GetRoot.cs" />
     <Compile Include="SQL\MySqlWorker.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -9,7 +9,8 @@ namespace Mimir
 {
     class Program
     {
-        public const string Version = "1.0.0";
+        public const string Name = "Mimir";
+        public const string Version = "0.3.0";
 
         public static string Path = Directory.GetCurrentDirectory();
 
@@ -39,6 +40,11 @@ namespace Mimir
 
         public static X509Certificate serverCertificate = new X509Certificate();
 
+        // todo: Read/Write config file!
+        public static string PublicKey = "";
+        public static string[] SkinDomains = new string[1] { "*.romonov.com" };
+        public static string ServerName = "Mimir Example Server";
+
         static void Main(string[] args)
         {
             Logger.Info($"Mimir version: {Version}, made by: Romonov! ");
@@ -51,12 +57,10 @@ namespace Mimir
                 return;
             }
 
-            /*
             X509Store store = new X509Store(StoreName.Root);
             store.Open(OpenFlags.ReadWrite);
             X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindBySubjectName, "Mimir", false);
             serverCertificate = certs[0];
-            */
 
             Logger.Info("Welcome!");
 
@@ -123,7 +127,7 @@ namespace Mimir
                 }
                 else
                 {
-                    serverCertificate = new X509Certificate($@"F:\Mimir\Mimir\Mimir\bin\Debug\Cert\{SslPfxName}", "123");
+                    //serverCertificate = new X509Certificate($@"F:\Mimir\Mimir\Mimir\bin\Debug\Cert\{SslPfxName}", "123");
                 }
             }
 

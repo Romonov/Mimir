@@ -1,5 +1,7 @@
 ﻿using RUL;
 using RUL.HTTP;
+using Mimir.Response;
+using Mimir.Response.AuthServer;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
@@ -24,7 +26,7 @@ namespace Mimir.Common
                 {
                     case "/":
                         status = 200;
-                        contect = "Hi";
+                        contect = GetRoot.Text();
                         break;
                     default:
                         status = 404;
@@ -35,6 +37,26 @@ namespace Mimir.Common
             {
                 switch (msg.Url)
                 {
+                    case "/authserver/authenticate":
+                        status = 200;
+                        contect = Authenticate.Process(msg.PostData);
+                        break;
+                    case "/authserver/refresh":
+                        status = 200;
+                        contect = Refresh.Process(msg.PostData);
+                        break;
+                    case "/authserver/validate":
+                        status = 204;
+                        contect = Validate.Process(msg.PostData);
+                        break;
+                    case "/authserver/invalidate":
+                        status = 204;
+                        contect = Invalidate.Process(msg.PostData);
+                        break;
+                    case "/authserver/signout":
+                        status = 204;
+                        contect = Signout.Process(msg.PostData);
+                        break;
                     default:
                         status = 403;
                         break;
@@ -57,16 +79,16 @@ namespace Mimir.Common
             Logger.Info($"Response header: {response}");
             Logger.Info($"Response contect: {contect}");
 
-            if (Program.UseSsl)
+            //if (Program.UseSsl)
             {
                 sslStream.Write(bresponse);
                 sslStream.Write(bcontect);
                 sslStream.Flush();
             }
-            else
+            //else
             {
-                socket.Send(bresponse);
-                socket.Send(bcontect);
+            //    socket.Send(bresponse);
+            //    socket.Send(bcontect);
             }
 
             if (msg.Connection != Connection.KeepAlive)

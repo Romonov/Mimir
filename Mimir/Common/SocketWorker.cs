@@ -51,7 +51,7 @@ namespace Mimir.Common
                 StringBuilder messageData = new StringBuilder();
                 int real_recv = 0;
 
-                if (Program.UseSsl)
+                //if (Program.UseSsl)
                 {
                     real_recv = sslStream.Read(recv_buffer, 0, recv_buffer.Length);
                     Decoder decoder = Encoding.UTF8.GetDecoder();
@@ -59,9 +59,9 @@ namespace Mimir.Common
                     decoder.GetChars(recv_buffer, 0, real_recv, chars, 0);
                     messageData.Append(chars);
                 }
-                else
+                //else
                 {
-                    string recv_request = Encoding.Default.GetString(recv_buffer, 0, real_recv);
+                //    string recv_request = Encoding.Default.GetString(recv_buffer, 0, real_recv);
                 }
 
                 if (messageData.ToString() != "")
