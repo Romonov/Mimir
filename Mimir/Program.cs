@@ -10,17 +10,14 @@ namespace Mimir
     class Program
     {
         public const string Name = "Mimir";
-        public const string Version = "0.3.0";
+        public const string Version = "0.3.1";
 
         public static string Path = Directory.GetCurrentDirectory();
 
-        public static int Port = 443;
-        public static int MaxConnection = 233;
-
-        public static bool IsRunning = false;
-
-        public static bool UseSsl = true;
-        public static bool SslUseCABundle = true;
+        public static string SQLIP = "localhost";
+        public static string SQLUsername = "root";
+        public static string SQLPassword = "123456";
+        public const string SQLDatabase = "mimir";
 
         public static string SslCAName = "ca_bundle.crt";
         public static string SslCAContent = "";
@@ -28,22 +25,26 @@ namespace Mimir
         public static string SslCertContent = "";
         public static string SslKeyName = "private.key";
         public static string SslKeyContent = "";
-        public static string SslPfxName = "ssl.pfx";
-        public static string SslPfxPassword = "123";
 
-        public static string SQLIP = "localhost";
-        public static string SQLUsername = "root";
-        public static string SQLPassword = "123456";
-        public const string SQLDatabase = "mimir";
+        public static string SkinPublicKey = "";
+
+        public static string ServerName = "Mimir Server";
+
+        public static string[] SkinDomains;
+
+        public static int Port = 45672;
+        public static int MaxConnection = 233;
+        public static int SkinDomainsCount = 1;
+
+        public static bool IsRunning = false;
+        public static bool IsSslEnabled = true;
+        public static bool IsSslUseCertChain = true;
 
         SocketWorker SocketWorker = new SocketWorker();
 
         public static X509Certificate serverCertificate = new X509Certificate();
 
-        // todo: Read/Write config file!
-        public static string PublicKey = "";
-        public static string[] SkinDomains = new string[1] { "*.romonov.com" };
-        public static string ServerName = "Mimir Example Server";
+        public static ConfigWorker.SQLType SQLType = ConfigWorker.SQLType.MySql;
 
         static void Main(string[] args)
         {
@@ -84,46 +85,33 @@ namespace Mimir
         bool Init()
         {
             Logger.Info("Loading configs...");
-            string configPath = Directory.GetCurrentDirectory() + @"\config.ini";
+            string ConfigPath = Directory.GetCurrentDirectory() + @"\config.ini";
 
-            try
+
+            if (!File.Exists(ConfigPath))
             {
-                if (!File.Exists(configPath))
-                {
-                    INIWorker.Write();
-                }
-                else
-                {
-                    INIWorker.Read();
-                }
+                ConfigWorker.Write(ConfigPath);
             }
-            catch (Exception e)
+            else
             {
-                Logger.Error(e.Message);
-                File.Delete(configPath);
-
-                INIWorker.Write();
-
-                return false;
+                ConfigWorker.Read(ConfigPath);
             }
-            finally
-            {
-                Logger.Info("Configs loaded!");
-            }
+  
+            Logger.Info("Configs loaded!");
 
-            if (UseSsl && !Directory.Exists($@"{Path}\Cert"))
+            if (IsSslEnabled && !Directory.Exists($@"{Path}\Cert"))
             {
                 Directory.CreateDirectory($@"{Path}\Cert");
             }
 
-            if (UseSsl)
+            if (IsSslEnabled)
             {
-                if ((SslUseCABundle && !File.Exists($@"{Path}\Cert\{SslCAName}"))
+                if ((IsSslUseCertChain && !File.Exists($@"{Path}\Cert\{SslCAName}"))
                     || !File.Exists($@"{Path}\Cert\{SslCertName}")
                     || !File.Exists($@"{Path}\Cert\{SslKeyName}"))
                 {
                     Logger.Error("Cert file is missing, disabling ssl mode!");
-                    UseSsl = false;
+                    IsSslEnabled = false;
                 }
                 else
                 {

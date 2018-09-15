@@ -18,7 +18,7 @@ namespace Mimir.Response
             response.meta.implementationName = Program.Name;
             response.meta.implementationVersion = Program.Version;
             response.skinDomains = Program.SkinDomains;
-            response.signaturePublickey = Program.PublicKey;
+            response.signaturePublickey = Program.SkinPublicKey;
             
             Content = JsonConvert.SerializeObject(response);
             return Content;

@@ -52,7 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\INIWorker.cs" />
+    <Compile Include="Common\ConfigWorker.cs" />
     <Compile Include="Common\Processor.cs" />
     <Compile Include="Common\SocketWorker.cs" />
     <Compile Include="Program.cs" />
@@ -69,6 +69,8 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Response\SessionServer\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
