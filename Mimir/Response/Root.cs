@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Mimir.Response
 {
-    class GetRoot
+    class Root
     {
-        public static string Text()
+        public static string OnGet()
         {
             string Content = "";
             GetRootResponse response = new GetRootResponse();

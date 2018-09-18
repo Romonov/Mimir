@@ -62,7 +62,8 @@
     <Compile Include="Response\AuthServer\Refresh.cs" />
     <Compile Include="Response\AuthServer\Signout.cs" />
     <Compile Include="Response\AuthServer\Validate.cs" />
-    <Compile Include="Response\GetRoot.cs" />
+    <Compile Include="Response\Root.cs" />
+    <Compile Include="Response\Mimir\Notice.cs" />
     <Compile Include="SQL\MySqlWorker.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +71,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Response\Mimir\Users\" />
     <Folder Include="Response\SessionServer\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

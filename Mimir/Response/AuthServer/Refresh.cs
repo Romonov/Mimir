@@ -9,7 +9,7 @@ namespace Mimir.Response.AuthServer
 {
     public class Refresh
     {
-        public static string Process(string PostData)
+        public static string OnPost(string PostData)
         {
             JsonConvert.DeserializeObject<Request>(PostData);
 

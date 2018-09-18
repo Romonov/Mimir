@@ -5,6 +5,7 @@ using Mimir.Response.AuthServer;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
+using Mimir.Response.Mimir;
 
 namespace Mimir.Common
 {
@@ -26,7 +27,11 @@ namespace Mimir.Common
                 {
                     case "/":
                         status = 200;
-                        contect = GetRoot.Text();
+                        contect = Root.OnGet();
+                        break;
+                    case "/mimir/notice":
+                        status = 200;
+                        contect = Notice.OnGet();
                         break;
                     default:
                         status = 404;
@@ -37,26 +42,28 @@ namespace Mimir.Common
             {
                 switch (msg.Url)
                 {
+                    #region AuthServer
                     case "/authserver/authenticate":
                         status = 200;
-                        contect = Authenticate.Process(msg.PostData);
+                        contect = Authenticate.OnPost(msg.PostData);
                         break;
                     case "/authserver/refresh":
                         status = 200;
-                        contect = Refresh.Process(msg.PostData);
+                        contect = Refresh.OnPost(msg.PostData);
                         break;
                     case "/authserver/validate":
                         status = 204;
-                        contect = Validate.Process(msg.PostData);
+                        contect = Validate.OnPost(msg.PostData);
                         break;
                     case "/authserver/invalidate":
                         status = 204;
-                        contect = Invalidate.Process(msg.PostData);
+                        contect = Invalidate.OnPost(msg.PostData);
                         break;
                     case "/authserver/signout":
                         status = 204;
-                        contect = Signout.Process(msg.PostData);
+                        contect = Signout.OnPost(msg.PostData);
                         break;
+                    #endregion
                     default:
                         status = 403;
                         break;

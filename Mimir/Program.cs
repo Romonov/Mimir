@@ -9,6 +9,7 @@ namespace Mimir
 {
     class Program
     {
+        #region 定义变量
         public const string Name = "Mimir";
         public const string Version = "0.3.1";
 
@@ -37,7 +38,7 @@ namespace Mimir
         public static int SkinDomainsCount = 1;
 
         public static bool IsRunning = false;
-        public static bool IsSslEnabled = true;
+        public static bool IsSslEnabled = false;
         public static bool IsSslUseCertChain = true;
 
         SocketWorker SocketWorker = new SocketWorker();
@@ -45,6 +46,7 @@ namespace Mimir
         public static X509Certificate serverCertificate = new X509Certificate();
 
         public static ConfigWorker.SQLType SQLType = ConfigWorker.SQLType.MySql;
+        #endregion 
 
         static void Main(string[] args)
         {
@@ -65,6 +67,7 @@ namespace Mimir
 
             Logger.Info("Welcome!");
 
+            // 主循环 
             while (true)
             {
                 string input = Console.ReadLine();
@@ -82,6 +85,7 @@ namespace Mimir
             }
         }
 
+        // 初始化
         bool Init()
         {
             Logger.Info("Loading configs...");
@@ -112,10 +116,6 @@ namespace Mimir
                 {
                     Logger.Error("Cert file is missing, disabling ssl mode!");
                     IsSslEnabled = false;
-                }
-                else
-                {
-                    //serverCertificate = new X509Certificate($@"F:\Mimir\Mimir\Mimir\bin\Debug\Cert\{SslPfxName}", "123");
                 }
             }
 
