@@ -6,6 +6,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 using Mimir.Response.Mimir;
+using Mimir.Response.Users;
 
 namespace Mimir.Common
 {
@@ -42,6 +43,21 @@ namespace Mimir.Common
             {
                 switch (msg.Url)
                 {
+                    #region Users
+                    case "/users/register":
+                        status = 200;
+                        contect = Register.OnPost(msg.PostData);
+                        break;
+                    case "/users/login":
+                        status = 200;
+                        contect = Login.OnPost(msg.PostData);
+                        break;
+                    case "/users/logout":
+                        status = 204;
+                        contect = LogOut.OnPost(msg.PostData);
+                        break;
+                    #endregion
+
                     #region AuthServer
                     case "/authserver/authenticate":
                         status = 200;
