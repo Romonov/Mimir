@@ -11,6 +11,7 @@ namespace Mimir.Response.AuthServer
     {
         public static string OnPost(string PostData)
         {
+            // Post /authserver/authenticate
             JsonConvert.DeserializeObject<Request>(PostData);
 
             return "";

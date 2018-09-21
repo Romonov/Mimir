@@ -15,7 +15,7 @@ namespace Mimir.SQL
 
         public static MySqlConnection mySqlConnection = new MySqlConnection($"server={Program.SQLIP};userid={Program.SQLUsername};password={Program.SQLPassword};database={Program.SQLDatabase};SslMode=none;");
 
-        static ThreadStart threadStart = new ThreadStart(KeepAlive);
+        static readonly ThreadStart threadStart = new ThreadStart(KeepAlive);
         static Thread thread = new Thread(threadStart);
 
         public static MySqlConnection GetSqlConnection()

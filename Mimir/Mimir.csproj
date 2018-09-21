@@ -55,6 +55,8 @@
     <Compile Include="Common\ConfigWorker.cs" />
     <Compile Include="Common\Processor.cs" />
     <Compile Include="Common\SocketWorker.cs" />
+    <Compile Include="Common\UuidWorker.cs" />
+    <Compile Include="SQL\SqlProxy.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Response\AuthServer\Authenticate.cs" />

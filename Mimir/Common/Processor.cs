@@ -7,12 +7,13 @@ using System.Net.Sockets;
 using System.Text;
 using Mimir.Response.Mimir;
 using Mimir.Response.Users;
+using System;
 
 namespace Mimir.Common
 {
     class Processor
     {
-        public static void Process(string req, Socket socket, SslStream sslStream)
+        public static void Process(string req, Socket socket, SslStream sslStream, bool IsSSL)
         {
             HttpMsg msg = HttpProtocol.Solve(req);
 
@@ -102,24 +103,32 @@ namespace Mimir.Common
             Logger.Info($"Response header: {response}");
             Logger.Info($"Response contect: {contect}");
 
-            //if (Program.UseSsl)
+            try
             {
-                sslStream.Write(bresponse);
-                sslStream.Write(bcontect);
-                sslStream.Flush();
+                if (IsSSL)
+                {
+                    sslStream.Write(bresponse);
+                    sslStream.Write(bcontect);
+                    sslStream.Flush();
+                }
+                else
+                {
+                    socket.Send(bresponse);
+                    socket.Send(bcontect);
+                }
             }
-            //else
+            catch(Exception e)
             {
-            //    socket.Send(bresponse);
-            //    socket.Send(bcontect);
+                Logger.Error(e.Message);
             }
-
-            if (msg.Connection != Connection.KeepAlive)
+            finally
             {
-                sslStream.Close();
-                socket.Close();
+                if (msg.Connection != Connection.KeepAlive)
+                {
+                    sslStream.Close();
+                    socket.Close();
+                }
             }
-
             return;
         }
     }

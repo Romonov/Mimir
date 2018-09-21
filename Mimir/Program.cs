@@ -11,7 +11,7 @@ namespace Mimir
     {
         #region 定义变量
         public const string Name = "Mimir";
-        public const string Version = "0.3.1";
+        public const string Version = "0.3.3";
 
         public static string Path = Directory.GetCurrentDirectory();
 
@@ -75,7 +75,7 @@ namespace Mimir
                 switch (input)
                 {
                     case "stop":
-                        MySqlWorker.Close();
+                        SqlProxy.Close();
                         Environment.Exit(0);
                         break;
                     default:
@@ -124,7 +124,7 @@ namespace Mimir
                 SocketWorker.Init(Port, MaxConnection);
                 SocketWorker.Start();
 
-                MySqlWorker.Open();
+                SqlProxy.Open();
             }
             catch(Exception e)
             {
