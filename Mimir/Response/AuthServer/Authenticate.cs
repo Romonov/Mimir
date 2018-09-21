@@ -1,20 +1,31 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Mimir.SQL;
+using Newtonsoft.Json;
+using System.Data;
+using static Mimir.Common.Processor;
 
 namespace Mimir.Response.AuthServer
 {
     public class Authenticate
     {
-        public static string OnPost(string PostData)
+        public static ReturnContent OnPost(string PostData)
         {
             // Post /authserver/authenticate
-            JsonConvert.DeserializeObject<Request>(PostData);
+            ReturnContent returnContect = new ReturnContent();
 
-            return "";
+            Request request = JsonConvert.DeserializeObject<Request>(PostData);
+
+            DataSet dataSet = SqlProxy.Querier($"select * from 'users' where 'Email' = {request.username}");
+            DataRow[] dataRows = dataSet.Tables[0].Select();
+            if(request.password != dataRows[0]["Password"].ToString())
+            {
+                returnContect.Status = 403;
+            }
+            else
+            {
+                
+            }
+
+            return returnContect;
         }
 
         struct Request

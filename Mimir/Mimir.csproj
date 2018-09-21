@@ -56,6 +56,10 @@
     <Compile Include="Common\Processor.cs" />
     <Compile Include="Common\SocketWorker.cs" />
     <Compile Include="Common\UuidWorker.cs" />
+    <Compile Include="Response\Api\Profiles\Minecraft.cs" />
+    <Compile Include="Response\SessionServer\Session\Minecraft\HasJoined.cs" />
+    <Compile Include="Response\SessionServer\Session\Minecraft\Join.cs" />
+    <Compile Include="Response\SessionServer\Session\Minecraft\Profile\Root.cs" />
     <Compile Include="SQL\SqlProxy.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -75,8 +79,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Response\SessionServer\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

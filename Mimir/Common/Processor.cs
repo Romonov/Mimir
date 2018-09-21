@@ -11,7 +11,7 @@ using System;
 
 namespace Mimir.Common
 {
-    class Processor
+    public class Processor
     {
         public static void Process(string req, Socket socket, SslStream sslStream, bool IsSSL)
         {
@@ -19,24 +19,25 @@ namespace Mimir.Common
 
             string contect = "";
             byte[] bcontect;
-            string response = "";
+            string responseHeader = "";
             byte[] bresponse;
 
             int status = 200;
+
+            ReturnContent response = new ReturnContent();
+
             if (msg.Method == Method.Get)
             {
                 switch (msg.Url)
                 {
                     case "/":
-                        status = 200;
-                        contect = Root.OnGet();
+                        response = Root.OnGet();
                         break;
                     case "/mimir/notice":
-                        status = 200;
-                        contect = Notice.OnGet();
+                        response = Notice.OnGet();
                         break;
                     default:
-                        status = 404;
+                        response.Status = 403;
                         break;
                 }
             }
@@ -46,43 +47,43 @@ namespace Mimir.Common
                 {
                     #region Users
                     case "/users/register":
-                        status = 200;
-                        contect = Register.OnPost(msg.PostData);
+                        response = Register.OnPost(msg.PostData);
                         break;
                     case "/users/login":
-                        status = 200;
-                        contect = Login.OnPost(msg.PostData);
+                        response = Login.OnPost(msg.PostData);
                         break;
                     case "/users/logout":
-                        status = 204;
-                        contect = LogOut.OnPost(msg.PostData);
+                        response = LogOut.OnPost(msg.PostData);
                         break;
                     #endregion
 
                     #region AuthServer
                     case "/authserver/authenticate":
-                        status = 200;
-                        contect = Authenticate.OnPost(msg.PostData);
+                        response = Authenticate.OnPost(msg.PostData);
                         break;
                     case "/authserver/refresh":
-                        status = 200;
-                        contect = Refresh.OnPost(msg.PostData);
+                        response = Refresh.OnPost(msg.PostData);
                         break;
                     case "/authserver/validate":
-                        status = 204;
-                        contect = Validate.OnPost(msg.PostData);
+                        response = Validate.OnPost(msg.PostData);
                         break;
                     case "/authserver/invalidate":
-                        status = 204;
-                        contect = Invalidate.OnPost(msg.PostData);
+                        response = Invalidate.OnPost(msg.PostData);
                         break;
                     case "/authserver/signout":
-                        status = 204;
-                        contect = Signout.OnPost(msg.PostData);
+                        response = Signout.OnPost(msg.PostData);
                         break;
                     #endregion
                     default:
-                        status = 403;
+                        /*
+                        GET /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
+
+                        if (Guid.TryParse(msg.Url.Split('/')[5], out Guid guid))
+                        {
+
+                        }
+                        */
+                        response.Status = 403;
                         break;
                 }
             }
@@ -91,16 +92,16 @@ namespace Mimir.Common
                 switch (msg.Url)
                 {
                     default:
-                        status = 403;
+                        response.Status = 403;
                         break;
                 }
             }
 
-            bcontect = Encoding.Default.GetBytes(contect);
-            response = HttpProtocol.Make(status, "text", bcontect.Length);
-            bresponse = Encoding.Default.GetBytes(response);
+            bcontect = Encoding.Default.GetBytes(response.Contect);
+            responseHeader = HttpProtocol.Make(response.Status, "text", bcontect.Length);
+            bresponse = Encoding.Default.GetBytes(responseHeader);
 
-            Logger.Info($"Response header: {response}");
+            Logger.Info($"Response header: {responseHeader}");
             Logger.Info($"Response contect: {contect}");
 
             try
@@ -130,6 +131,12 @@ namespace Mimir.Common
                 }
             }
             return;
+        }
+
+        public struct ReturnContent
+        {
+            public string Contect;
+            public int Status;
         }
     }
 }
