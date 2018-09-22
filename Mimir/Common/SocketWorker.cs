@@ -51,10 +51,10 @@ namespace Mimir.Common
 
                 try
                 {
-                    sslStream.AuthenticateAsServer(Program.serverCertificate);
+                    sslStream.AuthenticateAsServer(Program.ServerCertificate);
 
-                    //sslStream.ReadTimeout = 5000;
-                    //sslStream.WriteTimeout = 5000;
+                    sslStream.ReadTimeout = 5000;
+                    sslStream.WriteTimeout = 5000;
 
                     real_recv = sslStream.Read(recv_buffer, 0, recv_buffer.Length);
 
@@ -63,6 +63,7 @@ namespace Mimir.Common
                 }
                 catch (Exception e)
                 {
+                    
                     Logger.Warn(e.Message);
 
                     real_recv = new_client.Receive(recv_buffer);
@@ -71,6 +72,7 @@ namespace Mimir.Common
 
                     messageData = "";
                     messageData = Encoding.Default.GetString(recv_buffer, 0, real_recv);
+
                 }
                 finally
                 {

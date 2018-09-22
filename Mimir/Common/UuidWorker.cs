@@ -8,7 +8,7 @@ namespace Mimir.Common
 {
     class UuidWorker
     {
-        public static string GenUuid(string str)
+        public static string GenUuid()
         {
             return Guid.NewGuid().ToString("");
         }

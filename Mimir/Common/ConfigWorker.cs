@@ -25,10 +25,8 @@ namespace Mimir.Common
                 INI.Write(ConfigPath, "SQL", "Username", Program.SQLUsername);
                 INI.Write(ConfigPath, "SQL", "Password", Program.SQLPassword);
 
-                INI.Write(ConfigPath, "SSL", "CertChain", Program.IsSslUseCertChain.ToString());
-                INI.Write(ConfigPath, "SSL", "CA", Program.SslCAName);
                 INI.Write(ConfigPath, "SSL", "Cert", Program.SslCertName);
-                INI.Write(ConfigPath, "SSL", "Key", Program.SslKeyName);
+                INI.Write(ConfigPath, "SSL", "Password", Program.SslCertPassword);
 
                 INI.Write(ConfigPath, "SkinDomains", "Count", Program.SkinDomains.Length.ToString());
                 List<string> list = new List<string>();
@@ -60,13 +58,8 @@ namespace Mimir.Common
                 Program.SQLUsername = INI.Read(ConfigPath, "SQL", "Username");
                 Program.SQLPassword = INI.Read(ConfigPath, "SQL", "Password");
 
-                Program.IsSslUseCertChain = BoolParse(INI.Read(ConfigPath, "SSL", "CertChain"));
-                Program.SslCAName = INI.Read(ConfigPath, "SSL", "CA");
-                Program.SslCAContent = File.ReadAllText($@"{Program.Path}\Cert\{Program.SslCAName}");
                 Program.SslCertName = INI.Read(ConfigPath, "SSL", "Cert");
-                Program.SslCertContent = File.ReadAllText($@"{Program.Path}\Cert\{Program.SslCertName}");
-                Program.SslKeyName = INI.Read(ConfigPath, "SSL", "Key");
-                Program.SslKeyContent = File.ReadAllText($@"{Program.Path}\Cert\{Program.SslKeyName}");
+                Program.SslCertPassword = INI.Read(ConfigPath, "SSL", "Password");
 
                 Program.SkinDomainsCount = int.Parse(INI.Read(ConfigPath, "SkinDomains", "Count"));
                 List<string> list = new List<string>();
@@ -86,15 +79,15 @@ namespace Mimir.Common
 
         static SQLType GetSQLType(string configPath)
         {
-            switch(INI.Read(configPath, "SQL", "Type"))
+            switch(INI.Read(configPath, "SQL", "Type").ToLower())
             {
-                case "MySql":
+                case "mysql":
                     return SQLType.MySql;
-                case "MsSql":
+                case "mssql":
                     return SQLType.MsSql;
-                case "MariaDB":
+                case "mariadb":
                     return SQLType.MariaDB;
-                case "Sqlite":
+                case "sqlite":
                     return SQLType.Sqlite;
                 default:
                     Logger.Error("Bad sql server type, using MySql");

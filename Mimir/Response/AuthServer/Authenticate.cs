@@ -1,4 +1,5 @@
-﻿using Mimir.SQL;
+﻿using Mimir.Common;
+using Mimir.SQL;
 using Newtonsoft.Json;
 using System.Data;
 using static Mimir.Common.Processor;
@@ -11,18 +12,27 @@ namespace Mimir.Response.AuthServer
         {
             // Post /authserver/authenticate
             ReturnContent returnContect = new ReturnContent();
+            Response response = new Response();
 
             Request request = JsonConvert.DeserializeObject<Request>(PostData);
 
-            DataSet dataSet = SqlProxy.Querier($"select * from 'users' where 'Email' = {request.username}");
+            DataSet dataSet = SqlProxy.Querier($"SELECT users.Email FROM users WHERE users.Email = {request.username}");
             DataRow[] dataRows = dataSet.Tables[0].Select();
-            if(request.password != dataRows[0]["Password"].ToString())
+            if (request.password != dataRows[0]["Password"].ToString())
             {
                 returnContect.Status = 403;
+                return returnContect;
             }
             else
             {
-                
+                returnContect.Status = 200;
+            }
+
+            response.accessToken = UuidWorker.ToUnsignedUuid(UuidWorker.GenUuid());
+
+            if(request.clientToken == null)
+            {
+                response.clientToken = UuidWorker.GenUuid();
             }
 
             return returnContect;
@@ -62,6 +72,18 @@ namespace Mimir.Response.AuthServer
         struct User
         {
             public string accessToken;
+        }
+
+        struct Profiles
+        {
+            public string id;
+            public Properties[] properties;
+        }
+
+        struct Properties
+        {
+            public string name;
+            public string value;
         }
     }
 }

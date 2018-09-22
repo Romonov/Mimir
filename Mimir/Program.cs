@@ -3,6 +3,7 @@ using Mimir.SQL;
 using RUL;
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Mimir
@@ -11,7 +12,7 @@ namespace Mimir
     {
         #region 定义变量
         public const string Name = "Mimir";
-        public const string Version = "0.4.3";
+        public const string Version = "0.5.1";
 
         public static string Path = Directory.GetCurrentDirectory();
 
@@ -20,12 +21,8 @@ namespace Mimir
         public static string SQLPassword = "123456";
         public const string SQLDatabase = "mimir";
 
-        public static string SslCAName = "ca_bundle.crt";
-        public static string SslCAContent = "";
-        public static string SslCertName = "certificate.crt";
-        public static string SslCertContent = "";
-        public static string SslKeyName = "private.key";
-        public static string SslKeyContent = "";
+        public static string SslCertName = "ssl.pfx";
+        public static string SslCertPassword = "123";
 
         public static string SkinPublicKey = "";
 
@@ -39,11 +36,10 @@ namespace Mimir
 
         public static bool IsRunning = false;
         public static bool IsSslEnabled = false;
-        public static bool IsSslUseCertChain = true;
 
         SocketWorker SocketWorker = new SocketWorker();
 
-        public static X509Certificate serverCertificate = new X509Certificate();
+        public static X509Certificate2 ServerCertificate = new X509Certificate2();
 
         public static ConfigWorker.SQLType SQLType = ConfigWorker.SQLType.MySql;
         #endregion 
@@ -59,11 +55,6 @@ namespace Mimir
                 Console.Read();
                 return;
             }
-
-            X509Store store = new X509Store(StoreName.Root);
-            store.Open(OpenFlags.ReadWrite);
-            X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindBySubjectName, "Mimir", false);
-            serverCertificate = certs[0];
 
             Logger.Info("Welcome!");
 
@@ -91,7 +82,6 @@ namespace Mimir
             Logger.Info("Loading configs...");
             string ConfigPath = Directory.GetCurrentDirectory() + @"\config.ini";
 
-
             if (!File.Exists(ConfigPath))
             {
                 ConfigWorker.Write(ConfigPath);
@@ -103,6 +93,14 @@ namespace Mimir
   
             Logger.Info("Configs loaded!");
 
+            if (!File.Exists(Directory.GetCurrentDirectory() + @"\PrivateKey.xml"))
+            {
+                Logger.Warn("Private key file is missing, and it will be generated now.");
+                RSAWorker.GenKey();
+            }
+
+            RSAWorker.LoadKey();
+
             if (IsSslEnabled && !Directory.Exists($@"{Path}\Cert"))
             {
                 Directory.CreateDirectory($@"{Path}\Cert");
@@ -110,21 +108,24 @@ namespace Mimir
 
             if (IsSslEnabled)
             {
-                if ((IsSslUseCertChain && !File.Exists($@"{Path}\Cert\{SslCAName}"))
-                    || !File.Exists($@"{Path}\Cert\{SslCertName}")
-                    || !File.Exists($@"{Path}\Cert\{SslKeyName}"))
+                if (!File.Exists($@"{Path}\Cert\{SslCertName}"))
                 {
                     Logger.Error("Cert file is missing, disabling ssl mode!");
                     IsSslEnabled = false;
                 }
             }
 
+            if (IsSslEnabled)
+            {
+                ServerCertificate = new X509Certificate2($@"{Path}\Cert\{SslCertName}", SslCertPassword);
+            }
+
             try
             {
+                SqlProxy.Open();
+
                 SocketWorker.Init(Port, MaxConnection);
                 SocketWorker.Start();
-
-                SqlProxy.Open();
             }
             catch(Exception e)
             {

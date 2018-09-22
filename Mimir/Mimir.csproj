@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Common\ConfigWorker.cs" />
     <Compile Include="Common\Processor.cs" />
+    <Compile Include="Common\RSAWorker.cs" />
     <Compile Include="Common\SocketWorker.cs" />
     <Compile Include="Common\UuidWorker.cs" />
     <Compile Include="Response\Api\Profiles\Minecraft.cs" />

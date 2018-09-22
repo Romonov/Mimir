@@ -17,27 +17,27 @@ namespace Mimir.Common
         {
             HttpMsg msg = HttpProtocol.Solve(req);
 
-            string contect = "";
             byte[] bcontect;
             string responseHeader = "";
             byte[] bresponse;
 
-            int status = 200;
+            ReturnContent content = new ReturnContent();
 
-            ReturnContent response = new ReturnContent();
+            content.Status = 200;
+            content.Contect = "";
 
             if (msg.Method == Method.Get)
             {
                 switch (msg.Url)
                 {
                     case "/":
-                        response = Root.OnGet();
+                        content = Root.OnGet();
                         break;
                     case "/mimir/notice":
-                        response = Notice.OnGet();
+                        content = Notice.OnGet();
                         break;
                     default:
-                        response.Status = 403;
+                        content.Status = 403;
                         break;
                 }
             }
@@ -47,31 +47,31 @@ namespace Mimir.Common
                 {
                     #region Users
                     case "/users/register":
-                        response = Register.OnPost(msg.PostData);
+                        content = Register.OnPost(msg.PostData);
                         break;
                     case "/users/login":
-                        response = Login.OnPost(msg.PostData);
+                        content = Login.OnPost(msg.PostData);
                         break;
                     case "/users/logout":
-                        response = LogOut.OnPost(msg.PostData);
+                        content = LogOut.OnPost(msg.PostData);
                         break;
                     #endregion
 
                     #region AuthServer
                     case "/authserver/authenticate":
-                        response = Authenticate.OnPost(msg.PostData);
+                        content = Authenticate.OnPost(msg.PostData);
                         break;
                     case "/authserver/refresh":
-                        response = Refresh.OnPost(msg.PostData);
+                        content = Refresh.OnPost(msg.PostData);
                         break;
                     case "/authserver/validate":
-                        response = Validate.OnPost(msg.PostData);
+                        content = Validate.OnPost(msg.PostData);
                         break;
                     case "/authserver/invalidate":
-                        response = Invalidate.OnPost(msg.PostData);
+                        content = Invalidate.OnPost(msg.PostData);
                         break;
                     case "/authserver/signout":
-                        response = Signout.OnPost(msg.PostData);
+                        content = Signout.OnPost(msg.PostData);
                         break;
                     #endregion
                     default:
@@ -83,7 +83,7 @@ namespace Mimir.Common
 
                         }
                         */
-                        response.Status = 403;
+                        content.Status = 403;
                         break;
                 }
             }
@@ -92,17 +92,17 @@ namespace Mimir.Common
                 switch (msg.Url)
                 {
                     default:
-                        response.Status = 403;
+                        content.Status = 403;
                         break;
                 }
             }
 
-            bcontect = Encoding.Default.GetBytes(response.Contect);
-            responseHeader = HttpProtocol.Make(response.Status, "text", bcontect.Length);
+            bcontect = Encoding.Default.GetBytes(content.Contect);
+            responseHeader = HttpProtocol.Make(content.Status, "text", bcontect.Length);
             bresponse = Encoding.Default.GetBytes(responseHeader);
 
-            Logger.Info($"Response header: {responseHeader}");
-            Logger.Info($"Response contect: {contect}");
+            Logger.Debug($"Response header: {responseHeader}");
+            Logger.Debug($"Response contect: {content.Contect}");
 
             try
             {
@@ -124,7 +124,7 @@ namespace Mimir.Common
             }
             finally
             {
-                if (msg.Connection != Connection.KeepAlive)
+                //if (msg.Connection != Connection.KeepAlive)
                 {
                     sslStream.Close();
                     socket.Close();
