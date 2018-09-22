@@ -79,6 +79,7 @@ namespace Mimir
         // 初始化
         bool Init()
         {
+            // 加载配置文件
             Logger.Info("Loading configs...");
             string ConfigPath = Directory.GetCurrentDirectory() + @"\config.ini";
 
@@ -93,14 +94,22 @@ namespace Mimir
   
             Logger.Info("Configs loaded!");
 
+            // 加载签名秘钥
             if (!File.Exists(Directory.GetCurrentDirectory() + @"\PrivateKey.xml"))
             {
                 Logger.Warn("Private key file is missing, and it will be generated now.");
-                RSAWorker.GenKey();
+                if (!RSAWorker.GenKey())
+                {
+                    return false;
+                }
             }
 
-            RSAWorker.LoadKey();
+            if (!RSAWorker.LoadKey())
+            {
+                return false;
+            }
 
+            // 加载SSL证书
             if (IsSslEnabled && !Directory.Exists($@"{Path}\Cert"))
             {
                 Directory.CreateDirectory($@"{Path}\Cert");
@@ -120,6 +129,7 @@ namespace Mimir
                 ServerCertificate = new X509Certificate2($@"{Path}\Cert\{SslCertName}", SslCertPassword);
             }
 
+            // 打开SQL和Socket链接
             try
             {
                 SqlProxy.Open();

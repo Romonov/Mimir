@@ -15,8 +15,8 @@ namespace Mimir.Response.AuthServer
             Response response = new Response();
 
             Request request = JsonConvert.DeserializeObject<Request>(PostData);
-
-            DataSet dataSet = SqlProxy.Querier($"SELECT users.Email FROM users WHERE users.Email = {request.username}");
+            
+            DataSet dataSet = SqlProxy.Querier($"SELECT users.Email FROM uvsers WHERE users.Email = '{request.username}'");
             DataRow[] dataRows = dataSet.Tables[0].Select();
             if (request.password != dataRows[0]["Password"].ToString())
             {
@@ -34,6 +34,8 @@ namespace Mimir.Response.AuthServer
             {
                 response.clientToken = UuidWorker.GenUuid();
             }
+
+            returnContect.Contect = JsonConvert.SerializeObject(response);
 
             return returnContect;
         }

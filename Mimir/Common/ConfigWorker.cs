@@ -1,16 +1,16 @@
-﻿using Mimir;
-using RUL;
+﻿using RUL;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mimir.Common
 {
     class ConfigWorker
     {
+        /// <summary>
+        /// 写配置文件方法
+        /// </summary>
+        /// <param name="ConfigPath">配置文件路径</param>
+        /// <returns>成功与否</returns>
         public static bool Write(string ConfigPath)
         {
             try
@@ -44,6 +44,11 @@ namespace Mimir.Common
             return true;
         }
 
+        /// <summary>
+        /// 读配置文件方法
+        /// </summary>
+        /// <param name="ConfigPath">配置文件路径</param>
+        /// <returns>成功与否</returns>
         public static bool Read(string ConfigPath)
         {
             try
@@ -77,9 +82,14 @@ namespace Mimir.Common
             return true;
         }
 
-        static SQLType GetSQLType(string configPath)
+        /// <summary>
+        /// 辨别SQL服务器设置方法
+        /// </summary>
+        /// <param name="ConfigPath">配置文件路径</param>
+        /// <returns>返回SQL服务器类型</returns>
+        static SQLType GetSQLType(string ConfigPath)
         {
-            switch(INI.Read(configPath, "SQL", "Type").ToLower())
+            switch(INI.Read(ConfigPath, "SQL", "Type").ToLower())
             {
                 case "mysql":
                     return SQLType.MySql;
@@ -91,11 +101,16 @@ namespace Mimir.Common
                     return SQLType.Sqlite;
                 default:
                     Logger.Error("Bad sql server type, using MySql");
-                    INI.Write(configPath, "SQL", "Type", SQLType.MySql.ToString());
+                    INI.Write(ConfigPath, "SQL", "Type", SQLType.MySql.ToString());
                     return SQLType.MySql;
             }
         }
 
+        /// <summary>
+        /// 把特定字符串转换为对应的布尔值
+        /// </summary>
+        /// <param name="str">字符串</param>
+        /// <returns>布尔值</returns>
         static bool BoolParse(string str)
         {
             if(str.ToLower() == "true")
@@ -108,6 +123,9 @@ namespace Mimir.Common
             }
         }
 
+        /// <summary>
+        /// SQL服务器类型
+        /// </summary>
         public enum SQLType
         {
             MySql, 

@@ -8,18 +8,20 @@ namespace Mimir.Common
 {
     class UuidWorker
     {
+        /// <summary>
+        /// 生成UUID
+        /// </summary>
+        /// <returns>生成的UUID</returns>
         public static string GenUuid()
         {
             return Guid.NewGuid().ToString("");
         }
 
-        /*
-        public static string GetPlayerUuid(string Username)
-        {
-            return GenUuid($"OfflinePlayer:{Username}");
-        }
-        */
-
+        /// <summary>
+        /// 转换为无符号UUID
+        /// </summary>
+        /// <param name="SignedUuid">UUID</param>
+        /// <returns>无符号UUID</returns>
         public static string ToUnsignedUuid(string SignedUuid)
         {
             Guid guid = new Guid("N");
@@ -27,6 +29,11 @@ namespace Mimir.Common
             return guid.ToString();
         }
 
+        /// <summary>
+        /// 转换为UUID
+        /// </summary>
+        /// <param name="UnsignedUuid">无符号UUID</param>
+        /// <returns>UUID</returns>
         public static string ToSignedUuid(string UnsignedUuid)
         {
             Guid guid = new Guid("D");
