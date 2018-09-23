@@ -12,7 +12,7 @@ namespace Mimir
     {
         #region 定义变量
         public const string Name = "Mimir";
-        public const string Version = "0.5.1";
+        public const string Version = "0.5.3";
 
         public static string Path = Directory.GetCurrentDirectory();
 
@@ -36,13 +36,14 @@ namespace Mimir
 
         public static bool IsRunning = false;
         public static bool IsSslEnabled = false;
+        public static bool IsCustomCert = true;
 
         SocketWorker SocketWorker = new SocketWorker();
 
         public static X509Certificate2 ServerCertificate = new X509Certificate2();
 
         public static ConfigWorker.SQLType SQLType = ConfigWorker.SQLType.MySql;
-        #endregion 
+        #endregion
 
         static void Main(string[] args)
         {
@@ -67,6 +68,7 @@ namespace Mimir
                 {
                     case "stop":
                         SqlProxy.Close();
+                        ConfigWorker.Save(Directory.GetCurrentDirectory() + @"\config.ini");
                         Environment.Exit(0);
                         break;
                     default:
@@ -85,7 +87,7 @@ namespace Mimir
 
             if (!File.Exists(ConfigPath))
             {
-                ConfigWorker.Write(ConfigPath);
+                ConfigWorker.Init(ConfigPath);
             }
             else
             {
@@ -109,25 +111,28 @@ namespace Mimir
                 return false;
             }
 
-            // 加载SSL证书
-            if (IsSslEnabled && !Directory.Exists($@"{Path}\Cert"))
-            {
-                Directory.CreateDirectory($@"{Path}\Cert");
-            }
+            SkinPublicKey = RSAWorker.RSAPublicKeyConverter(File.ReadAllText(Directory.GetCurrentDirectory() + @"\PublicKey.xml"));
 
-            if (IsSslEnabled)
+            // 加载SSL证书
+            try
             {
-                if (!File.Exists($@"{Path}\Cert\{SslCertName}"))
+                if (IsSslEnabled)
                 {
-                    Logger.Error("Cert file is missing, disabling ssl mode!");
-                    IsSslEnabled = false;
+                    CertWorker.Load();
                 }
             }
-
-            if (IsSslEnabled)
+            catch(Exception e)
             {
-                ServerCertificate = new X509Certificate2($@"{Path}\Cert\{SslCertName}", SslCertPassword);
+                Logger.Error(e.Message);
             }
+
+            /*
+            X509Store store = new X509Store(StoreName.Root);
+            store.Open(OpenFlags.ReadWrite);
+            X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindBySubjectName, "Mimir", false);
+            ServerCertificate = certs[0];
+            store.Close();
+            */
 
             // 打开SQL和Socket链接
             try

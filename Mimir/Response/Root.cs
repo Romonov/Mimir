@@ -20,7 +20,7 @@ namespace Mimir.Response
             response.meta.implementationName = Program.Name;
             response.meta.implementationVersion = Program.Version;
             response.skinDomains = Program.SkinDomains;
-            response.signaturePublickey = Program.SkinPublicKey;
+            response.signaturePublickey = $"-----BEGIN PUBLIC KEY-----\n{Program.SkinPublicKey}\n-----END PUBLIC KEY-----\n";
 
             returnContect.Contect = JsonConvert.SerializeObject(response);
             returnContect.Status = 200;

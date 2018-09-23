@@ -24,9 +24,9 @@ namespace Mimir.Common
         /// <returns>无符号UUID</returns>
         public static string ToUnsignedUuid(string SignedUuid)
         {
-            Guid guid = new Guid("N");
+            Guid guid = new Guid();
             Guid.TryParse(SignedUuid, out guid);
-            return guid.ToString();
+            return guid.ToString("N");
         }
 
         /// <summary>
@@ -36,9 +36,9 @@ namespace Mimir.Common
         /// <returns>UUID</returns>
         public static string ToSignedUuid(string UnsignedUuid)
         {
-            Guid guid = new Guid("D");
+            Guid guid = new Guid();
             Guid.TryParse(UnsignedUuid, out guid);
-            return guid.ToString();
+            return guid.ToString("D");
         }
     }
 }

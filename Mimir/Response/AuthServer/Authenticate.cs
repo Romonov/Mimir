@@ -16,11 +16,17 @@ namespace Mimir.Response.AuthServer
 
             Request request = JsonConvert.DeserializeObject<Request>(PostData);
             
-            DataSet dataSet = SqlProxy.Querier($"SELECT users.Email FROM uvsers WHERE users.Email = '{request.username}'");
+            DataSet dataSet = SqlProxy.Querier($"SELECT users.Email FROM users WHERE users.Email = '{request.username}'");
             DataRow[] dataRows = dataSet.Tables[0].Select();
-            if (request.password != dataRows[0]["Password"].ToString())
+
+            // Passwords
+            if (request.password != "123456") //dataRows[0]["password"].ToString())
             {
                 returnContect.Status = 403;
+                ReturnError returnError = new ReturnError();
+                returnError.error = "ForbiddenOperationException";
+                returnError.errorMessage = "Invalid credentials. Invalid username or password.";
+                returnContect.Contect = JsonConvert.SerializeObject(returnError); ;
                 return returnContect;
             }
             else
@@ -28,11 +34,35 @@ namespace Mimir.Response.AuthServer
                 returnContect.Status = 200;
             }
 
+            // Tokens
             response.accessToken = UuidWorker.ToUnsignedUuid(UuidWorker.GenUuid());
+            response.selectedProfile.accessToken = response.accessToken;
 
-            if(request.clientToken == null)
+            if (request.clientToken == null)
             {
                 response.clientToken = UuidWorker.GenUuid();
+            }
+            else
+            {
+                response.clientToken = request.clientToken;
+                response.selectedProfile.clientToken = request.clientToken;
+            }
+
+            // Profiles
+            response.selectedProfile.availableProfiles = new string[] { "Romonov" };
+
+            // Users
+            if (request.requestUser)
+            {
+                User user = new User();
+                Profiles profiles = new Profiles();
+                profiles.id = "romonov";
+                Properties properties = new Properties();
+                properties.name = "preferredLanguage";
+                properties.value = "zh_cn";
+                profiles.properties = new Properties[] { properties };
+                user.profiles = new Profiles[] { profiles };
+                response.user = user;
             }
 
             returnContect.Contect = JsonConvert.SerializeObject(response);
@@ -73,7 +103,7 @@ namespace Mimir.Response.AuthServer
 
         struct User
         {
-            public string accessToken;
+            public Profiles[] profiles;
         }
 
         struct Profiles

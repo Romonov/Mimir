@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\CertWorker.cs" />
     <Compile Include="Common\ConfigWorker.cs" />
     <Compile Include="Common\Processor.cs" />
     <Compile Include="Common\RSAWorker.cs" />

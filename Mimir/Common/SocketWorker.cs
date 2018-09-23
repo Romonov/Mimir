@@ -96,8 +96,7 @@ namespace Mimir.Common
                 }
                 catch (Exception e)
                 {
-                    throw;
-                    Logger.Error(e.Message);
+                    Logger.Error(e.Message); 
                 }
                 finally
                 {
@@ -107,12 +106,11 @@ namespace Mimir.Common
                         Processor.Process(messageData, new_client, sslStream, Program.IsSslEnabled);
                     }
                 }
-
             }
 
             catch (Exception e)
             {
-                Logger.Error(e.Message); throw;
+                Logger.Error(e.Message); 
             }
         }
     }

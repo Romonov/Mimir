@@ -163,5 +163,15 @@ namespace Mimir.Common
             public string Contect;
             public int Status;
         }
+
+        /// <summary>
+        /// 错误信息返回的自定义类型
+        /// </summary>
+        public struct ReturnError
+        {
+            public string error;
+            public string errorMessage;
+            public string cause;
+        }
     }
 }

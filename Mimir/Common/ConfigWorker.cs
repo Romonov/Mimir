@@ -6,12 +6,7 @@ namespace Mimir.Common
 {
     class ConfigWorker
     {
-        /// <summary>
-        /// 写配置文件方法
-        /// </summary>
-        /// <param name="ConfigPath">配置文件路径</param>
-        /// <returns>成功与否</returns>
-        public static bool Write(string ConfigPath)
+        public static bool Init(string ConfigPath)
         {
             try
             {
@@ -25,16 +20,50 @@ namespace Mimir.Common
                 INI.Write(ConfigPath, "SQL", "Username", Program.SQLUsername);
                 INI.Write(ConfigPath, "SQL", "Password", Program.SQLPassword);
 
+                INI.Write(ConfigPath, "SSL", "IsCustomSSL", Program.IsCustomCert.ToString());
                 INI.Write(ConfigPath, "SSL", "Cert", Program.SslCertName);
                 INI.Write(ConfigPath, "SSL", "Password", Program.SslCertPassword);
 
-                INI.Write(ConfigPath, "SkinDomains", "Count", Program.SkinDomains.Length.ToString());
-                List<string> list = new List<string>();
-                for (int i = 0; i < int.Parse(INI.Read(ConfigPath, "SkinDomains", "Count")); i++)
+                INI.Write(ConfigPath, "SkinDomains", "Count", "1");
+                INI.Write(ConfigPath, "SkinDomains", "1", ".romonov.com");
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 存配置文件方法
+        /// </summary>
+        /// <param name="ConfigPath">配置文件路径</param>
+        /// <returns>成功与否</returns>
+        public static bool Save(string ConfigPath)
+        {
+            try
+            {
+                INI.Write(ConfigPath, "General", "Name", Program.ServerName);
+                INI.Write(ConfigPath, "General", "Port", Program.Port.ToString());
+                INI.Write(ConfigPath, "General", "MaxConnection", Program.MaxConnection.ToString());
+                INI.Write(ConfigPath, "General", "SSL", Program.IsSslEnabled.ToString());
+
+                INI.Write(ConfigPath, "SQL", "Type", Program.SQLType.ToString());
+                INI.Write(ConfigPath, "SQL", "IP", Program.SQLIP);
+                INI.Write(ConfigPath, "SQL", "Username", Program.SQLUsername);
+                INI.Write(ConfigPath, "SQL", "Password", Program.SQLPassword);
+
+                INI.Write(ConfigPath, "SSL", "IsCustomSSL", Program.IsCustomCert.ToString());
+                INI.Write(ConfigPath, "SSL", "Cert", Program.SslCertName);
+                INI.Write(ConfigPath, "SSL", "Password", Program.SslCertPassword);
+
+                INI.Write(ConfigPath, "SkinDomains", "Count", Program.SkinDomainsCount.ToString());
+
+                for (int i = 1; i <= Program.SkinDomains.Length + 1; i++)
                 {
-                    INI.Write(ConfigPath, "SkinDomains", "Count", Program.SkinDomains.Length.ToString());
+                    INI.Write(ConfigPath, "SkinDomains", i.ToString(), Program.SkinDomains[i]);
                 }
-                Program.SkinDomains = list.ToArray();
             }
             catch(Exception e)
             {
@@ -63,12 +92,13 @@ namespace Mimir.Common
                 Program.SQLUsername = INI.Read(ConfigPath, "SQL", "Username");
                 Program.SQLPassword = INI.Read(ConfigPath, "SQL", "Password");
 
+                Program.IsCustomCert = BoolParse(INI.Read(ConfigPath, "SSL", "IsCustomSSL"));
                 Program.SslCertName = INI.Read(ConfigPath, "SSL", "Cert");
                 Program.SslCertPassword = INI.Read(ConfigPath, "SSL", "Password");
 
                 Program.SkinDomainsCount = int.Parse(INI.Read(ConfigPath, "SkinDomains", "Count"));
                 List<string> list = new List<string>();
-                for (int i = 0; i < int.Parse(INI.Read(ConfigPath, "SkinDomains", "Count")); i++)
+                for (int i = 1; i <= int.Parse(INI.Read(ConfigPath, "SkinDomains", "Count")); i++)
                 {
                     list.Add(INI.Read(ConfigPath, "SkinDomains", i.ToString()));
                 }

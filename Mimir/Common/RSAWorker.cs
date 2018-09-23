@@ -1,8 +1,13 @@
-﻿using RUL;
+﻿using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.X509;
+using RUL;
 using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml;
 
 namespace Mimir.Common
 {
@@ -81,6 +86,24 @@ namespace Mimir.Common
             byte[] privateValue = PrivateKey.Decrypt(Convert.FromBase64String(str), false);
             string privateStr = Encoding.Default.GetString(privateValue);
             return privateStr;
+        }
+
+        /// <summary>  
+        /// RSA 公钥转为Java格式
+        /// </summary>  
+        /// <param name="XML">XML文件名</param>  
+        /// <returns></returns>  
+        public static string RSAPublicKeyConverter(string XML)
+        {
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(XML);
+            BigInteger m = new BigInteger(1, Convert.FromBase64String(xmlDocument.DocumentElement.GetElementsByTagName("Modulus")[0].InnerText));
+            BigInteger p = new BigInteger(1, Convert.FromBase64String(xmlDocument.DocumentElement.GetElementsByTagName("Exponent")[0].InnerText));
+            RsaKeyParameters pub = new RsaKeyParameters(false, m, p);
+
+            SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(pub);
+            byte[] serializedPublicBytes = publicKeyInfo.ToAsn1Object().GetDerEncoded();
+            return Convert.ToBase64String(serializedPublicBytes);
         }
     }
 }
