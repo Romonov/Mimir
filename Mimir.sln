@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.28010.2003
+VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimir", "Mimir\Mimir.csproj", "{ACA3C19F-6C64-4F3E-9B61-4F699D79FEDE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimir", "Mimir\Mimir.csproj", "{B48D115A-EFAC-4175-BE73-A522C809E241}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ACA3C19F-6C64-4F3E-9B61-4F699D79FEDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ACA3C19F-6C64-4F3E-9B61-4F699D79FEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ACA3C19F-6C64-4F3E-9B61-4F699D79FEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ACA3C19F-6C64-4F3E-9B61-4F699D79FEDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B48D115A-EFAC-4175-BE73-A522C809E241}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B48D115A-EFAC-4175-BE73-A522C809E241}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B48D115A-EFAC-4175-BE73-A522C809E241}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B48D115A-EFAC-4175-BE73-A522C809E241}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {73E68D85-2AF5-4719-BD0B-46383C2F1BEF}
+		SolutionGuid = {AAF840E2-EA68-4C6A-8F56-7D0D819DA8E4}
 	EndGlobalSection
 EndGlobal

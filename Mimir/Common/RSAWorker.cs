@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Xml;
 
 namespace Mimir.Common
@@ -23,13 +24,16 @@ namespace Mimir.Common
         {
             try
             {
-                Logger.Info("Generating RSA secret keys, it will take at least 5 seconds...");
+                Logger.Info("Generating RSA secret keys, it will take at least 7 seconds...");
 
                 RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(4096);
 
                 StreamWriter privateKey = new StreamWriter("PrivateKey.xml");
                 privateKey.WriteLine(rsa.ToXmlString(true));
                 privateKey.FlushAsync();
+
+                // 让用户给钱优化
+                Thread.Sleep(1000);
 
                 StreamWriter publicKey = new StreamWriter("PublicKey.xml");
                 publicKey.WriteLine(rsa.ToXmlString(false));

@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{ACA3C19F-6C64-4F3E-9B61-4F699D79FEDE}</ProjectGuid>
+    <ProjectGuid>{B48D115A-EFAC-4175-BE73-A522C809E241}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Mimir</RootNamespace>
     <AssemblyName>Mimir</AssemblyName>
@@ -33,11 +33,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
-      <HintPath>..\packages\BouncyCastle.1.8.3\lib\BouncyCastle.Crypto.dll</HintPath>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.3.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.3.1\lib\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data">
-      <HintPath>..\..\..\Magicpush\mysqlv4.5.2\MySql.Data.dll</HintPath>
+    <Reference Include="Google.Protobuf, Version=3.5.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.5.1\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=8.0.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.8.0.12\lib\net452\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -46,7 +49,15 @@
       <HintPath>..\..\..\RUL\RUL\bin\Debug\RUL.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,30 +66,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\CertWorker.cs" />
     <Compile Include="Common\ConfigWorker.cs" />
-    <Compile Include="Common\Processor.cs" />
+    <Compile Include="Common\Router.cs" />
     <Compile Include="Common\RSAWorker.cs" />
     <Compile Include="Common\SocketWorker.cs" />
+    <Compile Include="Common\SQL\MySqlWorker.cs" />
+    <Compile Include="Common\SQL\SqlProxy.cs" />
     <Compile Include="Common\UuidWorker.cs" />
-    <Compile Include="Response\Api\Profiles\Minecraft.cs" />
-    <Compile Include="Response\SessionServer\Session\Minecraft\HasJoined.cs" />
-    <Compile Include="Response\SessionServer\Session\Minecraft\Join.cs" />
-    <Compile Include="Response\SessionServer\Session\Minecraft\Profile\Root.cs" />
-    <Compile Include="SQL\SqlProxy.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Response\AuthServer\Authenticate.cs" />
-    <Compile Include="Response\AuthServer\Invalidate.cs" />
-    <Compile Include="Response\AuthServer\Refresh.cs" />
-    <Compile Include="Response\AuthServer\Signout.cs" />
-    <Compile Include="Response\AuthServer\Validate.cs" />
     <Compile Include="Response\Root.cs" />
-    <Compile Include="Response\Mimir\Notice.cs" />
-    <Compile Include="Response\Users\Login.cs" />
-    <Compile Include="Response\Users\LogOut.cs" />
-    <Compile Include="Response\Users\Register.cs" />
-    <Compile Include="SQL\MySqlWorker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

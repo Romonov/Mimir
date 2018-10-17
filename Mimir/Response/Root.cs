@@ -4,16 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Mimir.Common.Processor;
 
 namespace Mimir.Response
 {
     class Root
     {
-        public static ReturnContent OnGet()
+        public static Tuple<int, string> OnGet()
         {
-            ReturnContent returnContect = new ReturnContent();
-
             GetRootResponse response = new GetRootResponse();
 
             response.meta.serverName = Program.ServerName;
@@ -21,11 +18,8 @@ namespace Mimir.Response
             response.meta.implementationVersion = Program.Version;
             response.skinDomains = Program.SkinDomains;
             response.signaturePublickey = $"-----BEGIN PUBLIC KEY-----\n{Program.SkinPublicKey}\n-----END PUBLIC KEY-----\n";
-
-            returnContect.Contect = JsonConvert.SerializeObject(response);
-            returnContect.Status = 200;
-
-            return returnContect;
+            
+            return new Tuple<int, string>(200, JsonConvert.SerializeObject(response));
         }
     }
 

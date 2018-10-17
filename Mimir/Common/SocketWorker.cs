@@ -3,9 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Security;
 using System.Net.Sockets;
-using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +14,7 @@ namespace Mimir.Common
         /// <summary>
         /// Socket实例
         /// </summary>
-        public Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private readonly Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
         /// <summary>
         /// 获取Socket实例
@@ -41,7 +39,7 @@ namespace Mimir.Common
                 Logger.Info($"Socket created, bind to localhost:{port}.");
                 socket.Listen(listen);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Error(e.Message);
                 return false;
@@ -69,48 +67,25 @@ namespace Mimir.Common
                 Socket _socket = ar.AsyncState as Socket;
                 Socket new_client = _socket.EndAccept(ar);
                 _socket.BeginAccept(new AsyncCallback(OnAccept), _socket);
-                
-                SslStream sslStream = new SslStream(new NetworkStream(new_client, true), false);
-;
+
                 byte[] recv_buffer = new byte[1024 * 1024 * 10];
                 string messageData = "";
                 int real_recv = 0;
 
-                try
-                {
-                    if (Program.IsSslEnabled)
-                    {
-                        sslStream.AuthenticateAsServer(Program.ServerCertificate, false, SslProtocols.Tls, true);
+                real_recv = new_client.Receive(recv_buffer);
 
-                        sslStream.ReadTimeout = 5000;
-                        sslStream.WriteTimeout = 5000;
+                messageData = "";
+                messageData = Encoding.Default.GetString(recv_buffer, 0, real_recv);
 
-                        real_recv = sslStream.Read(recv_buffer, 0, recv_buffer.Length);
-                    }
-                    else
-                    {
-                        real_recv = new_client.Receive(recv_buffer);
-                    }
-                    messageData = "";
-                    messageData = Encoding.Default.GetString(recv_buffer, 0, real_recv);
-                }
-                catch (Exception e)
+                if (messageData.ToString() != "")
                 {
-                    Logger.Error(e.Message); 
-                }
-                finally
-                {
-                    if (messageData.ToString() != "")
-                    {
-                        Logger.Debug($"Recived request from {new_client.RemoteEndPoint}\n{messageData.ToString()}");
-                        Processor.Process(messageData, new_client, sslStream, Program.IsSslEnabled);
-                    }
+                    Logger.Debug($"Recived request from {new_client.RemoteEndPoint}\n{messageData.ToString()}");
+                    Router.Route(messageData, new_client);
                 }
             }
-
             catch (Exception e)
             {
-                Logger.Error(e.Message); 
+                Logger.Error(e.Message);
             }
         }
     }

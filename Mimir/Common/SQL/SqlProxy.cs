@@ -38,7 +38,7 @@ namespace Mimir.SQL
             return null;
         }
 
-        public static DataSet Querier(string Command)
+        public static DataSet Query(string Command)
         {
             DataSet dataSet = new DataSet();
 
@@ -56,6 +56,12 @@ namespace Mimir.SQL
             }
 
             return dataSet;
+        }
+
+        public static bool Save(DataSet dataSet)
+        {
+
+            return false;
         }
 
         public static int Excuter(string Command)

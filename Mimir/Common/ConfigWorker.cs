@@ -13,16 +13,16 @@ namespace Mimir.Common
                 INI.Write(ConfigPath, "General", "Name", Program.ServerName);
                 INI.Write(ConfigPath, "General", "Port", Program.Port.ToString());
                 INI.Write(ConfigPath, "General", "MaxConnection", Program.MaxConnection.ToString());
-                INI.Write(ConfigPath, "General", "SSL", Program.IsSslEnabled.ToString());
+                //INI.Write(ConfigPath, "General", "SSL", Program.IsSslEnabled.ToString());
 
                 INI.Write(ConfigPath, "SQL", "Type", Program.SQLType.ToString());
                 INI.Write(ConfigPath, "SQL", "IP", Program.SQLIP);
                 INI.Write(ConfigPath, "SQL", "Username", Program.SQLUsername);
                 INI.Write(ConfigPath, "SQL", "Password", Program.SQLPassword);
 
-                INI.Write(ConfigPath, "SSL", "IsCustomSSL", Program.IsCustomCert.ToString());
-                INI.Write(ConfigPath, "SSL", "Cert", Program.SslCertName);
-                INI.Write(ConfigPath, "SSL", "Password", Program.SslCertPassword);
+                //INI.Write(ConfigPath, "SSL", "IsCustomSSL", Program.IsCustomCert.ToString());
+                //INI.Write(ConfigPath, "SSL", "Cert", Program.SslCertName);
+                //INI.Write(ConfigPath, "SSL", "Password", Program.SslCertPassword);
 
                 INI.Write(ConfigPath, "SkinDomains", "Count", "1");
                 INI.Write(ConfigPath, "SkinDomains", "1", ".romonov.com");
@@ -47,16 +47,16 @@ namespace Mimir.Common
                 INI.Write(ConfigPath, "General", "Name", Program.ServerName);
                 INI.Write(ConfigPath, "General", "Port", Program.Port.ToString());
                 INI.Write(ConfigPath, "General", "MaxConnection", Program.MaxConnection.ToString());
-                INI.Write(ConfigPath, "General", "SSL", Program.IsSslEnabled.ToString());
+                //INI.Write(ConfigPath, "General", "SSL", Program.IsSslEnabled.ToString());
 
                 INI.Write(ConfigPath, "SQL", "Type", Program.SQLType.ToString());
                 INI.Write(ConfigPath, "SQL", "IP", Program.SQLIP);
                 INI.Write(ConfigPath, "SQL", "Username", Program.SQLUsername);
                 INI.Write(ConfigPath, "SQL", "Password", Program.SQLPassword);
 
-                INI.Write(ConfigPath, "SSL", "IsCustomSSL", Program.IsCustomCert.ToString());
-                INI.Write(ConfigPath, "SSL", "Cert", Program.SslCertName);
-                INI.Write(ConfigPath, "SSL", "Password", Program.SslCertPassword);
+                //INI.Write(ConfigPath, "SSL", "IsCustomSSL", Program.IsCustomCert.ToString());
+                //INI.Write(ConfigPath, "SSL", "Cert", Program.SslCertName);
+                //INI.Write(ConfigPath, "SSL", "Password", Program.SslCertPassword);
 
                 INI.Write(ConfigPath, "SkinDomains", "Count", Program.SkinDomainsCount.ToString());
 
@@ -85,16 +85,16 @@ namespace Mimir.Common
                 Program.ServerName = INI.Read(ConfigPath, "General", "Name");
                 Program.Port = int.Parse(INI.Read(ConfigPath, "General", "Port"));
                 Program.MaxConnection = int.Parse(INI.Read(ConfigPath, "General", "MaxConnection"));
-                Program.IsSslEnabled = BoolParse(INI.Read(ConfigPath, "General", "SSL"));
+                //Program.IsSslEnabled = BoolParse(INI.Read(ConfigPath, "General", "SSL"));
 
                 Program.SQLType = GetSQLType(ConfigPath);
                 Program.SQLIP = INI.Read(ConfigPath, "SQL", "IP");
                 Program.SQLUsername = INI.Read(ConfigPath, "SQL", "Username");
                 Program.SQLPassword = INI.Read(ConfigPath, "SQL", "Password");
 
-                Program.IsCustomCert = BoolParse(INI.Read(ConfigPath, "SSL", "IsCustomSSL"));
-                Program.SslCertName = INI.Read(ConfigPath, "SSL", "Cert");
-                Program.SslCertPassword = INI.Read(ConfigPath, "SSL", "Password");
+                //Program.IsCustomCert = BoolParse(INI.Read(ConfigPath, "SSL", "IsCustomSSL"));
+                //Program.SslCertName = INI.Read(ConfigPath, "SSL", "Cert");
+                //Program.SslCertPassword = INI.Read(ConfigPath, "SSL", "Password");
 
                 Program.SkinDomainsCount = int.Parse(INI.Read(ConfigPath, "SkinDomains", "Count"));
                 List<string> list = new List<string>();

@@ -2,9 +2,12 @@
 using Mimir.SQL;
 using RUL;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mimir
 {
@@ -12,7 +15,7 @@ namespace Mimir
     {
         #region 定义变量
         public const string Name = "Mimir";
-        public const string Version = "0.5.3";
+        public const string Version = "0.6.0";
 
         public static string Path = Directory.GetCurrentDirectory();
 
@@ -20,10 +23,7 @@ namespace Mimir
         public static string SQLUsername = "root";
         public static string SQLPassword = "123456";
         public const string SQLDatabase = "mimir";
-
-        public static string SslCertName = "ssl.pfx";
-        public static string SslCertPassword = "123";
-
+        
         public static string SkinPublicKey = "";
 
         public static string ServerName = "Mimir Server";
@@ -35,13 +35,9 @@ namespace Mimir
         public static int SkinDomainsCount = 1;
 
         public static bool IsRunning = false;
-        public static bool IsSslEnabled = false;
-        public static bool IsCustomCert = true;
 
-        SocketWorker SocketWorker = new SocketWorker();
-
-        public static X509Certificate2 ServerCertificate = new X509Certificate2();
-
+        static SocketWorker SocketListener = new SocketWorker();
+        
         public static ConfigWorker.SQLType SQLType = ConfigWorker.SQLType.MySql;
         #endregion
 
@@ -50,14 +46,51 @@ namespace Mimir
             Logger.Info($"Mimir version: {Version}, made by: Romonov! ");
             Logger.Info("Starting...");
 
-            if (!new Program().Init())
+            // 初始化
+            try
             {
-                Logger.Info("Init Failed.");
-                Console.Read();
-                return;
+                // 加载配置文件
+                Logger.Info("Loading configs...");
+                string ConfigPath = Directory.GetCurrentDirectory() + @"\config.ini";
+
+                if (!File.Exists(ConfigPath))
+                {
+                    ConfigWorker.Init(ConfigPath);
+                }
+                else
+                {
+                    ConfigWorker.Read(ConfigPath);
+                }
+
+                Logger.Info("Configs loaded!");
+
+                // 加载签名秘钥
+                if (!File.Exists(Directory.GetCurrentDirectory() + @"\PrivateKey.xml"))
+                {
+                    Logger.Warn("Private key file is missing, and it will be generated now.");
+                    RSAWorker.GenKey();
+                }
+
+                RSAWorker.LoadKey();
+
+                Thread.Sleep(500);
+                SkinPublicKey = RSAWorker.RSAPublicKeyConverter(File.ReadAllText(Directory.GetCurrentDirectory() + @"\PublicKey.xml"));
+
+                // 打开SQL和Socket链接
+                SqlProxy.Open();
+
+                SocketListener.Init(Port, MaxConnection);
+                SocketListener.Start();
+
+                IsRunning = true;
+
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
             }
 
-            Logger.Info("Welcome!");
+            Logger.Info("Welcome!!");
 
             // 主循环 
             while (true)
@@ -76,81 +109,6 @@ namespace Mimir
                         continue;
                 }
             }
-        }
-
-        // 初始化
-        bool Init()
-        {
-            // 加载配置文件
-            Logger.Info("Loading configs...");
-            string ConfigPath = Directory.GetCurrentDirectory() + @"\config.ini";
-
-            if (!File.Exists(ConfigPath))
-            {
-                ConfigWorker.Init(ConfigPath);
-            }
-            else
-            {
-                ConfigWorker.Read(ConfigPath);
-            }
-  
-            Logger.Info("Configs loaded!");
-
-            // 加载签名秘钥
-            if (!File.Exists(Directory.GetCurrentDirectory() + @"\PrivateKey.xml"))
-            {
-                Logger.Warn("Private key file is missing, and it will be generated now.");
-                if (!RSAWorker.GenKey())
-                {
-                    return false;
-                }
-            }
-
-            if (!RSAWorker.LoadKey())
-            {
-                return false;
-            }
-
-            SkinPublicKey = RSAWorker.RSAPublicKeyConverter(File.ReadAllText(Directory.GetCurrentDirectory() + @"\PublicKey.xml"));
-
-            // 加载SSL证书
-            try
-            {
-                if (IsSslEnabled)
-                {
-                    CertWorker.Load();
-                }
-            }
-            catch(Exception e)
-            {
-                Logger.Error(e.Message);
-            }
-
-            /*
-            X509Store store = new X509Store(StoreName.Root);
-            store.Open(OpenFlags.ReadWrite);
-            X509Certificate2Collection certs = store.Certificates.Find(X509FindType.FindBySubjectName, "Mimir", false);
-            ServerCertificate = certs[0];
-            store.Close();
-            */
-
-            // 打开SQL和Socket链接
-            try
-            {
-                SqlProxy.Open();
-
-                SocketWorker.Init(Port, MaxConnection);
-                SocketWorker.Start();
-            }
-            catch(Exception e)
-            {
-                Logger.Error(e.Message);
-                return false;
-            }            
-
-            IsRunning = true;
-
-            return true;
         }
     }
 }
