@@ -1,4 +1,6 @@
 ﻿using Mimir.Response;
+using Mimir.Response.AuthServer;
+using Mimir.Response.Users;
 using RUL;
 using RUL.HTTP;
 using System;
@@ -51,7 +53,7 @@ namespace Mimir.Common
                 {
                     switch (msg.Url)
                     {
-                        /*
+                        
                         #region Users
                         case "/users/register":
                             Response = Register.OnPost(msg.PostData);
@@ -82,16 +84,14 @@ namespace Mimir.Common
                             break;
                         #endregion
                         default:
-                            /*
-                            GET /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
 
-                            if (Guid.TryParse(msg.Url.Split('/')[5], out Guid guid))
+                            //GET /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
+                            //if (Guid.TryParse(msg.Url.Split('/')[5], out Guid guid))
                             {
 
                             }
                             Response = new Tuple<int, string>(403, "");
                             break;
-                            */
                     }
                 }
                 else

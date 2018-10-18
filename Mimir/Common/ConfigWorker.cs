@@ -62,7 +62,7 @@ namespace Mimir.Common
 
                 for (int i = 1; i <= Program.SkinDomains.Length + 1; i++)
                 {
-                    INI.Write(ConfigPath, "SkinDomains", i.ToString(), Program.SkinDomains[i]);
+                    INI.Write(ConfigPath, "SkinDomains", i.ToString(), Program.SkinDomains[i - 1]);
                 }
             }
             catch(Exception e)

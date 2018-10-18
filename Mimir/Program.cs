@@ -15,7 +15,7 @@ namespace Mimir
     {
         #region 定义变量
         public const string Name = "Mimir";
-        public const string Version = "0.6.0";
+        public const string Version = "0.6.1";
 
         public static string Path = Directory.GetCurrentDirectory();
 
@@ -46,7 +46,38 @@ namespace Mimir
             Logger.Info($"Mimir version: {Version}, made by: Romonov! ");
             Logger.Info("Starting...");
 
-            // 初始化
+            if (!Init())
+            {
+                Logger.Error("Init failed!");
+                Console.Read();
+                Environment.Exit(1);
+            }
+
+            Logger.Info("Welcome!!");
+
+            // 主循环 
+            while (true)
+            {
+                string input = Console.ReadLine();
+                Logger.WriteToFile(input);
+                switch (input)
+                {
+                    case "stop":
+                        SqlProxy.Close();
+                        ConfigWorker.Save(Directory.GetCurrentDirectory() + @"\config.ini");
+                        Console.Read();
+                        Environment.Exit(0);
+                        break;
+                    default:
+                        Logger.Error("No such command.");
+                        continue;
+                }
+            }
+        }
+
+        // 初始化
+        static bool Init()
+        {
             try
             {
                 // 加载配置文件
@@ -73,8 +104,7 @@ namespace Mimir
 
                 RSAWorker.LoadKey();
 
-                Thread.Sleep(500);
-                SkinPublicKey = RSAWorker.RSAPublicKeyConverter(File.ReadAllText(Directory.GetCurrentDirectory() + @"\PublicKey.xml"));
+                SkinPublicKey = RSAWorker.RSAPublicKeyConverter(RSAWorker.PublicKey.ToXmlString(false));
 
                 // 打开SQL和Socket链接
                 SqlProxy.Open();
@@ -88,27 +118,10 @@ namespace Mimir
             catch (Exception e)
             {
                 Logger.Error(e);
+                return false;
             }
 
-            Logger.Info("Welcome!!");
-
-            // 主循环 
-            while (true)
-            {
-                string input = Console.ReadLine();
-                Logger.WriteToFile(input);
-                switch (input)
-                {
-                    case "stop":
-                        SqlProxy.Close();
-                        ConfigWorker.Save(Directory.GetCurrentDirectory() + @"\config.ini");
-                        Environment.Exit(0);
-                        break;
-                    default:
-                        Logger.Error("No such command.");
-                        continue;
-                }
-            }
+            return true;
         }
     }
 }

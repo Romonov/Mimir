@@ -75,7 +75,19 @@
     <Compile Include="Common\UuidWorker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Response\AuthServer\Authenticate.cs" />
+    <Compile Include="Response\AuthServer\Invalidate.cs" />
+    <Compile Include="Response\AuthServer\Refresh.cs" />
+    <Compile Include="Response\AuthServer\Signout.cs" />
+    <Compile Include="Response\AuthServer\Validate.cs" />
+    <Compile Include="Response\Exceptions\InvalidPassword.cs" />
     <Compile Include="Response\Root.cs" />
+    <Compile Include="Response\SessionServer\Session\Minecraft\HasJoined.cs" />
+    <Compile Include="Response\SessionServer\Session\Minecraft\Join.cs" />
+    <Compile Include="Response\SessionServer\Session\Minecraft\Profile\Root.cs" />
+    <Compile Include="Response\Users\Login.cs" />
+    <Compile Include="Response\Users\LogOut.cs" />
+    <Compile Include="Response\Users\Register.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
