@@ -21,7 +21,7 @@ namespace Mimir.Common
         /// <param name="Socket">Socket实例</param>
         public static void Route(string HttpReq, Socket Socket)
         {
-            HttpMsg msg = HttpProtocol.Solve(HttpReq);
+            HttpReq msg = HttpProtocol.Solve(HttpReq);
 
             byte[] bcontect;
             string responseHeader = "";

@@ -13,7 +13,7 @@ namespace Mimir.Response.Users
         public static Tuple<int, string> OnPost(string PostData)
         {
             // Post /users/register
-            JsonConvert.DeserializeObject<HttpMsg>(PostData);
+            JsonConvert.DeserializeObject<HttpReq>(PostData);
 
             return new Tuple<int, string>(204, "");
         }

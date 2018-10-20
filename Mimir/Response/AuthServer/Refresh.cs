@@ -1,6 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Mimir.Response.Exceptions;
+using Mimir.SQL;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,9 +14,82 @@ namespace Mimir.Response.AuthServer
     {
         public static Tuple<int, string> OnPost(string PostData)
         {
-            JsonConvert.DeserializeObject<Request>(PostData);
+            // Post /authserver/refresh
+            Response response = new Response();
 
-            return new Tuple<int, string>(204, "");
+            Request request = JsonConvert.DeserializeObject<Request>(PostData);
+
+            // Tokens
+            DataSet dataSetToken = SqlProxy.Query("SELECT * FROM `tokens`");
+
+            DataSet dataSetUser = SqlProxy.Query("SELECT * FROM `users`");
+
+            DataRow dataRowToken = null;
+            DataRow dataRowUser = null;
+
+            foreach (DataRow dataRow in dataSetToken.Tables[0].Rows)
+            {
+                if (dataRow["AccessToken"].ToString() == request.accessToken)
+                {
+                    if (request.clientToken != null)
+                    {
+                        if (dataRow["ClientToken"].ToString() == request.clientToken)
+                        {
+                            return InvalidToken.GetResponse();
+                        }
+                    }
+
+                    dataRowToken = dataRow;
+                }
+                else
+                {
+                    return InvalidToken.GetResponse();
+                }
+            }
+
+            foreach (DataRow dataRow in dataSetUser.Tables[0].Rows)
+            {
+                if (dataRow["Username"] == dataRowToken["BideUser"])
+                {
+                    dataRowUser = dataRow;
+                }
+            }
+
+            // Profiles
+            if (request.selectedProfile.HasValue)
+            {
+                response.selectedProfile = request.selectedProfile;
+            }
+            else
+            {
+                DataSet dataSetProfiles = SqlProxy.Query("SELECT * FROM `profiles`;");
+
+                foreach (DataRow dataRow in dataSetProfiles.Tables[0].Rows)
+                {
+                    if (dataRow["UserID"].ToString() == dataRowUser["Username"].ToString() && dataRow["IsSelected"].ToString() == "True")
+                    {
+                        SelectedProfile playerProfile = new SelectedProfile();
+                        playerProfile.id = dataRow["UnsignedUUID"].ToString();
+                        playerProfile.name = dataRow["Name"].ToString();
+                        response.selectedProfile = playerProfile;
+                    }
+                }
+            }
+
+            // Users
+
+            if (request.requestUser)
+            {
+                User user = new User();
+                user.id = dataRowUser["Username"].ToString();
+                Properties properties = new Properties();
+                properties.name = "preferredLanguage";
+                properties.value = dataRowUser["PreferredLanguage"].ToString();
+                user.properties = new Properties[] { properties };
+                response.user = user;
+            }
+
+            return new Tuple<int, string>(200, JsonConvert.SerializeObject(response));
         }
 
         struct Request
@@ -21,26 +97,35 @@ namespace Mimir.Response.AuthServer
             public string accessToken;
             public string clientToken;
             public bool requestUser;
-            public SelectedProfile selectedProfile;
-        }
-        
-        struct SelectedProfile
-        {
-
+            public SelectedProfile? selectedProfile;
         }
 
         struct Response
         {
             public string accessToken;
             public string clientToken;
-            public SelectedProfile selectedProfile;
+            public SelectedProfile? selectedProfile;
             public User? user;
+        }
+
+        struct SelectedProfile
+        {
+            public string id;
+            public string name;
+            public Properties[] properties;
         }
 
         struct User
         {
+            public string id;
+            public Properties[] properties;
+        }
 
+        struct Properties
+        {
+            public string name;
+            public string value;
+            public string signature;
         }
     }
-
 }
