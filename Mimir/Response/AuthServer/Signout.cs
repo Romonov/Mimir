@@ -1,5 +1,5 @@
 ﻿using Mimir.Response.Exceptions;
-using Mimir.SQL;
+using Mimir.Common.SQL;
 using Newtonsoft.Json;
 using RUL.Encrypt;
 using System;

@@ -1,5 +1,7 @@
-﻿using Mimir.Common.SQL;
+﻿using Mimir.Common;
+using Mimir.Common.SQL;
 using Mimir.Response.Exceptions;
+using RUL.Encrypt;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -28,9 +30,11 @@ namespace Mimir.Response.Users
                 return EmailAlreadyUsed.GetResponse();
             }
 
-            SqlProxy.Excuter("insert into `users` ");
+            string UUID = UuidWorker.GenUuid();
 
-            return new Tuple<int, string>(200, "UUID");
+            SqlProxy.Excuter($"insert into `users` (`UUID`, `Username`, `Password`, `Email`, `Nickname`, `PreferrefLanguage`, `LastLogin`, `CreateTime`, `IsLogged`) values ('{UUID}', '{request.Username}', '{HashWorker.MD5(request.Password)}', '{request.Email}', '{request.Nickname}', '{request.PreferredLanguage}', '{TimeWorker.GetTimeStamp()}', '{TimeWorker.GetTimeStamp()}', '1')");
+
+            return new Tuple<int, string>(200, UUID);
         }
 
         struct Request

@@ -72,6 +72,7 @@
     <Compile Include="Common\SocketWorker.cs" />
     <Compile Include="Common\SQL\MySqlWorker.cs" />
     <Compile Include="Common\SQL\SqlProxy.cs" />
+    <Compile Include="Common\TimeWorker.cs" />
     <Compile Include="Common\UuidWorker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

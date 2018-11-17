@@ -1,5 +1,5 @@
 ﻿using Mimir.Common;
-using Mimir.SQL;
+using Mimir.Common.SQL;
 using RUL;
 using System;
 using System.Collections.Generic;
