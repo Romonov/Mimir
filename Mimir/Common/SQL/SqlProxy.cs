@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Mimir.SQL
+namespace Mimir.Common.SQL
 {
     class SqlProxy
     {
@@ -86,6 +86,15 @@ namespace Mimir.SQL
             }
 
             return rows;
+        }
+
+        public static bool IsEmpty(DataSet ds)
+        {
+            if((ds == null) || (ds.Tables.Count == 0) || (ds.Tables.Count == 1 && ds.Tables[0].Rows.Count == 0))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

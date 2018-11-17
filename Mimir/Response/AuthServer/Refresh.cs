@@ -33,7 +33,7 @@ namespace Mimir.Response.AuthServer
                 {
                     if (request.clientToken != null)
                     {
-                        if (dataRow["ClientToken"].ToString() == request.clientToken)
+                        if (dataRow["ClientToken"].ToString() != request.clientToken)
                         {
                             return InvalidToken.GetResponse();
                         }
@@ -49,32 +49,38 @@ namespace Mimir.Response.AuthServer
 
             foreach (DataRow dataRow in dataSetUser.Tables[0].Rows)
             {
-                if (dataRow["Username"] == dataRowToken["BideUser"])
+                if (dataRow["Username"].ToString() == dataRowToken["BindUser"].ToString())
                 {
                     dataRowUser = dataRow;
                 }
             }
 
+            response.accessToken = dataRowToken["AccessToken"].ToString();
+            response.clientToken = dataRowToken["ClientToken"].ToString();
+
             // Profiles
+
             if (request.selectedProfile.HasValue)
             {
                 response.selectedProfile = request.selectedProfile;
             }
             else
             {
+                SelectedProfile playerProfile = new SelectedProfile();
                 DataSet dataSetProfiles = SqlProxy.Query("SELECT * FROM `profiles`;");
 
                 foreach (DataRow dataRow in dataSetProfiles.Tables[0].Rows)
                 {
                     if (dataRow["UserID"].ToString() == dataRowUser["Username"].ToString() && dataRow["IsSelected"].ToString() == "True")
                     {
-                        SelectedProfile playerProfile = new SelectedProfile();
                         playerProfile.id = dataRow["UnsignedUUID"].ToString();
                         playerProfile.name = dataRow["Name"].ToString();
-                        response.selectedProfile = playerProfile;
                     }
                 }
+
+                response.selectedProfile = playerProfile;
             }
+
 
             // Users
 

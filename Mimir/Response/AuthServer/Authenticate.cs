@@ -1,6 +1,6 @@
 ﻿using Mimir.Common;
 using Mimir.Response.Exceptions;
-using Mimir.SQL;
+using Mimir.Common.SQL;
 using Newtonsoft.Json;
 using RUL;
 using RUL.Encrypt;
@@ -31,6 +31,11 @@ namespace Mimir.Response.AuthServer
                 if (dataRow["Email"].ToString() == request.username && dataRow["Password"].ToString() == HashWorker.MD5(request.password))
                 {
                     userRow = dataRow;
+
+                    if (userRow["IsLogged"].ToString() == "True")
+                    {
+
+                    }
                 }
                 else
                 {
@@ -73,13 +78,16 @@ namespace Mimir.Response.AuthServer
                 response.clientToken = request.clientToken;
             }
 
-            if (response.selectedProfile.HasValue)
+            //if ()
             {
-                SqlProxy.Excuter($"INSERT INTO `tokens` (`AccessToken`, `ClientToken`, `BindProfile`, `CreateTime`, `Status`, `BindUser`) VALUES('{response.accessToken}', '{response.clientToken}', '{response.selectedProfile.Value.name}', '{Time.GetUnixTimeStamp()}', 2, '{userRow["Username"].ToString()}');");
-            }
-            else
-            {
-                SqlProxy.Excuter($"INSERT INTO `tokens` (`AccessToken`, `ClientToken`, `CreateTime`, `Status`, `BindUser`) VALUES ('{response.accessToken}', '{response.clientToken}', '{Time.GetUnixTimeStamp()}', 2, '{userRow["Username"].ToString()}');");
+                if (response.selectedProfile.HasValue)
+                {
+                    SqlProxy.Excuter($"INSERT INTO `tokens` (`AccessToken`, `ClientToken`, `BindProfile`, `CreateTime`, `Status`, `BindUser`) VALUES('{response.accessToken}', '{response.clientToken}', '{response.selectedProfile.Value.name}', '{Time.GetUnixTimeStamp()}', 2, '{userRow["Username"].ToString()}');");
+                }
+                else
+                {
+                    SqlProxy.Excuter($"INSERT INTO `tokens` (`AccessToken`, `ClientToken`, `CreateTime`, `Status`, `BindUser`) VALUES ('{response.accessToken}', '{response.clientToken}', '{Time.GetUnixTimeStamp()}', 2, '{userRow["Username"].ToString()}');");
+                }
             }
 
 

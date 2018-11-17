@@ -101,7 +101,7 @@ namespace Mimir.Common
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
+                Logger.Error(e);
             }
 
             // 发送返回

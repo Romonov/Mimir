@@ -80,8 +80,10 @@
     <Compile Include="Response\AuthServer\Refresh.cs" />
     <Compile Include="Response\AuthServer\Signout.cs" />
     <Compile Include="Response\AuthServer\Validate.cs" />
+    <Compile Include="Response\Exceptions\EmailAlreadyUsed.cs" />
     <Compile Include="Response\Exceptions\InvalidPassword.cs" />
     <Compile Include="Response\Exceptions\InvalidToken.cs" />
+    <Compile Include="Response\Exceptions\UsernameAlreadyUsed.cs" />
     <Compile Include="Response\Root.cs" />
     <Compile Include="Response\SessionServer\Session\Minecraft\HasJoined.cs" />
     <Compile Include="Response\SessionServer\Session\Minecraft\Join.cs" />
@@ -94,6 +96,8 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Response\Profiles\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
