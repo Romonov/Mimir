@@ -1,6 +1,7 @@
 ﻿using Mimir.Common;
 using Mimir.Common.SQL;
 using Mimir.Response.Exceptions;
+using RUL.Net;
 using RUL.Encrypt;
 using Newtonsoft.Json;
 using System;
@@ -20,19 +21,24 @@ namespace Mimir.Response.Users
             Request request = JsonConvert.DeserializeObject<Request>(PostData);
 
             // 检查用户名或邮箱重复
+            if (!SqlSecurity.Check(PostData))
+            {
+                return UnsafeSqlChar.GetResponse();
+            }
+
             if (!SqlProxy.IsEmpty(SqlProxy.Query($"select * from `users` where `Username` = '{request.Username}'")))
             {
-                return UsernameAlreadyUsed.GetResponse();
+                return new Tuple<int, string>(200, "ExceptionUsernameAlreadyUsed!");
             }
 
             if (!SqlProxy.IsEmpty(SqlProxy.Query($"select * from `users` where `Email` = '{request.Email}'")))
             {
-                return EmailAlreadyUsed.GetResponse();
+                return new Tuple<int, string>(200, "ExceptionEmailAlreadyUsed!");
             }
 
             string UUID = UuidWorker.GenUuid();
 
-            SqlProxy.Excuter($"insert into `users` (`UUID`, `Username`, `Password`, `Email`, `Nickname`, `PreferrefLanguage`, `LastLogin`, `CreateTime`, `IsLogged`) values ('{UUID}', '{request.Username}', '{HashWorker.MD5(request.Password)}', '{request.Email}', '{request.Nickname}', '{request.PreferredLanguage}', '{TimeWorker.GetTimeStamp()}', '{TimeWorker.GetTimeStamp()}', '1')");
+            SqlProxy.Excuter($"insert into `users` (`UUID`, `Username`, `Password`, `Email`, `Nickname`, `PreferredLanguage`, `LastLogin`, `CreateTime`, `IsLogged`, `IsAdmin`) values ('{UUID}', '{request.Username}', '{HashWorker.MD5(request.Password)}', '{request.Email}', '{request.Nickname}', '{request.PreferredLanguage}', '{TimeWorker.GetTimeStamp()}', '{TimeWorker.GetTimeStamp()}', '1', '{request.IsAdmin}');");
 
             return new Tuple<int, string>(200, UUID);
         }

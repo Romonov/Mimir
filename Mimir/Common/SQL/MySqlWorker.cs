@@ -36,7 +36,7 @@ namespace Mimir.Common.SQL
             }
             catch (Exception e)
             {
-                Logger.Error(e);
+                throw;
             }
         }
 

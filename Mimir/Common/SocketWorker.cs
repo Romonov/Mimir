@@ -17,15 +17,6 @@ namespace Mimir.Common
         private readonly Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
         /// <summary>
-        /// 获取Socket实例
-        /// </summary>
-        /// <returns>Socket实例</returns>
-        public Socket GetSocket()
-        {
-            return socket;
-        }
-
-        /// <summary>
         /// 初始化Socket
         /// </summary>
         /// <param name="port">端监听口</param>
@@ -80,7 +71,7 @@ namespace Mimir.Common
                 if (messageData.ToString() != "")
                 {
                     Logger.Debug($"Recived request from {new_client.RemoteEndPoint}\n{messageData.ToString()}");
-                    Router.Route(messageData, new_client);
+                    Router.Route(messageData, new_client, (IPEndPoint)new_client.RemoteEndPoint);
                 }
             }
             catch (Exception e)

@@ -2,10 +2,12 @@
 using Mimir.Response.AuthServer;
 using Mimir.Response.Users;
 using RUL;
-using RUL.HTTP;
+using RUL.Net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +21,8 @@ namespace Mimir.Common
         /// </summary>
         /// <param name="HttpReq">请求字符串</param>
         /// <param name="Socket">Socket实例</param>
-        public static void Route(string HttpReq, Socket Socket)
+        /// <param name="EndPoint">远程终结点</param>
+        public static void Route(string HttpReq, Socket Socket, IPEndPoint IPEndPoint)
         {
             HttpReq msg = HttpProtocol.Solve(HttpReq);
 
@@ -34,26 +37,23 @@ namespace Mimir.Common
             {
                 if (msg.Method == Method.Get)
                 {
-                    switch (msg.Url)
+                    switch (msg.Url.ToLower())
                     {
                         case "/":
                             Response = Root.OnGet();
                             break;
-                            /*
-                        case "/mimir/notice":
-                            Response = Notice.OnGet();
-                            break;
-                            */
                         default:
-                            Response = new Tuple<int, string>(403, "");
+                            if(!File.Exists(Program.Path + msg.Url.ToLower()))
+                            {
+
+                            }
                             break;
                     }
                 }
                 else if (msg.Method == Method.Post)
                 {
-                    switch (msg.Url)
+                    switch (msg.Url.ToLower())
                     {
-                        
                         #region Users
                         case "/users/register":
                             Response = Register.OnPost(msg.PostData);
@@ -86,7 +86,7 @@ namespace Mimir.Common
                         default:
 
                             //GET /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
-                            //if (Guid.TryParse(msg.Url.Split('/')[5], out Guid guid))
+                            //if (Guid.TryParse(msg.Url.Split('/')[6], out Guid guid))
                             {
 
                             }

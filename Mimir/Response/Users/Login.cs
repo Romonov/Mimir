@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using RUL.HTTP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +12,17 @@ namespace Mimir.Response.Users
         public static Tuple<int, string> OnPost(string PostData)
         {
             // Post /users/login
-            JsonConvert.DeserializeObject<HttpReq>(PostData);
+            Request request = JsonConvert.DeserializeObject<Request>(PostData);
 
-            return new Tuple<int, string>(204, "");
+
+
+            return new Tuple<int, string>(200, "true");
+        }
+
+        struct Request
+        {
+            public string Username;
+            public string Password;
         }
     }
 }

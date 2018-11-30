@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,8 @@ namespace Mimir
 
         public static string ServerName = "Mimir Server";
 
+        public static IPAddress FrontEndAddress = IPAddress.Loopback;
+
         public static string[] SkinDomains;
 
         public static int Port = 45672;
@@ -35,6 +38,7 @@ namespace Mimir
         public static int SkinDomainsCount = 1;
 
         public static bool IsRunning = false;
+        public static bool IsDebug = false;
 
         static SocketWorker SocketListener = new SocketWorker();
         
@@ -48,7 +52,7 @@ namespace Mimir
 
             if (!Init())
             {
-                Logger.Error("Init failed!");
+                Logger.Error("Init failed!\a");
                 Console.Read();
                 Environment.Exit(1);
             }
@@ -117,7 +121,7 @@ namespace Mimir
             }
             catch (Exception e)
             {
-                Logger.Error(e);
+                Logger.Error(e.Message);
                 return false;
             }
 

@@ -72,6 +72,7 @@
     <Compile Include="Common\SocketWorker.cs" />
     <Compile Include="Common\SQL\MySqlWorker.cs" />
     <Compile Include="Common\SQL\SqlProxy.cs" />
+    <Compile Include="Common\SQL\SqlSecurity.cs" />
     <Compile Include="Common\TimeWorker.cs" />
     <Compile Include="Common\UuidWorker.cs" />
     <Compile Include="Program.cs" />
@@ -81,10 +82,9 @@
     <Compile Include="Response\AuthServer\Refresh.cs" />
     <Compile Include="Response\AuthServer\Signout.cs" />
     <Compile Include="Response\AuthServer\Validate.cs" />
-    <Compile Include="Response\Exceptions\EmailAlreadyUsed.cs" />
     <Compile Include="Response\Exceptions\InvalidPassword.cs" />
     <Compile Include="Response\Exceptions\InvalidToken.cs" />
-    <Compile Include="Response\Exceptions\UsernameAlreadyUsed.cs" />
+    <Compile Include="Response\Exceptions\UnsafeSqlChar.cs" />
     <Compile Include="Response\Root.cs" />
     <Compile Include="Response\SessionServer\Session\Minecraft\HasJoined.cs" />
     <Compile Include="Response\SessionServer\Session\Minecraft\Join.cs" />
@@ -98,7 +98,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Html\css\" />
+    <Folder Include="Html\img\" />
+    <Folder Include="Html\js\" />
     <Folder Include="Response\Profiles\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Html\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
