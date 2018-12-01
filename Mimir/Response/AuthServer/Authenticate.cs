@@ -12,7 +12,7 @@ namespace Mimir.Response.AuthServer
 {
     public class Authenticate
     {
-        public static Tuple<int, string> OnPost(string PostData)
+        public static Tuple<int, string, string> OnPost(string PostData)
         {
             // Post /authserver/authenticate
             Response response = new Response();
@@ -103,7 +103,7 @@ namespace Mimir.Response.AuthServer
                 response.user = user;
             }
 
-            return new Tuple<int, string>(200, JsonConvert.SerializeObject(response));
+            return new Tuple<int, string, string>(200, "text/plain", JsonConvert.SerializeObject(response));
         }
 
         struct Request

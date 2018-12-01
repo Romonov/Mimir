@@ -15,7 +15,7 @@ namespace Mimir.Response.Users
 {
     class Register
     {
-        public static Tuple<int, string> OnPost(string PostData)
+        public static Tuple<int, string, string> OnPost(string PostData)
         {
             // Post /users/register
             Request request = JsonConvert.DeserializeObject<Request>(PostData);
@@ -28,19 +28,19 @@ namespace Mimir.Response.Users
 
             if (!SqlProxy.IsEmpty(SqlProxy.Query($"select * from `users` where `Username` = '{request.Username}'")))
             {
-                return new Tuple<int, string>(200, "ExceptionUsernameAlreadyUsed!");
+                return new Tuple<int, string, string>(200, "text/plain", "ExceptionUsernameAlreadyUsed!");
             }
 
             if (!SqlProxy.IsEmpty(SqlProxy.Query($"select * from `users` where `Email` = '{request.Email}'")))
             {
-                return new Tuple<int, string>(200, "ExceptionEmailAlreadyUsed!");
+                return new Tuple<int, string, string>(200, "text/plain", "ExceptionEmailAlreadyUsed!");
             }
 
             string UUID = UuidWorker.GenUuid();
 
             SqlProxy.Excuter($"insert into `users` (`UUID`, `Username`, `Password`, `Email`, `Nickname`, `PreferredLanguage`, `LastLogin`, `CreateTime`, `IsLogged`, `IsAdmin`) values ('{UUID}', '{request.Username}', '{HashWorker.MD5(request.Password)}', '{request.Email}', '{request.Nickname}', '{request.PreferredLanguage}', '{TimeWorker.GetTimeStamp()}', '{TimeWorker.GetTimeStamp()}', '1', '{request.IsAdmin}');");
 
-            return new Tuple<int, string>(200, UUID);
+            return new Tuple<int, string, string>(200, "text/plain", UUID);
         }
 
         struct Request

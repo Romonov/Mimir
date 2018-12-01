@@ -4,9 +4,9 @@ namespace Mimir.Response.Exceptions
 {
     class UnsafeSqlChar
     {
-        public static Tuple<int, string> GetResponse()
+        public static Tuple<int, string, string> GetResponse()
         {
-            return new Tuple<int, string>(403, "Bad SQL Command!");
+            return new Tuple<int, string, string>(403, "text/plain", "Bad SQL Command!");
         }
     }
 }

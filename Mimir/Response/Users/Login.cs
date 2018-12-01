@@ -9,14 +9,14 @@ namespace Mimir.Response.Users
 {
     class Login
     {
-        public static Tuple<int, string> OnPost(string PostData)
+        public static Tuple<int, string, string> OnPost(string PostData)
         {
             // Post /users/login
             Request request = JsonConvert.DeserializeObject<Request>(PostData);
 
 
 
-            return new Tuple<int, string>(200, "true");
+            return new Tuple<int, string, string>(200, "text/plain", "true");
         }
 
         struct Request

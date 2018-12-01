@@ -8,7 +8,7 @@ namespace Mimir.Response.AuthServer
 {
     public class Validate
     {
-        public static Tuple<int, string> OnPost(string PostData)
+        public static Tuple<int, string, string> OnPost(string PostData)
         {
             Request request = JsonConvert.DeserializeObject<Request>(PostData);
 
@@ -40,7 +40,7 @@ namespace Mimir.Response.AuthServer
                 }
             }
 
-            return new Tuple<int, string>(204, "");
+            return new Tuple<int, string, string>(204, "text/plain", "");
         }
 
         struct Request

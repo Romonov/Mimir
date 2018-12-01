@@ -11,12 +11,12 @@ namespace Mimir.Response.Users
     class LogOut
     {
 
-        public static Tuple<int, string> OnPost(string PostData)
+        public static Tuple<int, string, string> OnPost(string PostData)
         {
             // Post /users/logout
             JsonConvert.DeserializeObject<HttpReq>(PostData);
 
-            return new Tuple<int, string>(204, "");
+            return new Tuple<int, string, string>(204, "text/plain", "");
         }
     }
 }

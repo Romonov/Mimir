@@ -9,7 +9,7 @@ namespace Mimir.Response
 {
     class Root
     {
-        public static Tuple<int, string> OnGet()
+        public static Tuple<int, string, string> OnGet()
         {
             GetRootResponse response = new GetRootResponse();
 
@@ -19,7 +19,7 @@ namespace Mimir.Response
             response.skinDomains = Program.SkinDomains;
             response.signaturePublickey = $"-----BEGIN PUBLIC KEY-----\n{Program.SkinPublicKey}\n-----END PUBLIC KEY-----\n";
             
-            return new Tuple<int, string>(200, JsonConvert.SerializeObject(response));
+            return new Tuple<int, string, string>(200, "text/plain", JsonConvert.SerializeObject(response));
         }
     }
 

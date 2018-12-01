@@ -9,7 +9,7 @@ namespace Mimir.Response.AuthServer
 {
     public class Signout
     {
-        public static Tuple<int, string> OnPost(string PostData)
+        public static Tuple<int, string, string> OnPost(string PostData)
         {
             Request request = JsonConvert.DeserializeObject<Request>(PostData);
 
@@ -33,7 +33,7 @@ namespace Mimir.Response.AuthServer
             // Signout
             SqlProxy.Excuter($"UPDATE `tokens` SET `Status` = 2 WHERE `BindUser` = {userRow["Username"].ToString()}");
 
-            return new Tuple<int, string>(204, "");
+            return new Tuple<int, string, string>(204, "text/plain", "");
         }
 
         struct Request

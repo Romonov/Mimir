@@ -19,68 +19,93 @@ namespace Mimir.Common
         /// <summary>
         /// 路由并处理请求
         /// </summary>
-        /// <param name="HttpReq">请求字符串</param>
-        /// <param name="Socket">Socket实例</param>
+        /// <param name="httpReq">请求字符串</param>
+        /// <param name="socket">Socket实例</param>
         /// <param name="EndPoint">远程终结点</param>
-        public static void Route(string HttpReq, Socket Socket, IPEndPoint IPEndPoint)
+        public static void Route(string httpReq, Socket socket)
         {
-            HttpReq msg = HttpProtocol.Solve(HttpReq);
+            HttpReq req = HttpProtocol.Solve(httpReq);
+
+            Logger.Info($"Got request {req.Url} from {socket.RemoteEndPoint}.");
 
             byte[] bcontect;
             string responseHeader = "";
             byte[] bresponse;
 
-            Tuple<int, string> Response = new Tuple<int, string>(403, "");
+            Tuple<int, string, string> Response = new Tuple<int, string, string>(403, "text/plain", "");
 
             // 处理请求
             try
             {
-                if (msg.Method == Method.Get)
+                if (req.Method == Method.Get)
                 {
-                    switch (msg.Url.ToLower())
+                    switch (req.Url.ToLower())
                     {
                         case "/":
                             Response = Root.OnGet();
                             break;
                         default:
-                            if(!File.Exists(Program.Path + msg.Url.ToLower()))
+                            string reqFilePath = Program.Path + @"/Html" + req.Url;
+                            if (File.Exists(reqFilePath))
                             {
+                                FileInfo reqFile = new FileInfo(reqFilePath);
+                                string reqFileExt = Path.GetExtension(reqFile.FullName);
+                                string reqFileType = "text/plain";
 
+                                switch (reqFileExt)
+                                {
+                                    case ".html":
+                                    case ".htm":
+                                        reqFileType = "text/html";
+                                        break;
+                                    case ".css":
+                                        reqFileType = "text/css";
+                                        break;
+                                    case ".js":
+                                        reqFileType = "application/javascript";
+                                        break;
+                                    case ".ico":
+                                        reqFileType = "image/x-icon";
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                Response = new Tuple<int, string, string>(200, reqFileType, File.ReadAllText(reqFilePath));
                             }
                             break;
                     }
                 }
-                else if (msg.Method == Method.Post)
+                else if (req.Method == Method.Post)
                 {
-                    switch (msg.Url.ToLower())
+                    switch (req.Url.ToLower())
                     {
                         #region Users
                         case "/users/register":
-                            Response = Register.OnPost(msg.PostData);
+                            Response = Register.OnPost(req.PostData);
                             break;
                         case "/users/login":
-                            Response = Login.OnPost(msg.PostData);
+                            Response = Login.OnPost(req.PostData);
                             break;
                         case "/users/logout":
-                            Response = LogOut.OnPost(msg.PostData);
+                            Response = LogOut.OnPost(req.PostData);
                             break;
                         #endregion
 
                         #region AuthServer
                         case "/authserver/authenticate":
-                            Response = Authenticate.OnPost(msg.PostData);
+                            Response = Authenticate.OnPost(req.PostData);
                             break;
                         case "/authserver/refresh":
-                            Response = Refresh.OnPost(msg.PostData);
+                            Response = Refresh.OnPost(req.PostData);
                             break;
                         case "/authserver/validate":
-                            Response = Validate.OnPost(msg.PostData);
+                            Response = Validate.OnPost(req.PostData);
                             break;
                         case "/authserver/invalidate":
-                            Response = Invalidate.OnPost(msg.PostData);
+                            Response = Invalidate.OnPost(req.PostData);
                             break;
                         case "/authserver/signout":
-                            Response = Signout.OnPost(msg.PostData);
+                            Response = Signout.OnPost(req.PostData);
                             break;
                         #endregion
                         default:
@@ -90,13 +115,13 @@ namespace Mimir.Common
                             {
 
                             }
-                            Response = new Tuple<int, string>(403, "");
+                            Response = new Tuple<int, string, string>(403, "text/plain", "");
                             break;
                     }
                 }
                 else
                 {
-                    Response = new Tuple<int, string>(403, "");
+                    Response = new Tuple<int, string, string>(403, "text/plain", "");
                 }
             }
             catch (Exception e)
@@ -105,25 +130,35 @@ namespace Mimir.Common
             }
 
             // 发送返回
-            bcontect = Encoding.Default.GetBytes(Response.Item2);
-            responseHeader = HttpProtocol.Make(Response.Item1, "text", bcontect.Length);
+            bcontect = Encoding.Default.GetBytes(Response.Item3);
+            responseHeader = HttpProtocol.Make(Response.Item1, Response.Item2, bcontect.Length);
             bresponse = Encoding.Default.GetBytes(responseHeader);
 
-            Logger.Debug($"Response header: {responseHeader}");
-            Logger.Debug($"Response contect: {Response.Item2}");
+            if (Program.IsDebug)
+            {
+                Logger.Debug($"Response header: {responseHeader}");
+                Logger.Debug($"Response contect: {Response.Item3}");
+            }
 
             try
             {
-                Socket.Send(bresponse);
-                Socket.Send(bcontect);
+                socket.Send(bresponse);
+                socket.Send(bcontect);
             }
             catch (Exception e)
             {
-                Logger.Error(e);
+                if (Program.IsDebug)
+                {
+                    Logger.Error(e);
+                }
+                else
+                {
+                    Logger.Error(e.Message);
+                }
             }
             finally
             {
-                Socket.Close();
+                socket.Close();
             }
         }
 
