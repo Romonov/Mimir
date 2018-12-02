@@ -61,10 +61,16 @@ namespace Mimir.Common
                                         reqFileType = "text/html";
                                         break;
                                     case ".css":
-                                        reqFileType = "text/css";
+                                        reqFileType = "text/stylesheet";
                                         break;
                                     case ".js":
                                         reqFileType = "application/javascript";
+                                        break;
+                                    case ".jpg":
+                                    case ".png":
+                                        reqFileType = "image";
+                                        reqFileContectBytes = File.ReadAllBytes(reqFilePath);
+                                        reqFileIsImage = true;
                                         break;
                                     case ".ico":
                                         reqFileType = "image/x-icon";
@@ -156,9 +162,13 @@ namespace Mimir.Common
             string responseHeader = "";
             byte[] bresponse;
 
+            Dictionary<string, string> header = new Dictionary<string, string>();
+            header.Add("Server", "Mimir");
+            header.Add("Author", "Romonov");
+
             // 发送返回
             bcontect = Encoding.Default.GetBytes(response);
-            responseHeader = HttpProtocol.Make(status, responseType, bcontect.Length);
+            responseHeader = HttpProtocol.Build(status, responseType, bcontect.Length, header);
             bresponse = Encoding.Default.GetBytes(responseHeader);
 
             if (Program.IsDebug)
@@ -202,9 +212,13 @@ namespace Mimir.Common
             string responseHeader = "";
             byte[] bresponse;
 
+            Dictionary<string, string> header = new Dictionary<string, string>();
+            header.Add("Server", "Mimir");
+            header.Add("Author", "Romonov");
+
             // 发送返回
             bcontect = response;
-            responseHeader = HttpProtocol.Make(status, responseType, bcontect.Length);
+            responseHeader = HttpProtocol.Build(status, responseType, bcontect.Length, header);
             bresponse = Encoding.Default.GetBytes(responseHeader);
 
             if (Program.IsDebug)

@@ -70,7 +70,10 @@ namespace Mimir.Common
 
                 if (messageData.ToString() != "")
                 {
-                    //Logger.Debug($"Recived request from {new_client.RemoteEndPoint}\n{messageData.ToString()}");
+                    if (Program.IsDebug)
+                    {
+                        Logger.Debug($"Recived request from {new_client.RemoteEndPoint}\n{messageData.ToString()}");
+                    }
                     Router.Route(messageData, new_client);
                 }
             }
