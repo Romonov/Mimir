@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using RUL.Encrypt;
 using System;
 using System.Data;
+using System.Text;
 
 namespace Mimir.Response.AuthServer
 {

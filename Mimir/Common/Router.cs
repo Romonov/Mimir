@@ -28,9 +28,11 @@ namespace Mimir.Common
 
             Logger.Info($"Got request {req.Url} from {socket.RemoteEndPoint}.");
 
-            byte[] bcontect;
-            string responseHeader = "";
-            byte[] bresponse;
+            // 这个实现不好
+            bool isReqFile = false;
+            string reqFilePath = Program.Path + @"/Html" + req.Url;
+            byte[] reqFileContectBytes = new byte[0];
+            bool reqFileIsImage = false;
 
             Tuple<int, string, string> Response = new Tuple<int, string, string>(403, "text/plain", "");
 
@@ -45,12 +47,12 @@ namespace Mimir.Common
                             Response = Root.OnGet();
                             break;
                         default:
-                            string reqFilePath = Program.Path + @"/Html" + req.Url;
                             if (File.Exists(reqFilePath))
                             {
                                 FileInfo reqFile = new FileInfo(reqFilePath);
                                 string reqFileExt = Path.GetExtension(reqFile.FullName);
                                 string reqFileType = "text/plain";
+                                string reqFileContect = File.ReadAllText(reqFilePath);
 
                                 switch (reqFileExt)
                                 {
@@ -66,11 +68,13 @@ namespace Mimir.Common
                                         break;
                                     case ".ico":
                                         reqFileType = "image/x-icon";
+                                        reqFileContectBytes = File.ReadAllBytes(reqFilePath);
+                                        reqFileIsImage = true;
                                         break;
                                     default:
                                         break;
                                 }
-                                Response = new Tuple<int, string, string>(200, reqFileType, File.ReadAllText(reqFilePath));
+                                Response = new Tuple<int, string, string>(200, reqFileType, reqFileContect);
                             }
                             break;
                     }
@@ -129,15 +133,84 @@ namespace Mimir.Common
                 Logger.Error(e);
             }
 
+            if (reqFileIsImage)
+            {
+                Post(Response.Item1, Response.Item2, reqFileContectBytes, socket);
+            }
+            else
+            {
+                Post(Response.Item1, Response.Item2, Response.Item3, socket);
+            }
+        }
+
+        /// <summary>
+        /// 发送返回信息
+        /// </summary>
+        /// <param name="status">Http状态码</param>
+        /// <param name="responseType">返回信息的类型</param>
+        /// <param name="response">返回信息的内容</param>
+        /// <param name="socket">Socket实例</param>
+        private static void Post(int status, string responseType, string response, Socket socket)
+        {
+            byte[] bcontect;
+            string responseHeader = "";
+            byte[] bresponse;
+
             // 发送返回
-            bcontect = Encoding.Default.GetBytes(Response.Item3);
-            responseHeader = HttpProtocol.Make(Response.Item1, Response.Item2, bcontect.Length);
+            bcontect = Encoding.Default.GetBytes(response);
+            responseHeader = HttpProtocol.Make(status, responseType, bcontect.Length);
             bresponse = Encoding.Default.GetBytes(responseHeader);
 
             if (Program.IsDebug)
             {
                 Logger.Debug($"Response header: {responseHeader}");
-                Logger.Debug($"Response contect: {Response.Item3}");
+                Logger.Debug($"Response contect: {response}");
+            }
+
+            try
+            {
+                socket.Send(bresponse);
+                socket.Send(bcontect);
+            }
+            catch (Exception e)
+            {
+                if (Program.IsDebug)
+                {
+                    Logger.Error(e);
+                }
+                else
+                {
+                    Logger.Error(e.Message);
+                }
+            }
+            finally
+            {
+                socket.Close();
+            }
+        }
+
+        /// <summary>
+        /// 发送返回信息
+        /// </summary>
+        /// <param name="status">Http状态码</param>
+        /// <param name="responseType">返回信息的类型</param>
+        /// <param name="response">返回信息的内容</param>
+        /// <param name="socket">Socket实例</param>
+        private static void Post(int status, string responseType, byte[] response, Socket socket)
+        {
+            byte[] bcontect;
+            string responseHeader = "";
+            byte[] bresponse;
+
+            // 发送返回
+            bcontect = response;
+            responseHeader = HttpProtocol.Make(status, responseType, bcontect.Length);
+            bresponse = Encoding.Default.GetBytes(responseHeader);
+
+            if (Program.IsDebug)
+            {
+                Logger.Debug($"Response header: {responseHeader}");
+                //Logger.Debug($"Response contect: {Encoding.Default.GetString(response)}");
             }
 
             try
