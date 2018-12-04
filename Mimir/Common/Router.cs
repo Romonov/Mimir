@@ -166,6 +166,7 @@ namespace Mimir.Common
             header.Add("Server", "Mimir");
             header.Add("Author", "Romonov");
             header.Add("Version", Program.Version);
+            header.Add("X-Authlib-Injector-API-Location", "/");
 
             // 发送返回
             bcontect = Encoding.Default.GetBytes(response);
@@ -217,6 +218,7 @@ namespace Mimir.Common
             header.Add("Server", "Mimir");
             header.Add("Author", "Romonov");
             header.Add("Version", Program.Version);
+            header.Add("X-Authlib-Injector-API-Location", "/");
 
             // 发送返回
             bcontect = response;
