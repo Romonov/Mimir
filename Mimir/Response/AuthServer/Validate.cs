@@ -10,37 +10,30 @@ namespace Mimir.Response.AuthServer
     {
         public static Tuple<int, string, string> OnPost(string postData)
         {
+            // Post /authserver/validate
+
             Request request = JsonConvert.DeserializeObject<Request>(postData);
 
             // Tokens
-            DataSet dataSetToken = SqlProxy.Query("SELECT * FROM `tokens`");
+            DataSet dataSetToken;
 
-            DataSet dataSetUser = SqlProxy.Query("SELECT * FROM `users`");
-
-            DataRow dataRowToken = null;
-            DataRow dataRowUser = null;
-
-            foreach (DataRow dataRow in dataSetToken.Tables[0].Rows)
+            if (request.clientToken != null)
             {
-                if (dataRow["AccessToken"].ToString() == request.accessToken)
-                {
-                    if (request.clientToken != null)
-                    {
-                        if (dataRow["ClientToken"].ToString() == request.clientToken)
-                        {
-                            return InvalidToken.GetResponse();
-                        }
-                    }
-
-                    dataRowToken = dataRow;
-                }
-                else
-                {
-                    return InvalidToken.GetResponse();
-                }
+                dataSetToken = SqlProxy.Query($"select * from `tokens` where `AccessToken` = '{SqlSecurity.Parse(request.accessToken)}' and `ClientToken` = '{SqlSecurity.Parse(request.clientToken)}' and `Status` = 2;");
+            }
+            else
+            {
+                dataSetToken = SqlProxy.Query($"select * from `tokens` where `AccessToken` = '{SqlSecurity.Parse(request.accessToken)}' and `Status` = 2;");
             }
 
-            return new Tuple<int, string, string>(204, "text/plain", "");
+            if (dataSetToken.Tables[0].Rows.Count >= 1)
+            {
+                return new Tuple<int, string, string>(204, "text/plain", "");
+            }
+            else
+            {
+                return InvalidToken.GetResponse();
+            }
         }
 
         struct Request
