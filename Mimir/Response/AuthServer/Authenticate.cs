@@ -12,39 +12,29 @@ namespace Mimir.Response.AuthServer
 {
     public class Authenticate
     {
-        public static Tuple<int, string, string> OnPost(string PostData)
+        public static Tuple<int, string, string> OnPost(string postData)
         {
             // Post /authserver/authenticate
             Response response = new Response();
 
-            Request request = JsonConvert.DeserializeObject<Request>(PostData);
-            
+            Request request = JsonConvert.DeserializeObject<Request>(postData);
+
             // Login
-            DataSet dataSetUser = SqlProxy.Query($"SELECT * FROM users");
+            DataSet dataSetUser = SqlProxy.Query($"select * from `users` where `Email` = '{SqlSecurity.Parse(request.username)}' and `Password` = '{HashWorker.MD5(request.password)}';");
 
-            DataRow userRow = null;
+            DataRow userRow;
 
-            //SqlProxy.Query($"select * from users where Email=`{request.username}` and Password=md5(`{request.password}`)");
-
-            foreach (DataRow dataRow in dataSetUser.Tables[0].Rows)
+            if (dataSetUser.Tables[0].Rows.Count == 1)
             {
-                if (dataRow["Email"].ToString() == request.username && dataRow["Password"].ToString() == HashWorker.MD5(request.password))
-                {
-                    userRow = dataRow;
-
-                    if (userRow["IsLogged"].ToString() == "True")
-                    {
-
-                    }
-                }
-                else
-                {
-                    return InvalidPassword.GetResponse();
-                }
+                userRow = dataSetUser.Tables[0].Rows[0];
             }
-
+            else
+            {
+                return InvalidPassword.GetResponse();
+            }
+            
             // Profiles
-            DataSet dataSetProfiles = SqlProxy.Query("SELECT * FROM `profiles`;");
+            DataSet dataSetProfiles = SqlProxy.Query($"SELECT * FROM `profiles` where `UserID` = '{userRow["Username"].ToString()}';");
 
             List<PlayerProfiles> availableProfiles = new List<PlayerProfiles>();
 
@@ -78,18 +68,14 @@ namespace Mimir.Response.AuthServer
                 response.clientToken = request.clientToken;
             }
 
-            //if ()
+            if (response.selectedProfile.HasValue)
             {
-                if (response.selectedProfile.HasValue)
-                {
-                    SqlProxy.Excuter($"INSERT INTO `tokens` (`AccessToken`, `ClientToken`, `BindProfile`, `CreateTime`, `Status`, `BindUser`) VALUES('{response.accessToken}', '{response.clientToken}', '{response.selectedProfile.Value.name}', '{Time.GetUnixTimeStamp()}', 2, '{userRow["Username"].ToString()}');");
-                }
-                else
-                {
-                    SqlProxy.Excuter($"INSERT INTO `tokens` (`AccessToken`, `ClientToken`, `CreateTime`, `Status`, `BindUser`) VALUES ('{response.accessToken}', '{response.clientToken}', '{Time.GetUnixTimeStamp()}', 2, '{userRow["Username"].ToString()}');");
-                }
+                SqlProxy.Excuter($"insert into `tokens` (`AccessToken`, `ClientToken`, `BindProfile`, `CreateTime`, `Status`, `BindUser`) VALUES('{SqlSecurity.Parse(response.accessToken)}', '{SqlSecurity.Parse(response.clientToken)}', '{SqlSecurity.Parse(response.selectedProfile.Value.name)}', '{Time.GetUnixTimeStamp()}', 2, '{userRow["Username"].ToString()}');");
             }
-
+            else
+            {
+                SqlProxy.Excuter($"insert into `tokens` (`AccessToken`, `ClientToken`, `CreateTime`, `Status`, `BindUser`) VALUES ('{SqlSecurity.Parse(response.accessToken)}', '{SqlSecurity.Parse(response.clientToken)}', '{Time.GetUnixTimeStamp()}', 2, '{userRow["Username"].ToString()}');");
+            }
 
             // Users
             if (request.requestUser)
@@ -114,13 +100,11 @@ namespace Mimir.Response.AuthServer
             public bool requestUser;
             public Agent agent;
         }
-
         struct Agent
         {
             public string name;
             public int version;
         }
-
         struct Response
         {
             public string accessToken;
@@ -129,20 +113,17 @@ namespace Mimir.Response.AuthServer
             public PlayerProfiles? selectedProfile;
             public User? user;
         }
-        
         struct PlayerProfiles
         {
             public string id;
             public string name;
             public Properties[] properties;
         }
-
         struct User
         {
             public string id;
             public Properties[] properties;
         }
-        
         struct Properties
         {
             public string name;

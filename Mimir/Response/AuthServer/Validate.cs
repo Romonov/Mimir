@@ -8,9 +8,9 @@ namespace Mimir.Response.AuthServer
 {
     public class Validate
     {
-        public static Tuple<int, string, string> OnPost(string PostData)
+        public static Tuple<int, string, string> OnPost(string postData)
         {
-            Request request = JsonConvert.DeserializeObject<Request>(PostData);
+            Request request = JsonConvert.DeserializeObject<Request>(postData);
 
             // Tokens
             DataSet dataSetToken = SqlProxy.Query("SELECT * FROM `tokens`");

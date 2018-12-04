@@ -165,6 +165,7 @@ namespace Mimir.Common
             Dictionary<string, string> header = new Dictionary<string, string>();
             header.Add("Server", "Mimir");
             header.Add("Author", "Romonov");
+            header.Add("Version", Program.Version);
 
             // 发送返回
             bcontect = Encoding.Default.GetBytes(response);
@@ -215,6 +216,7 @@ namespace Mimir.Common
             Dictionary<string, string> header = new Dictionary<string, string>();
             header.Add("Server", "Mimir");
             header.Add("Author", "Romonov");
+            header.Add("Version", Program.Version);
 
             // 发送返回
             bcontect = response;
@@ -231,6 +233,8 @@ namespace Mimir.Common
             {
                 socket.Send(bresponse);
                 socket.Send(bcontect);
+                //socket.Send(bcontect, 0, 100, SocketFlags.None);
+                //socket.Send(bcontect, 100, bcontect.Length - 100, SocketFlags.None);
             }
             catch (Exception e)
             {
