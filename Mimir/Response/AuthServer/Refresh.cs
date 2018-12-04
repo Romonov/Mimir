@@ -50,7 +50,7 @@ namespace Mimir.Response.AuthServer
                 response.clientToken = UuidWorker.GenUuid();
             }
 
-            response.accessToken = UuidWorker.GenUuid();
+            response.accessToken = UuidWorker.ToUnsignedUuid(UuidWorker.GenUuid());
 
             // Users
             dataRowUser = SqlProxy.Query($"select * from `users` where `Username` = '{dataRowOldToken["BindUser"]}';").Tables[0].Rows[0];
@@ -72,6 +72,8 @@ namespace Mimir.Response.AuthServer
             {
                 response.selectedProfile = request.selectedProfile;
                 SqlProxy.Excuter($"insert into `tokens` (`AccessToken`, `ClientToken`, `BindProfile`, `CreateTime`, `Status`, `BindUser`) VALUES('{response.accessToken}', '{SqlSecurity.Parse(response.clientToken)}', '{SqlSecurity.Parse(response.selectedProfile.Value.name)}', '{Time.GetUnixTimeStamp()}', 2, '{dataRowUser["Username"].ToString()}');");
+                SqlProxy.Excuter($"update `profiles` set `IsSelected` = 0 where `UserID` = '{dataRowUser["Username"].ToString()}';");
+                SqlProxy.Excuter($"update `profiles` set `IsSelected` = 1 where `Name` = '{request.selectedProfile.Value.name}';");
             }
             else
             {
