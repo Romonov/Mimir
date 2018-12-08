@@ -10,8 +10,14 @@ namespace Mimir.Common
     {
         public static string GetTimeStamp()
         {
-            TimeSpan ts  = DateTime.UtcNow - new DateTime(1970, 1, 1);
+            TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
             return ts.TotalMilliseconds.ToString();
+        }
+
+        public static string GetTimeStamp(long add)
+        {
+            TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
+            return (ts.TotalMilliseconds + add).ToString();
         }
     }
 }

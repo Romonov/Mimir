@@ -16,7 +16,7 @@ namespace Mimir
     {
         #region 定义变量
         public const string Name = "Mimir";
-        public const string Version = "0.6.3";
+        public const string Version = "0.6.5";
 
         public static string Path = Directory.GetCurrentDirectory();
 

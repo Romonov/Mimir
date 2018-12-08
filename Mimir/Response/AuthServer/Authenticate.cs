@@ -85,7 +85,7 @@ namespace Mimir.Response.AuthServer
                 Properties properties = new Properties();
                 properties.name = "preferredLanguage";
                 properties.value = userRow["PreferredLanguage"].ToString();
-                user.properties = new Properties[] { properties };
+                user.properties = new Properties?[] { properties };
                 response.user = user;
             }
 
@@ -117,12 +117,12 @@ namespace Mimir.Response.AuthServer
         {
             public string id;
             public string name;
-            public Properties[] properties;
+            public Properties?[] properties;
         }
         struct User
         {
             public string id;
-            public Properties[] properties;
+            public Properties?[] properties;
         }
         struct Properties
         {

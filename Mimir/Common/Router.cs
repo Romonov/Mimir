@@ -1,5 +1,6 @@
 ﻿using Mimir.Response;
 using Mimir.Response.AuthServer;
+using Mimir.Response.SessionServer.Session.Minecraft;
 using Mimir.Response.Users;
 using RUL;
 using RUL.Net;
@@ -26,7 +27,7 @@ namespace Mimir.Common
         {
             HttpReq req = HttpProtocol.Solve(httpReq);
 
-            Logger.Info($"Got request {req.Url} from {socket.RemoteEndPoint}.");
+            Logger.Info($"Got request {req.Method} {req.Url} from {socket.RemoteEndPoint}.");
 
             // 这个实现不好
             bool isReqFile = false;
@@ -41,11 +42,18 @@ namespace Mimir.Common
             {
                 if (req.Method == Method.Get)
                 {
-                    switch (req.Url.ToLower())
+                    switch (req.Url)
                     {
                         case "/":
                             Response = Root.OnGet();
                             break;
+
+                        #region SessionServer
+                        case "/sessionserver/session/minecraft/hasJoined":
+                            Response = HasJoined.OnGet(req.Get);
+                            break;
+                        #endregion
+
                         default:
                             if (File.Exists(reqFilePath))
                             {
@@ -87,7 +95,7 @@ namespace Mimir.Common
                 }
                 else if (req.Method == Method.Post)
                 {
-                    switch (req.Url.ToLower())
+                    switch (req.Url)
                     {
                         #region Users
                         case "/users/register":
@@ -118,9 +126,15 @@ namespace Mimir.Common
                             Response = Signout.OnPost(req.PostData);
                             break;
                         #endregion
-                        default:
 
-                            //GET /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
+                        #region SessionServer
+                        case "/sessionserver/session/minecraft/join":
+                            IPEndPoint ipEndPoint = (IPEndPoint)socket.RemoteEndPoint;
+                            Response = Join.OnPost(req.PostData, ipEndPoint.Address.ToString());
+                            break;
+                        #endregion
+                        default:
+                            // GET /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
                             //if (Guid.TryParse(msg.Url.Split('/')[6], out Guid guid))
                             {
 
