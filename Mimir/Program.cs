@@ -86,15 +86,21 @@ namespace Mimir
             {
                 // 加载配置文件
                 Logger.Info("Loading configs...");
-                string ConfigPath = Directory.GetCurrentDirectory() + @"\config.ini";
+                string configPath = Directory.GetCurrentDirectory() + @"\config.ini";
 
-                if (!File.Exists(ConfigPath))
+                if (!File.Exists(configPath))
                 {
-                    ConfigWorker.Init(ConfigPath);
+                    ConfigWorker.Init(configPath);
                 }
                 else
                 {
-                    ConfigWorker.Read(ConfigPath);
+                    ConfigWorker.Read(configPath);
+                }
+
+                string texturesPath = Directory.GetCurrentDirectory() + @"\Textures";
+                if (!Directory.Exists(texturesPath))
+                {
+                    Directory.CreateDirectory(texturesPath);
                 }
 
                 Logger.Info("Configs loaded!");

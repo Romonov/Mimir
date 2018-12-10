@@ -55,40 +55,48 @@ namespace Mimir.Common
                         #endregion
 
                         default:
-                            if (File.Exists(reqFilePath))
+                            // Get /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
+                            if (Guid.TryParse(req.Url.Split('/')[6], out Guid guid))
                             {
-                                FileInfo reqFile = new FileInfo(reqFilePath);
-                                string reqFileExt = Path.GetExtension(reqFile.FullName);
-                                string reqFileType = "text/plain";
-                                string reqFileContect = File.ReadAllText(reqFilePath);
-
-                                switch (reqFileExt)
+                                Response = Mimir.Response.SessionServer.Session.Minecraft.Profile.Root.OnGet(req.Get, guid);
+                            }
+                            else
+                            {
+                                if (File.Exists(reqFilePath))
                                 {
-                                    case ".html":
-                                    case ".htm":
-                                        reqFileType = "text/html";
-                                        break;
-                                    case ".css":
-                                        reqFileType = "text/stylesheet";
-                                        break;
-                                    case ".js":
-                                        reqFileType = "application/javascript";
-                                        break;
-                                    case ".jpg":
-                                    case ".png":
-                                        reqFileType = "image";
-                                        reqFileContectBytes = File.ReadAllBytes(reqFilePath);
-                                        reqFileIsImage = true;
-                                        break;
-                                    case ".ico":
-                                        reqFileType = "image/x-icon";
-                                        reqFileContectBytes = File.ReadAllBytes(reqFilePath);
-                                        reqFileIsImage = true;
-                                        break;
-                                    default:
-                                        break;
+                                    FileInfo reqFile = new FileInfo(reqFilePath);
+                                    string reqFileExt = Path.GetExtension(reqFile.FullName);
+                                    string reqFileType = "text/plain";
+                                    string reqFileContect = File.ReadAllText(reqFilePath);
+
+                                    switch (reqFileExt)
+                                    {
+                                        case ".html":
+                                        case ".htm":
+                                            reqFileType = "text/html";
+                                            break;
+                                        case ".css":
+                                            reqFileType = "text/stylesheet";
+                                            break;
+                                        case ".js":
+                                            reqFileType = "application/javascript";
+                                            break;
+                                        case ".jpg":
+                                        case ".png":
+                                            reqFileType = "image";
+                                            reqFileContectBytes = File.ReadAllBytes(reqFilePath);
+                                            reqFileIsImage = true;
+                                            break;
+                                        case ".ico":
+                                            reqFileType = "image/x-icon";
+                                            reqFileContectBytes = File.ReadAllBytes(reqFilePath);
+                                            reqFileIsImage = true;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    Response = new Tuple<int, string, string>(200, reqFileType, reqFileContect);
                                 }
-                                Response = new Tuple<int, string, string>(200, reqFileType, reqFileContect);
                             }
                             break;
                     }
@@ -133,12 +141,14 @@ namespace Mimir.Common
                             Response = Join.OnPost(req.PostData, ipEndPoint.Address.ToString());
                             break;
                         #endregion
-                        default:
-                            // GET /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
-                            //if (Guid.TryParse(msg.Url.Split('/')[6], out Guid guid))
-                            {
 
-                            }
+                        #region
+                        case "/api/profiles/minecraft":
+                            Response = Mimir.Response.API.Profiles.Minecraft.Root.OnPost(req.PostData);
+                            break;
+                        #endregion
+                        default:
+                            
                             Response = new Tuple<int, string, string>(403, "text/plain", "");
                             break;
                     }
