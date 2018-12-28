@@ -43,27 +43,29 @@ namespace Mimir
         static SocketWorker SocketListener = new SocketWorker();
         
         public static ConfigWorker.SQLType SQLType = ConfigWorker.SQLType.MySql;
+
+        private static Logger log = new Logger("Main");
         #endregion
 
         static void Main(string[] args)
         {
-            Logger.Info($"Mimir version: {Version}, made by: Romonov! ");
-            Logger.Info("Starting...");
+            log.Info($"Mimir version: {Version}, made by: Romonov! ");
+            log.Info("Starting...");
 
             if (!Init())
             {
-                Logger.Error("Init failed!\a");
+                log.Error("Init failed!\a");
                 Console.Read();
                 Environment.Exit(1);
             }
 
-            Logger.Info("Welcome!!");
+            log.Info("Welcome!!");
 
             // 主循环 
             while (true)
             {
                 string input = Console.ReadLine();
-                Logger.WriteToFile(input);
+                log.WriteToFile(input);
                 switch (input)
                 {
                     case "stop":
@@ -73,7 +75,7 @@ namespace Mimir
                         Environment.Exit(0);
                         break;
                     default:
-                        Logger.Error("No such command.");
+                        log.Error("No such command.");
                         continue;
                 }
             }
@@ -85,7 +87,7 @@ namespace Mimir
             try
             {
                 // 加载配置文件
-                Logger.Info("Loading configs...");
+                log.Info("Loading configs...");
                 string configPath = Directory.GetCurrentDirectory() + @"\config.ini";
 
                 if (!File.Exists(configPath))
@@ -103,12 +105,12 @@ namespace Mimir
                     Directory.CreateDirectory(texturesPath);
                 }
 
-                Logger.Info("Configs loaded!");
+                log.Info("Configs loaded!");
 
                 // 加载签名秘钥
                 if (!File.Exists(Directory.GetCurrentDirectory() + @"\PrivateKey.xml"))
                 {
-                    Logger.Warn("Private key file is missing, and it will be generated now.");
+                    log.Warn("Private key file is missing, and it will be generated now.");
                     RSAWorker.GenKey();
                 }
 
@@ -127,7 +129,7 @@ namespace Mimir
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
+                log.Error(e.Message);
                 return false;
             }
 

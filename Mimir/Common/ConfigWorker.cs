@@ -7,6 +7,8 @@ namespace Mimir.Common
 {
     class ConfigWorker
     {
+        private static Logger log = new Logger("Config");
+
         public static bool Init(string configPath)
         {
             try
@@ -27,11 +29,11 @@ namespace Mimir.Common
                 //INI.Write(ConfigPath, "SSL", "Password", Program.SslCertPassword);
 
                 INI.Write(configPath, "SkinDomains", "Count", "1");
-                INI.Write(configPath, "SkinDomains", "1", ".romonov.com");
+                INI.Write(configPath, "SkinDomains", "1", "*.romonov.com");
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
+                log.Error(e.Message);
                 return false;
             }
             return true;
@@ -70,7 +72,7 @@ namespace Mimir.Common
             }
             catch(Exception e)
             {
-                Logger.Error(e.Message);
+                log.Error(e.Message);
                 return false;
             }
             return true;
@@ -110,7 +112,7 @@ namespace Mimir.Common
             }
             catch(Exception e)
             {
-                Logger.Error(e.Message);
+                log.Error(e.Message);
                 return false;
             }
             return true;
@@ -134,7 +136,7 @@ namespace Mimir.Common
                 case "sqlite":
                     return SQLType.Sqlite;
                 default:
-                    Logger.Error("Bad sql server type, using MySql");
+                    log.Error("Bad sql server type, using MySql");
                     INI.Write(ConfigPath, "SQL", "Type", SQLType.MySql.ToString());
                     return SQLType.MySql;
             }

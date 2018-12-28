@@ -17,6 +17,8 @@ namespace Mimir.Common
 {
     class Router
     {
+        private static Logger log = new Logger("Router");
+
         /// <summary>
         /// 路由并处理请求
         /// </summary>
@@ -27,7 +29,7 @@ namespace Mimir.Common
         {
             HttpReq req = HttpProtocol.Solve(httpReq);
 
-            Logger.Info($"Got request {req.Method} {req.Url} from {socket.RemoteEndPoint}.");
+            log.Info($"Got request {req.Method} {req.Url} from {socket.RemoteEndPoint}.");
 
             // 这个实现不好
             bool isReqFile = false;
@@ -160,7 +162,7 @@ namespace Mimir.Common
             }
             catch (Exception e)
             {
-                Logger.Error(e);
+                log.Error(e);
             }
 
             if (reqFileIsImage)
@@ -199,8 +201,8 @@ namespace Mimir.Common
 
             if (Program.IsDebug)
             {
-                Logger.Debug($"Response header: {responseHeader}");
-                Logger.Debug($"Response contect: {response}");
+                log.Debug($"Response header: {responseHeader}");
+                log.Debug($"Response contect: {response}");
             }
 
             try
@@ -212,11 +214,11 @@ namespace Mimir.Common
             {
                 if (Program.IsDebug)
                 {
-                    Logger.Error(e);
+                    log.Error(e);
                 }
                 else
                 {
-                    Logger.Error(e.Message);
+                    log.Error(e.Message);
                 }
             }
             finally
@@ -251,8 +253,8 @@ namespace Mimir.Common
 
             if (Program.IsDebug)
             {
-                Logger.Debug($"Response header: {responseHeader}");
-                //Logger.Debug($"Response contect: {Encoding.Default.GetString(response)}");
+                log.Debug($"Response header: {responseHeader}");
+                //log.Debug($"Response contect: {Encoding.Default.GetString(response)}");
             }
 
             try
@@ -266,11 +268,11 @@ namespace Mimir.Common
             {
                 if (Program.IsDebug)
                 {
-                    Logger.Error(e);
+                    log.Error(e);
                 }
                 else
                 {
-                    Logger.Error(e.Message);
+                    log.Error(e.Message);
                 }
             }
             finally

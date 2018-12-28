@@ -11,6 +11,8 @@ namespace Mimir.Common
 {
     class SocketWorker
     {
+        private Logger log = new Logger("Socket");
+
         /// <summary>
         /// Socket实例
         /// </summary>
@@ -27,12 +29,12 @@ namespace Mimir.Common
             try
             {
                 socket.Bind(new IPEndPoint(IPAddress.Any, port));
-                Logger.Info($"Socket created, bind to localhost:{port}.");
+                log.Info($"Socket created, bind to localhost:{port}.");
                 socket.Listen(listen);
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
+                log.Error(e.Message);
                 return false;
             }
             return true;
@@ -44,7 +46,7 @@ namespace Mimir.Common
         public void Start()
         {
             socket.BeginAccept(new AsyncCallback(OnAccept), socket);
-            Logger.Info("Socket is listing now.");
+            log.Info("Socket is listing now.");
         }
 
         /// <summary>
@@ -72,14 +74,14 @@ namespace Mimir.Common
                 {
                     if (Program.IsDebug)
                     {
-                        Logger.Debug($"Recived request from {new_client.RemoteEndPoint}\n{messageData.ToString()}");
+                        log.Debug($"Recived request from {new_client.RemoteEndPoint}\n{messageData.ToString()}");
                     }
                     Router.Route(messageData, new_client);
                 }
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
+                log.Error(e.Message);
             }
         }
     }

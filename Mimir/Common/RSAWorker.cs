@@ -14,6 +14,8 @@ namespace Mimir.Common
 {
     class RSAWorker
     {
+        private static Logger log = new Logger("RSAWorker");
+
         public static RSACryptoServiceProvider PublicKey = new RSACryptoServiceProvider();
         public static RSACryptoServiceProvider PrivateKey = new RSACryptoServiceProvider();
 
@@ -24,7 +26,7 @@ namespace Mimir.Common
         {
             try
             {
-                Logger.Info("Generating RSA secret keys, it will take at least 7 seconds...");
+                log.Info("Generating RSA secret keys, it will take at least 7 seconds...");
 
                 RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(4096);
 
@@ -41,7 +43,7 @@ namespace Mimir.Common
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
+                log.Error(e.Message);
                 return false;
             }
             return true;
@@ -55,14 +57,14 @@ namespace Mimir.Common
         {
             try
             {
-                Logger.Info("Loading secret keys.");
+                log.Info("Loading secret keys.");
                 PublicKey.FromXmlString(File.ReadAllText("PublicKey.xml"));
                 PrivateKey.FromXmlString(File.ReadAllText("PrivateKey.xml"));
-                Logger.Info("Secret keys load successfully.");
+                log.Info("Secret keys load successfully.");
             }
             catch(Exception e)
             {
-                Logger.Error(e.Message);
+                log.Error(e.Message);
                 return false;
             }
             return true;

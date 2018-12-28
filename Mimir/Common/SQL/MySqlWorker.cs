@@ -11,6 +11,8 @@ namespace Mimir.Common.SQL
 {
     class MySqlWorker
     {
+        private static Logger log = new Logger("MySQL");
+
         public static bool isConneted = false;
 
         public static MySqlConnection mySqlConnection = new MySqlConnection($"server={Program.SQLIP};userid={Program.SQLUsername};password={Program.SQLPassword};database={Program.SQLDatabase};SslMode=none;");
@@ -30,7 +32,7 @@ namespace Mimir.Common.SQL
                 mySqlConnection.Open();
                 isConneted = true;
 
-                Logger.Info("MySQL connected!");
+                log.Info("MySQL connected!");
 
                 thread.Start();
             }
@@ -58,7 +60,7 @@ namespace Mimir.Common.SQL
 
                 if (reader.HasRows)
                 {
-                    Logger.Info("MySQL connection has refreshed.");
+                    log.Info("MySQL connection has refreshed.");
                 }
 
                 reader.Close();

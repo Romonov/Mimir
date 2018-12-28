@@ -13,6 +13,8 @@ namespace Mimir.Common.SQL
 {
     class SqlProxy
     {
+        private static Logger log = new Logger("SQL");
+
         public static void Open()
         {
             if(Program.SQLType == ConfigWorker.SQLType.MySql)
@@ -51,7 +53,7 @@ namespace Mimir.Common.SQL
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn(e.Message);
+                    log.Warn(e.Message);
                 }
             }
 
@@ -77,7 +79,7 @@ namespace Mimir.Common.SQL
                 }
                 catch(Exception e)
                 {
-                    Logger.Warn(e.Message);
+                    log.Warn(e.Message);
                 }
                 finally
                 {
