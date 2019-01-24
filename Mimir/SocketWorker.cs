@@ -7,52 +7,34 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mimir.Common
+namespace Mimir
 {
     class SocketWorker
     {
-        private Logger log = new Logger("Socket");
+        private readonly Logger log = new Logger("Socket");
 
-        /// <summary>
-        /// Socket实例
-        /// </summary>
         private readonly Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-        /// <summary>
-        /// 初始化Socket
-        /// </summary>
-        /// <param name="port">端监听口</param>
-        /// <param name="listen">最大监听数量</param>
-        /// <returns>是否成功</returns>
-        public bool Init(int port, int listen)
+        public SocketWorker(int port, int listen)
         {
             try
             {
                 socket.Bind(new IPEndPoint(IPAddress.Any, port));
-                log.Info($"Socket created, bind to localhost:{port}.");
+                log.Info($"Socket created, bind to *:{port}.");
                 socket.Listen(listen);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                log.Error(e.Message);
-                return false;
+                throw;
             }
-            return true;
         }
 
-        /// <summary>
-        /// 启动监听
-        /// </summary>
         public void Start()
         {
             socket.BeginAccept(new AsyncCallback(OnAccept), socket);
             log.Info("Socket is listing now.");
         }
 
-        /// <summary>
-        /// 监听时触发
-        /// </summary>
-        /// <param name="ar">异步方法</param>
         public void OnAccept(IAsyncResult ar)
         {
             try
@@ -76,12 +58,13 @@ namespace Mimir.Common
                     {
                         log.Debug($"Recived request from {new_client.RemoteEndPoint}\n{messageData.ToString()}");
                     }
+
                     Router.Route(messageData, new_client);
                 }
             }
             catch (Exception e)
             {
-                log.Error(e.Message);
+                log.Error(e);
             }
         }
     }

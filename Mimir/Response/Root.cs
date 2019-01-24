@@ -9,17 +9,17 @@ namespace Mimir.Response
 {
     class Root
     {
-        public static Tuple<int, string, string> OnGet()
+        public static (int status, string type, string content) OnGet()
         {
             GetRootResponse response = new GetRootResponse();
 
             response.meta.serverName = Program.ServerName;
             response.meta.implementationName = Program.Name;
             response.meta.implementationVersion = Program.Version;
-            response.skinDomains = Program.SkinDomains;
-            response.signaturePublickey = $"-----BEGIN PUBLIC KEY-----\n{Program.SkinPublicKey}\n-----END PUBLIC KEY-----\n";
-            
-            return new Tuple<int, string, string>(200, "text/plain", JsonConvert.SerializeObject(response));
+            response.skinDomains = new string[] { "*"};
+            //response.signaturePublickey = $"-----BEGIN PUBLIC KEY-----\n{Program.SkinPublicKey}\n-----END PUBLIC KEY-----\n";
+
+            return (200, "text/plain", JsonConvert.SerializeObject(response));
         }
     }
 
