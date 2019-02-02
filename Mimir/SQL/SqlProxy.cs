@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Data;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mimir.SQL
 {
@@ -17,10 +14,13 @@ namespace Mimir.SQL
                 case SqlConnectionType.Sqlite:
                     Sqlite.Open();
                     break;
+
                 case SqlConnectionType.MySql:
-                    throw new NotImplementedException();
+                    MySql.Open();
+                    break;
+
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -30,10 +30,12 @@ namespace Mimir.SQL
             {
                 case SqlConnectionType.Sqlite:
                     return Sqlite.GetSqlConnection();
+
                 case SqlConnectionType.MySql:
-                    throw new NotImplementedException();
+                    return MySql.GetSqlConnection();
+
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -46,12 +48,14 @@ namespace Mimir.SQL
                 case SqlConnectionType.MySql:
                     throw new NotImplementedException();
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
         public static DataSet Query(string sql)
         {
+            DataSet dataSet = new DataSet();
+
             switch (Program.SqlType)
             {
                 case SqlConnectionType.Sqlite:
@@ -59,19 +63,25 @@ namespace Mimir.SQL
                     {
                         Open();
                     }
-                    DataSet dataSet = new DataSet();
-                    using (SQLiteCommand sqliteCommand = new SQLiteCommand(sql, Sqlite.GetSqlConnection()))
+                    using (SQLiteDataAdapter sqliteDataAdapter = new SQLiteDataAdapter(sql, Sqlite.GetSqlConnection()))
                     {
-                        using (SQLiteDataAdapter sqliteDataAdapter = new SQLiteDataAdapter(sqliteCommand))
-                        {
-                            sqliteDataAdapter.Fill(dataSet);
-                        }
+                        sqliteDataAdapter.Fill(dataSet);
                     }
                     return dataSet;
+
                 case SqlConnectionType.MySql:
-                    throw new NotImplementedException();
+                    if (!MySql.IsConnected)
+                    {
+                        Open();
+                    }
+                    using (MySqlDataAdapter mySqlDataAdapter = new MySqlDataAdapter(sql, MySql.GetSqlConnection()))
+                    {
+                        mySqlDataAdapter.Fill(dataSet);
+                    }
+                    return dataSet;
+
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -88,10 +98,19 @@ namespace Mimir.SQL
                     {
                         return sqliteCommand.ExecuteNonQuery();
                     }
+
                 case SqlConnectionType.MySql:
-                    throw new NotImplementedException();
+                    if (!MySql.IsConnected)
+                    {
+                        Open();
+                    }
+                    using (MySqlCommand mySqlCommand = new MySqlCommand(sql, MySql.GetSqlConnection()))
+                    {
+                        return mySqlCommand.ExecuteNonQuery();
+                    }
+
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -102,10 +121,13 @@ namespace Mimir.SQL
                 case SqlConnectionType.Sqlite:
                     Sqlite.Close();
                     break;
+
                 case SqlConnectionType.MySql:
+                    MySql.Close();
                     break;
+
                 default:
-                    break;
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }

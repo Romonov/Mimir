@@ -1,10 +1,7 @@
 ﻿using RUL;
 using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mimir.SQL
 {
@@ -17,6 +14,11 @@ namespace Mimir.SQL
 
         public static SQLiteConnection GetSqlConnection()
         {
+            if (sqliteConnection.State == ConnectionState.Closed)
+            {
+                log.Info("Reconnecting sqlite database.");
+                Open();
+            }
             return sqliteConnection;
         }
 
@@ -38,9 +40,12 @@ namespace Mimir.SQL
 
         public static void Close()
         {
-            sqliteConnection.Close();
+            if (sqliteConnection.State != ConnectionState.Closed)
+            {
+                sqliteConnection.Close();
+            }
+            IsConnected = false;
             log.Info("Sqlite connection closed.");
         }
-
     }
 }
