@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mimir.SQL;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,6 +39,7 @@ namespace Mimir.CLI
 
         public static void Stop(int exitCode)
         {
+            SqlProxy.Close();
             ConfigWorker.Save($@"{Program.Path}\config.ini");
             Console.Write("Please press any key to exit Mimir.");
             Console.ReadKey(false);

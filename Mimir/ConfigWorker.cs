@@ -1,4 +1,5 @@
-﻿using RUL;
+﻿using Mimir.SQL;
+using RUL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,23 @@ namespace Mimir
             bool.TryParse(Read(path, "General", "IsDebug", Program.IsDebug.ToString()), out Program.IsDebug);
             int.TryParse(Read(path, "General", "Port", Program.Port.ToString()), out Program.Port);
             int.TryParse(Read(path, "General", "MaxConnection", Program.MaxConnection.ToString()), out Program.MaxConnection);
+            Enum.TryParse(Read(path, "SQL", "Type", Program.SqlType.ToString(), true), out Program.SqlType);
+
+            switch (Program.SqlType)
+            {
+                case SqlConnectionType.Sqlite:
+                    Program.SqlDbName = Read(path, "SQL", "DatabaseName", Program.SqlDbName);
+                    break;
+                case SqlConnectionType.MySql:
+                    Program.SqlDbName = Read(path, "SQL", "DatabaseName", Program.SqlDbName);
+                    Program.SqlIp = Read(path, "SQL", "IP", Program.SqlIp);
+                    Program.SqlUsername = Read(path, "SQL", "Username", Program.SqlUsername);
+                    Program.SqlPassword = Read(path, "SQL", "Password", Program.SqlPassword, true);
+                    break;
+                default:
+                    throw new NullReferenceException();
+                    break;
+            }
 
             log.Info("Configs loaded.");
         }
@@ -31,11 +49,28 @@ namespace Mimir
             Write(path, "General", "IsDebug", Program.IsDebug.ToString());
             Write(path, "General", "Port", Program.Port.ToString());
             Write(path, "General", "MaxConnection", Program.MaxConnection.ToString());
+            Write(path, "SQL", "Type", Program.SqlType.ToString());
+            
+            switch (Program.SqlType)
+            {
+                case SqlConnectionType.Sqlite:
+                    Write(path, "SQL", "DatabaseName", Program.SqlDbName);
+                    break;
+                case SqlConnectionType.MySql:
+                    Write(path, "SQL", "DatabaseName", Program.SqlDbName); ;
+                    Write(path, "SQL", "IP", Program.SqlIp);
+                    Write(path, "SQL", "Username", Program.SqlUsername);
+                    Write(path, "SQL", "Password", Program.SqlPassword);
+                    break;
+                default:
+                    throw new NullReferenceException();
+                    break;
+            }
 
             log.Info("Configs saved.");
         }
 
-        private static string Read(string path, string section, string key, string defaultValue, bool isPassword = false)
+        private static string Read(string path, string section, string key, string defaultValue, bool isHide = false)
         {
             string value = defaultValue;
             try
@@ -46,14 +81,18 @@ namespace Mimir
                     throw new NullReferenceException();
                 }
 
-                if (!isPassword)
+                if (!isHide)
                 {
-                    log.Info($"Key {key} is set to value {value}.");
+                    log.Info($"Key \"{section}.{key}\" is set to value \"{value}\".");
+                }
+                else
+                {
+                    log.Info($"Key \"{section}.{key}\" is loaded.");
                 }
             }
             catch (Exception)
             {
-                log.Warn($"Key {key} is missing, will use default value.");
+                log.Warn($"Key \"{section}.{key}\" is missing, will use default value.");
                 Write(path, section, key, defaultValue);
             }
             return value;

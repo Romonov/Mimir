@@ -1,15 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mimir.Response
 {
     class Root
     {
-        public static (int status, string type, string content) OnGet()
+        public static ValueTuple<int, string, string> OnGet()
         {
             GetRootResponse response = new GetRootResponse();
 

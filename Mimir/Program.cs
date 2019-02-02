@@ -1,4 +1,5 @@
 ﻿using Mimir.CLI;
+using Mimir.SQL;
 using RUL;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,13 @@ namespace Mimir
 
         public static bool IsRunning = false;
         public static bool IsDebug = false;
+
+        public static SqlConnectionType SqlType = SqlConnectionType.Sqlite;
+        public static string SqlDbName = "mimir";
+        public static string SqlIp = "127.0.0.1";
+        public static string SqlUsername = "root";
+        public static string SqlPassword = "123456";
+
         #endregion
 
         private static Logger log = new Logger("Main");
@@ -38,7 +46,15 @@ namespace Mimir
 
             ConfigWorker.Load($@"{Path}\config.ini");
 
-            //log.Info("Connecting database...");
+            log.Info("Connecting database...");
+            try
+            {
+                SqlProxy.Open();
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
 
             try
             {
