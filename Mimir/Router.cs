@@ -58,11 +58,13 @@ namespace Mimir
             string responseHeader = "";
             byte[] bresponse;
 
-            Dictionary<string, string> header = new Dictionary<string, string>();
-            header.Add("Server", "Mimir");
-            header.Add("Author", "Romonov");
-            header.Add("Version", Program.Version);
-            header.Add("X-Authlib-Injector-API-Location", "/");
+            Dictionary<string, string> header = new Dictionary<string, string>()
+            {
+                { "Server", "Mimir"},
+                { "Author", "Romonov"},
+                { "Version", Program.Version},
+                { "X-Authlib-Injector-API-Location", "/"}
+            };
 
             // 发送返回
             bcontect = Encoding.Default.GetBytes(response);

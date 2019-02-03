@@ -34,8 +34,7 @@ namespace Mimir
                     Program.SqlPassword = Read(path, "SQL", "Password", Program.SqlPassword, true);
                     break;
                 default:
-                    throw new NullReferenceException();
-                    break;
+                    throw new ArgumentOutOfRangeException();
             }
 
             log.Info("Configs loaded.");
@@ -63,8 +62,7 @@ namespace Mimir
                     Write(path, "SQL", "Password", Program.SqlPassword);
                     break;
                 default:
-                    throw new NullReferenceException();
-                    break;
+                    throw new ArgumentOutOfRangeException();
             }
 
             log.Info("Configs saved.");

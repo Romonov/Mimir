@@ -10,10 +10,10 @@ namespace Mimir.Response
             GetRootResponse response = new GetRootResponse();
 
             response.meta.serverName = Program.ServerName;
-            response.meta.implementationName = Program.Name;
+            response.meta.implementationName = "Mimir";
             response.meta.implementationVersion = Program.Version;
             response.skinDomains = new string[] { "*"};
-            //response.signaturePublickey = $"-----BEGIN PUBLIC KEY-----\n{Program.SkinPublicKey}\n-----END PUBLIC KEY-----\n";
+            response.signaturePublickey = $"-----BEGIN PUBLIC KEY-----\n{Program.SkinPublicKey}\n-----END PUBLIC KEY-----\n";
 
             return (200, "text/plain", JsonConvert.SerializeObject(response));
         }

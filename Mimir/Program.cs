@@ -1,5 +1,6 @@
 ﻿using Mimir.CLI;
 using Mimir.SQL;
+using Mimir.Util;
 using RUL;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,7 @@ namespace Mimir
     class Program
     {
         #region 定义变量
-        public const string Name = "Mimir";
-        public const string Version = "0.7.0";
+        public const string Version = "0.7.1";
 
         public static string Path = Directory.GetCurrentDirectory();
                 
@@ -34,6 +34,7 @@ namespace Mimir
         public static string SqlUsername = "root";
         public static string SqlPassword = "123456";
 
+        public static string SkinPublicKey = "";
         #endregion
 
         private static Logger log = new Logger("Main");
@@ -46,6 +47,15 @@ namespace Mimir
 
             ConfigWorker.Load($@"{Path}\config.ini");
 
+            if (!File.Exists($@"{Path}\PublicKey.xml") || !File.Exists($@"{Path}\PrivateKey.xml"))
+            {
+                log.Warn("Private key file is missing, and it will be generated now.");
+                RSAWorker.GenKey();
+            }
+            RSAWorker.LoadKey();
+            SkinPublicKey = RSAWorker.RSAPublicKeyConverter(RSAWorker.PublicKey.ToXmlString(false));
+
+
             log.Info("Connecting database...");
             try
             {
@@ -54,6 +64,7 @@ namespace Mimir
             catch (Exception ex)
             {
                 log.Error(ex);
+                CommandHandler.Stop(1);
             }
 
             try
@@ -64,7 +75,7 @@ namespace Mimir
             catch (Exception ex)
             {
                 log.Fatal(ex);
-                CommandHandler.Stop(1);
+                CommandHandler.Stop(2);
             }
             
             log.Info("Welcome!!");
