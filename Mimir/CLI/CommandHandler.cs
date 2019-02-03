@@ -20,6 +20,7 @@ namespace Mimir.CLI
                     Program.GetLogger().Info("/stop: To stop the server.");
                     Program.GetLogger().Info("/user: To manage users in the database.");
                     Program.GetLogger().Info("/version: To show the version of Mimir.");
+                    Program.GetLogger().Info("/dbinit: To initialize the database.");
                     Program.GetLogger().Info("--------------- [ 1 / 1 ]  ---------------");
                     break;
                 case "stop":
@@ -30,6 +31,9 @@ namespace Mimir.CLI
                 case "version":
                 case "ver":
                 case "v":
+                    break;
+                case "dbinit":
+                    SqlProxy.Init();
                     break;
                 default:
                     Program.GetLogger().Error("No such command.");

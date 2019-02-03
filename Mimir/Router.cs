@@ -1,12 +1,11 @@
 ﻿using Mimir.Response;
+using Mimir.Response.AuthServer;
 using RUL;
 using RUL.Net;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Mimir
 {
@@ -24,24 +23,45 @@ namespace Mimir
 
             try
             {
-                if (req.Method == Method.Get)
+                switch (req.Method)
                 {
-                    switch (req.Url)
-                    {
-                        case "/":
-                            response = Root.OnGet();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                else if (req.Method == Method.Post)
-                {
+                    case Method.Get:
+                        switch (req.Url)
+                        {
+                            case "/":
+                                response = Root.OnGet();
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case Method.Post:
+                        switch (req.Url)
+                        {
+                            #region AuthServer
+                            case "/authserver/authenticate":
+                                response = Authenticate.OnPost(req.PostData);
+                                break;
+                            case "/authserver/refresh":
+                                response = Refresh.OnPost(req.PostData);
+                                break;
+                            case "/authserver/validate":
+                                response = Validate.OnPost(req.PostData);
+                                break;
+                            case "/authserver/invalidate":
+                                response = Invalidate.OnPost(req.PostData);
+                                break;
+                            case "/authserver/signout":
+                                response = Signout.OnPost(req.PostData);
+                                break;
+                            #endregion
 
-                }
-                else
-                {
-
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
             catch (Exception ex)

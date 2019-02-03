@@ -85,6 +85,14 @@
   <ItemGroup>
     <Compile Include="CLI\CommandHandler.cs" />
     <Compile Include="ConfigWorker.cs" />
+    <Compile Include="Response\AuthServer\Authenticate.cs" />
+    <Compile Include="Response\AuthServer\Invalidate.cs" />
+    <Compile Include="Response\AuthServer\Refresh.cs" />
+    <Compile Include="Response\AuthServer\Signout.cs" />
+    <Compile Include="Response\AuthServer\Validate.cs" />
+    <Compile Include="Response\Exceptions\InvalidPassword.cs" />
+    <Compile Include="Response\Exceptions\InvalidToken.cs" />
+    <Compile Include="Response\Exceptions\UnsafeSqlChar.cs" />
     <Compile Include="Response\Root.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
