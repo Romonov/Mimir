@@ -3,6 +3,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.X509;
 using RUL;
+using RUL.Encode;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -61,18 +62,11 @@ namespace Mimir.Util
             }
         }
 
-        public static string Encrypt(string str)
+        public static string Sign(string data)
         {
-            byte[] publicValue = PublicKey.Encrypt(Encoding.Default.GetBytes(str), false);
-            string publicStr = Convert.ToBase64String(publicValue);
-            return publicStr;
-        }
-
-        public string Decrypt(string str)
-        {
-            byte[] privateValue = PrivateKey.Decrypt(Convert.FromBase64String(str), false);
-            string privateStr = Encoding.Default.GetString(privateValue);
-            return privateStr;
+            byte[] byteData = Encoding.Default.GetBytes(data);
+            byte[] signedData = PrivateKey.SignData(byteData, new SHA1CryptoServiceProvider());
+            return Convert.ToBase64String(signedData);
         }
 
         public static string RSAPublicKeyConverter(string XML)

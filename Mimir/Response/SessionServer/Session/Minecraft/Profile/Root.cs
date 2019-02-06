@@ -16,11 +16,11 @@ namespace Mimir.Response.SessionServer.Session.Minecraft.Profile
 
             if (getData != null && getData.ContainsKey("unsigned"))
             {
-                profileInfo = GetProfile.Get(uuid, BoolParse(getData["unsigned"]));
+                profileInfo = GetProfile.Get(uuid, true, BoolParse(getData["unsigned"]));
             }
             else
             {
-                profileInfo = GetProfile.Get(uuid);
+                profileInfo = GetProfile.Get(uuid, true);
             }
 
             if (profileInfo == "")

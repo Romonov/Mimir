@@ -1,4 +1,5 @@
-﻿using Mimir.SQL;
+﻿using Mimir.Response.Common;
+using Mimir.SQL;
 using Mimir.Util;
 using Newtonsoft.Json;
 using RUL;
@@ -16,8 +17,6 @@ namespace Mimir.Response.SessionServer.Session.Minecraft
         public static ValueTuple<int, string, string> OnGet(Dictionary<string, string> arguments)
         {
             // Get /sessionserver/session/minecraft/hasJoined?username={username}&serverId={serverId}&ip={ip}
-            Response response = new Response();
-            
             DataSet dataSetSessions = SqlProxy.Query($"select * from `sessions` where `ServerID` = '{SqlSecurity.Parse(arguments["serverId"])}' and `ExpireTime` > {TimeWorker.GetTimeStamp()}");
             if (SqlProxy.IsEmpty(dataSetSessions))
             {
@@ -61,24 +60,8 @@ namespace Mimir.Response.SessionServer.Session.Minecraft
                 return (204, "text/plain", "");
             }
             DataRow dataRowProfile = dataSetProfile.Tables[0].Rows[0];
-
-            response.id = dataRowProfile["UnsignedUUID"].ToString();
-            response.name = dataRowProfile["Name"].ToString();
-
-            return (200, "text/plain", JsonConvert.SerializeObject(response));
-        }
-
-        struct Response
-        {
-            public string id;
-            public string name;
-            public Properties?[] properties;
-        }
-        struct Properties
-        {
-            public string name;
-            public string value;
-            public string signature;
+            
+            return (200, "text/plain", GetProfile.Get(arguments["username"], true, false));
         }
     }
 }

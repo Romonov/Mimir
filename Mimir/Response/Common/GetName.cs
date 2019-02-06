@@ -10,9 +10,9 @@ namespace Mimir.Response.Common
 {
     class GetName
     {
-        public static string GetProfile(Guid uuid)
+        public static string FromUuid(Guid uuid)
         {
-            DataSet dataSetProfiles = SqlProxy.Query($"select * from `profiles` where `UnsignedUUID` = '{uuid.ToString()}'");
+            DataSet dataSetProfiles = SqlProxy.Query($"select * from `profiles` where `UnsignedUUID` = '{uuid.ToString("N")}'");
 
             if (SqlProxy.IsEmpty(dataSetProfiles))
             {
