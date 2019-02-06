@@ -1,9 +1,11 @@
 ﻿using Mimir.Response;
 using Mimir.Response.AuthServer;
+using Mimir.Response.SessionServer.Session.Minecraft;
 using RUL;
 using RUL.Net;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -31,7 +33,19 @@ namespace Mimir
                             case "/":
                                 response = Root.OnGet();
                                 break;
+
+                            #region SessionServer
+                            case "/sessionserver/session/minecraft/hasJoined":
+                                response = HasJoined.OnGet(req.Get);
+                                break;
+                            #endregion
+
                             default:
+                                // Get /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
+                                if (Guid.TryParse(req.Url.Split('/')[5], out Guid guid))
+                                {
+                                    response = Response.SessionServer.Session.Minecraft.Profile.Root.OnGet(req.Get, guid);
+                                }
                                 break;
                         }
                         break;
@@ -53,6 +67,19 @@ namespace Mimir
                                 break;
                             case "/authserver/signout":
                                 response = Signout.OnPost(req.PostData);
+                                break;
+                            #endregion
+
+                            #region SessionServer
+                            case "/sessionserver/session/minecraft/join":
+                                IPEndPoint ipEndPoint = (IPEndPoint)socket.RemoteEndPoint;
+                                response = Join.OnPost(req.PostData, ipEndPoint.Address.ToString());
+                                break;
+                            #endregion
+
+                            #region
+                            case "/api/profiles/minecraft":
+                                response = Response.API.Profiles.Minecraft.Root.OnPost(req.PostData);
                                 break;
                             #endregion
 

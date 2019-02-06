@@ -12,7 +12,7 @@ namespace Mimir.Response
             response.meta.serverName = Program.ServerName;
             response.meta.implementationName = "Mimir";
             response.meta.implementationVersion = Program.Version;
-            response.skinDomains = new string[] { ""};
+            response.skinDomains = new string[] { ".mojang.com", ".minecraft.net"};
             response.signaturePublickey = $"-----BEGIN PUBLIC KEY-----\n{Program.SkinPublicKey}\n-----END PUBLIC KEY-----\n";
 
             return (200, "text/plain", JsonConvert.SerializeObject(response));

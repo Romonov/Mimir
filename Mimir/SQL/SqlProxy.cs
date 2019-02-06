@@ -144,14 +144,14 @@ namespace Mimir.SQL
             switch (Program.SqlType)
             {
                 case SqlConnectionType.Sqlite:
-                    if (!Sqlite.IsConnected)
+                    if (Sqlite.IsConnected)
                     {
                         Sqlite.Close();
                     }
                     break;
 
                 case SqlConnectionType.MySql:
-                    if (!MySql.IsConnected)
+                    if (MySql.IsConnected)
                     {
                         MySql.Close();
                     }

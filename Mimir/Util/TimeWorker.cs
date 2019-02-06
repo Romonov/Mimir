@@ -7,19 +7,19 @@ namespace Mimir.Util
         public static string GetTimeStamp()
         {
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            return long.Parse(ts.TotalMilliseconds.ToString()).ToString();
+            return ((long)(ts.TotalMilliseconds)).ToString();
         }
 
         public static string GetTimeStamp(long add)
         {
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            return (long.Parse(ts.TotalMilliseconds.ToString()) + add).ToString();
+            return ((long)(ts.TotalMilliseconds) + add).ToString();
         }
 
         public static string GetJavaTimeStamp()
         {
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            return (long.Parse(ts.TotalSeconds.ToString())).ToString();
+            return ((long)(ts.TotalSeconds)).ToString();
         }
     }
 }
