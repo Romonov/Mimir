@@ -117,7 +117,7 @@ namespace Mimir
         {
             try
             {
-                ini[section][key] = value;
+                ini[section].AddKey(key, value);
                 parser.WriteFile("config.ini", ini);
             }
             catch (Exception ex)
