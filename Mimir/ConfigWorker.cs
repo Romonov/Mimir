@@ -4,6 +4,7 @@ using Mimir.SQL;
 using RUL;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +15,20 @@ namespace Mimir
     {
         private static Logger log = new Logger("Config");
         private static readonly FileIniDataParser parser = new FileIniDataParser();
-        private static IniData ini = parser.ReadFile("config.ini");
+        private static IniData ini;
 
-        public static void Load(string path)
+        public static void Load()
         {
             log.Info("Loading configs...");
+
+            if (File.Exists("config.ini"))
+            {
+                ini = parser.ReadFile("config.ini");
+            }
+            else
+            {
+                ini = new IniData();
+            }
 
             Program.ServerName = Read("General", "ServerName", Program.ServerName);
             bool.TryParse(Read("General", "IsDebug", Program.IsDebug.ToString()), out Program.IsDebug);
@@ -44,7 +54,7 @@ namespace Mimir
             log.Info("Configs loaded.");
         }
 
-        public static void Save(string path)
+        public static void Save()
         {
             log.Info("Saving configs...");
 
@@ -77,8 +87,11 @@ namespace Mimir
             string value = defaultValue;
             try
             {
-                value = ini[section][key];
-                if (value == "")
+                if (ini[section][key].Length != 0)
+                {
+                    value = ini[section][key];
+                }
+                else
                 {
                     throw new NullReferenceException();
                 }

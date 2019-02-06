@@ -12,6 +12,8 @@ namespace Mimir.SQL
 
         public static void Open()
         {
+            log.Info("Connecting database...");
+
             switch (Program.SqlType)
             {
                 case SqlConnectionType.Sqlite:

@@ -44,7 +44,7 @@ namespace Mimir.CLI
         public static void Stop(int exitCode)
         {
             SqlProxy.Close();
-            ConfigWorker.Save($@"{Program.Path}\config.ini");
+            ConfigWorker.Save();
             Console.Write("Please press any key to exit Mimir.");
             Console.ReadKey(false);
             Environment.Exit(exitCode);

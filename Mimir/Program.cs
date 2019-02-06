@@ -46,7 +46,7 @@ namespace Mimir
             log.Info($"Mimir version: {Version}, made by: Romonov! ");
             log.Info("Starting...");
 
-            ConfigWorker.Load($@"{Path}\config.ini");
+            ConfigWorker.Load();
 
             if (!File.Exists($@"{Path}\PublicKey.xml") || !File.Exists($@"{Path}\PrivateKey.xml"))
             {
@@ -56,8 +56,6 @@ namespace Mimir
             RSAWorker.LoadKey();
             SkinPublicKey = RSAWorker.RSAPublicKeyConverter(RSAWorker.PublicKey.ToXmlString(false));
 
-
-            log.Info("Connecting database...");
             try
             {
                 SqlProxy.Open();
