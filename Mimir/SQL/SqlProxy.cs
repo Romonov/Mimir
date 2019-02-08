@@ -98,20 +98,12 @@ namespace Mimir.SQL
                 switch (Program.SqlType)
                 {
                     case SqlConnectionType.Sqlite:
-                        if (Sqlite.GetSqlConnection().State == ConnectionState.Broken)
-                        {
-                            Open();
-                        }
                         using (SQLiteCommand sqliteCommand = new SQLiteCommand(sql, Sqlite.GetSqlConnection()))
                         {
                             return sqliteCommand.ExecuteNonQuery();
                         }
 
                     case SqlConnectionType.MySql:
-                        if (MySql.GetSqlConnection().State == ConnectionState.Broken)
-                        {
-                            Open();
-                        }
                         using (MySqlCommand mySqlCommand = new MySqlCommand(sql, MySql.GetSqlConnection()))
                         {
                             return mySqlCommand.ExecuteNonQuery();

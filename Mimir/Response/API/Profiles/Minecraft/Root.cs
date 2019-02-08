@@ -1,10 +1,7 @@
 ﻿using Mimir.Response.Common;
+using Mimir.Response.Exceptions;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mimir.Response.API.Profiles.Minecraft
 {
@@ -15,6 +12,11 @@ namespace Mimir.Response.API.Profiles.Minecraft
             // Post /api/profiles/minecraft
 
             Request request = JsonConvert.DeserializeObject<Request>(postData);
+
+            if (request.name.Length > Program.UserMaxApiQuery)
+            {
+                return ForbiddenOperation.GetResponse();
+            }
 
             string profileInfo = "";
 

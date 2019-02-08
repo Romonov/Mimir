@@ -37,6 +37,8 @@ namespace Mimir
 
         public static bool UserAllowRegister = false;
         public static int UserMaxRegistration = 4567;
+        public static int UserTryTimesPerMinutes = 5;
+        public static int UserMaxApiQuery = 2;
 
         public static string SkinPublicKey = "";
         public static ConfigWorker.SkinSource SkinSource = ConfigWorker.SkinSource.Mojang;
@@ -82,6 +84,17 @@ namespace Mimir
                 log.Fatal(ex);
                 log.Info("Init failed.");
                 CommandHandler.Stop(2);
+            }
+
+            try
+            {
+                Poller.Start();
+            }
+            catch (Exception ex)
+            {
+                log.Fatal(ex);
+                log.Info("Init failed.");
+                CommandHandler.Stop(3);
             }
             
             log.Info("Welcome!!");

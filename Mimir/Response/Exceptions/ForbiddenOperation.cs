@@ -3,7 +3,7 @@ using System;
 
 namespace Mimir.Response.Exceptions
 {
-    class InvalidPassword
+    class ForbiddenOperation
     {
         public static ValueTuple<int, string, string> GetResponse()
         {

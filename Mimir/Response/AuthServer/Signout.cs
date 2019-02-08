@@ -14,7 +14,10 @@ namespace Mimir.Response.AuthServer
             Request request = JsonConvert.DeserializeObject<Request>(PostData);
 
             // Login
-            DataSet dataSetUser = SqlProxy.Query($"select * from `users` where `Username` = '{SqlSecurity.Parse(request.username)}' and `Password` = '{HashWorker.MD5(request.password)}';");
+            DataSet dataSetUser = SqlProxy.Query($"select * from `users` where `Username` = '{SqlSecurity.Parse(request.username)}' and `Password` = '{HashWorker.MD5(request.password)}' and `TryTimes` <= {Program.UserTryTimesPerMinutes};");
+
+            SqlProxy.Excute($"update `users` set `TryTimes` = `TryTimes` + 1 where `Email` = '{SqlSecurity.Parse(request.username)}'");
+
             DataRow dataRowUser;
 
             if (dataSetUser?.Tables[0]?.Rows.Count >= 1)
@@ -23,7 +26,7 @@ namespace Mimir.Response.AuthServer
             }
             else
             {
-                return InvalidPassword.GetResponse();
+                return ForbiddenOperation.GetResponse();
             }
 
             // Signout

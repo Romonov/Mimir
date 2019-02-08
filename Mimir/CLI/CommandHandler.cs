@@ -43,6 +43,7 @@ namespace Mimir.CLI
 
         public static void Stop(int exitCode)
         {
+            Poller.Stop();
             SqlProxy.Close();
             ConfigWorker.Save();
             Console.Write("Please press any key to exit Mimir.");
