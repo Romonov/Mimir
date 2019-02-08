@@ -10,7 +10,14 @@ namespace Mimir.Response.Skins
     {
         public static ValueTuple<int, string, byte[]> OnGet(Dictionary<string, string> getData)
         {
+            if (getData != null && getData.ContainsKey("id"))
+            {
 
+            }
+            if (getData != null && getData.ContainsKey("uuid"))
+            {
+
+            }
             return (200, "image/png", Encoding.Default.GetBytes(""));
         }
     }

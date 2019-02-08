@@ -107,12 +107,12 @@
     <Compile Include="Response\SessionServer\Session\Minecraft\Profile\Root.cs" />
     <Compile Include="Response\Skins\Root.cs" />
     <Compile Include="Router.cs" />
-    <Compile Include="Util\RSAWorker.cs" />
-    <Compile Include="SocketWorker.cs" />
     <Compile Include="SQL\MySql.cs" />
     <Compile Include="SQL\Sqlite.cs" />
     <Compile Include="SQL\SqlProxy.cs" />
     <Compile Include="SQL\SqlSecurity.cs" />
+    <Compile Include="Util\RSAWorker.cs" />
+    <Compile Include="SocketWorker.cs" />
     <Compile Include="Util\TimeWorker.cs" />
     <Compile Include="Util\UuidWorker.cs" />
   </ItemGroup>

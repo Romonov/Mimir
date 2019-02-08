@@ -14,11 +14,23 @@ namespace Mimir.SQL
 
         public static SQLiteConnection GetSqlConnection()
         {
-            if (sqliteConnection.State == ConnectionState.Closed)
+            if (sqliteConnection == null)
             {
-                log.Info("Reconnecting sqlite database.");
+                IsConnected = false;
                 Open();
             }
+            else if (sqliteConnection.State == ConnectionState.Closed)
+            {
+                log.Info("Connection closed, reconnecting.");
+                IsConnected = false;
+                Open();
+            }
+            else if (sqliteConnection.State == ConnectionState.Broken)
+            {
+                Close();
+                Open();
+            }
+
             return sqliteConnection;
         }
 

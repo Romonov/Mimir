@@ -48,17 +48,6 @@ namespace Mimir.SQL
         {
             log.Info("Initializing the database...");
 
-            Excute("DROP TABLE IF EXISTS `profiles`;");
-            Excute("CREATE TABLE `profiles` (`ID` int(11) NOT NULL AUTO_INCREMENT, `UserID` text NOT NULL, `Name` text NOT NULL, `UnsignedUUID` text NOT NULL, `IsSelected` tinyint(1) NOT NULL DEFAULT '0', PRIMARY KEY (`ID`)) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;");
-
-            Excute("DROP TABLE IF EXISTS `sessions`;");
-            Excute("CREATE TABLE `sessions` (`ServerID` char(100) NOT NULL, `AccessToken` text NOT NULL, `ClientIP` text NOT NULL COMMENT, `ExpireTime` double NOT NULL COMMENT, PRIMARY KEY (`ServerID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-
-            Excute("DROP TABLE IF EXISTS `tokens`;");
-            Excute("CREATE TABLE `tokens` (`AccessToken` char(32) NOT NULL, `ClientToken` char(32) NOT NULL, `BindProfile` text, `CreateTime` double NOT NULL, `Status` tinyint(1) NOT NULL, `BindUser` text NOT NULL, PRIMARY KEY (`AccessToken`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-
-            Excute("DROP TABLE IF EXISTS `users`;");
-            Excute("CREATE TABLE `users` (`ID` int(11) NOT NULL AUTO_INCREMENT, `UUID` char(32) NOT NULL, `Username` char(20) NOT NULL, `Password` text NOT NULL, `Email` char(30) NOT NULL, `Nickname` text NOT NULL, `PreferredLanguage` text NOT NULL, `LastLogin` double(13,0) NOT NULL DEFAULT '0', `CreateTime` double(13,0) NOT NULL, `IsLogged` tinyint(1) NOT NULL DEFAULT '0', `IsAdmin` tinyint(1) NOT NULL DEFAULT '0', `IsVerified` tinyint(1) NOT NULL DEFAULT '0', `TryTimes` int(11) NOT NULL DEFAULT '0', PRIMARY KEY (`ID`,`UUID`,`Username`,`Email`)) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;");
         }
 
         public static DataSet Query(string sql)
@@ -70,7 +59,7 @@ namespace Mimir.SQL
                 switch (Program.SqlType)
                 {
                     case SqlConnectionType.Sqlite:
-                        if (!Sqlite.IsConnected)
+                        if (Sqlite.GetSqlConnection().State == ConnectionState.Broken)
                         {
                             Open();
                         }
@@ -81,7 +70,7 @@ namespace Mimir.SQL
                         return dataSet;
 
                     case SqlConnectionType.MySql:
-                        if (!MySql.IsConnected)
+                        if (MySql.GetSqlConnection().State == ConnectionState.Broken)
                         {
                             Open();
                         }
@@ -109,7 +98,7 @@ namespace Mimir.SQL
                 switch (Program.SqlType)
                 {
                     case SqlConnectionType.Sqlite:
-                        if (!Sqlite.IsConnected)
+                        if (Sqlite.GetSqlConnection().State == ConnectionState.Broken)
                         {
                             Open();
                         }
@@ -119,7 +108,7 @@ namespace Mimir.SQL
                         }
 
                     case SqlConnectionType.MySql:
-                        if (!MySql.IsConnected)
+                        if (MySql.GetSqlConnection().State == ConnectionState.Broken)
                         {
                             Open();
                         }
