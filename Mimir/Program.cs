@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,11 +37,17 @@ namespace Mimir
         public static string SqlUsername = "root";
         public static string SqlPassword = "123456";
 
+        public static bool SslIsEnable = true;
+        public static ConfigWorker.SslCertSource SslCertSource = ConfigWorker.SslCertSource.Own;
+        public static string SslCertName = "cert.pfx";
+        public static string SslCertPassword = "******";
+        public static X509Certificate2 SslCert = null;
+
         public static bool UserAllowRegister = false;
         public static int UserMaxRegistration = 4567;
 
         public static int SecurityRegisterTimesPerMinute = 5;
-        internal static int SecurityRegisterTimes = 0;
+        public static int SecurityRegisterTimes = 0;
         public static int SecurityLoginTimesPerMinute = 5;
         public static int SecurityMaxApiQuery = 2;
 
@@ -66,6 +73,31 @@ namespace Mimir
             }
             RSAWorker.LoadKey();
             SkinPublicKey = RSAWorker.RSAPublicKeyConverter(RSAWorker.PublicKey.ToXmlString(false));
+
+            if (!File.Exists(SslCertName))
+            {
+                if (SslCertSource == ConfigWorker.SslCertSource.Own)
+                {
+                    log.Warn("SSL certificate can't load, disabling ssl mode.");
+                    SslIsEnable = false;
+                }
+                else if (SslCertSource == ConfigWorker.SslCertSource.Generate)
+                {
+                    log.Warn("SSL certificate is missing, generating ssl certificate.");
+                    CertWorker.Gen();
+                }
+            }
+            try
+            {
+                SslCert = new X509Certificate2(SslCertName, SslCertPassword);
+                log.Info("Ssl certificate loaded.");
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+                log.Warn("SSL certificate can't load, disabling ssl mode.");
+                SslIsEnable = false;
+            }
 
             try
             {
@@ -100,6 +132,8 @@ namespace Mimir
                 log.Info("Init failed.");
                 CommandHandler.Stop(3);
             }
+
+            ConfigWorker.Save();
             
             log.Info("Welcome!!");
             log.Info("Input \"help\" for show help messages.");

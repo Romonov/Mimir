@@ -7,6 +7,7 @@ using RUL.Net;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 
@@ -16,7 +17,7 @@ namespace Mimir
     {
         private static Logger log = new Logger("Router");
 
-        public static void Route(string httpReq, Socket socket)
+        public static void Route(string httpReq, Socket socket, SslStream sslStream)
         {
             HttpReq req = HttpProtocol.Solve(httpReq);
 
@@ -124,20 +125,20 @@ namespace Mimir
                 log.Error(ex);
             }
 
-            Post(response.status, response.type, response.content, socket);
+            Post(response.status, response.type, response.content, socket, sslStream);
         }
 
-        private static void Post(int status, string responseType, string response, Socket socket)
+        private static void Post(int status, string responseType, string response, Socket socket, SslStream sslStream)
         {
-            InternalPost(status, responseType, Encoding.Default.GetBytes(response), socket);
+            InternalPost(status, responseType, Encoding.Default.GetBytes(response), socket, sslStream);
         }
 
-        private static void Post(int status, string responseType, byte[] response, Socket socket)
+        private static void Post(int status, string responseType, byte[] response, Socket socket, SslStream sslStream)
         {
-            InternalPost(status, responseType, response, socket);
+            InternalPost(status, responseType, response, socket, sslStream);
         }
 
-        private static void InternalPost(int status, string responseType, byte[] byteResponse, Socket socket)
+        private static void InternalPost(int status, string responseType, byte[] byteResponse, Socket socket, SslStream sslStream)
         {
             string responseHeader = "";
             byte[] byteResponseHeader;
@@ -161,8 +162,17 @@ namespace Mimir
 
             try
             {
-                socket.Send(byteResponseHeader);
-                socket.Send(byteResponse);
+                if (Program.SslIsEnable)
+                {
+                    sslStream.Write(byteResponseHeader);
+                    sslStream.Write(byteResponse);
+                    sslStream.Flush();
+                }
+                else
+                {
+                    socket.Send(byteResponseHeader);
+                    socket.Send(byteResponse);
+                }
             }
             catch (Exception e)
             {
@@ -177,6 +187,10 @@ namespace Mimir
             }
             finally
             {
+                if (Program.SslIsEnable)
+                {
+                    sslStream.Close();
+                }
                 socket.Close();
             }
         }

@@ -36,12 +36,10 @@ namespace Mimir
             int.TryParse(Read("General", "MaxConnection", Program.MaxConnection.ToString()), out Program.MaxConnection);
 
             Enum.TryParse(Read("SQL", "Type", Program.SqlType.ToString(), true), out Program.SqlType);
-            CommitWrite("SQL", "Type", "Allow value: Sqlite, MySql");
+            CommitWrite("SQL", "Type", "Allow value: Sqlite, MySql.");
             Program.SqlDbName = Read("SQL", "DatabaseName", Program.SqlDbName);
             switch (Program.SqlType)
             {
-                case SqlConnectionType.Sqlite:
-                    break;
                 case SqlConnectionType.MySql:
                     Program.SqlIp = Read("SQL", "IP", Program.SqlIp);
                     Program.SqlUsername = Read("SQL", "Username", Program.SqlUsername);
@@ -51,11 +49,24 @@ namespace Mimir
                     throw new ArgumentOutOfRangeException();
             }
 
+            bool.TryParse(Read("SSL", "Enable", Program.SslIsEnable.ToString()), out Program.SslIsEnable);
+            if (Program.SslIsEnable)
+            {
+                Enum.TryParse(Read("SSL", "CertSource", Program.SslCertSource.ToString()), out Program.SslCertSource);
+                CommitWrite("SSL", "CertSource", "Allow value: Own, Generate.");
+                Program.SslCertName = Read("SSL", "CertName", Program.SslCertName);
+                Program.SslCertPassword = Read("SSL", "CertPassword", Program.SslCertPassword, true);
+            }
+
             bool.TryParse(Read("Users", "AllowRegister", Program.UserAllowRegister.ToString()), out Program.UserAllowRegister);
             int.TryParse(Read("Users", "MaxRegistration", Program.UserMaxRegistration.ToString()), out Program.UserMaxRegistration);
 
+            int.TryParse(Read("Security", "RegisterTimesPerMinute", Program.SecurityRegisterTimesPerMinute.ToString()), out Program.SecurityRegisterTimesPerMinute);
+            int.TryParse(Read("Security", "LoginTimesPerMinute", Program.SecurityLoginTimesPerMinute.ToString()), out Program.SecurityLoginTimesPerMinute);
+            int.TryParse(Read("Security", "MaxAPIQuery", Program.SecurityMaxApiQuery.ToString()), out Program.SecurityMaxApiQuery);
+
             Enum.TryParse(Read("Skins", "Source", Program.SkinSource.ToString(), true), out Program.SkinSource);
-            CommitWrite("Skins", "Source", "Allow value: Mojang, Local");
+            CommitWrite("Skins", "Source", "Allow value: Mojang, Local.");
             switch (Program.SkinSource)
             {
                 case SkinSource.Mojang:
@@ -65,10 +76,6 @@ namespace Mimir
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            int.TryParse(Read("Security", "RegisterTimesPerMinute", Program.SecurityRegisterTimesPerMinute.ToString()), out Program.SecurityRegisterTimesPerMinute);
-            int.TryParse(Read("Security", "LoginTimesPerMinute", Program.SecurityLoginTimesPerMinute.ToString()), out Program.SecurityLoginTimesPerMinute);
-            int.TryParse(Read("Security", "MaxAPIQuery", Program.SecurityMaxApiQuery.ToString()), out Program.SecurityMaxApiQuery);
 
             log.Info("Configs loaded.");
         }
@@ -86,8 +93,6 @@ namespace Mimir
             Write("SQL", "DatabaseName", Program.SqlDbName);
             switch (Program.SqlType)
             {
-                case SqlConnectionType.Sqlite:
-                    break;
                 case SqlConnectionType.MySql:
                     Write("SQL", "IP", Program.SqlIp);
                     Write("SQL", "Username", Program.SqlUsername);
@@ -97,8 +102,21 @@ namespace Mimir
                     throw new ArgumentOutOfRangeException();
             }
 
+            Write("SSL", "Enable", Program.SslIsEnable.ToString());
+            if (Program.SslIsEnable)
+            {
+                Write("SSL", "CertSource", Program.SslCertSource.ToString());
+                Write("SSL", "CertName", Program.SslCertName);
+                Write("SSL", "CertPassword", Program.SslCertPassword);
+            }
+
             Write("Users", "AllowRegister", Program.UserAllowRegister.ToString());
             Write("Users", "MaxRegistration", Program.UserMaxRegistration.ToString());
+
+            Write("Security", "RegisterTimesPerMinute", Program.SecurityRegisterTimesPerMinute.ToString());
+            Write("Security", "LoginTimesPerMinute", Program.SecurityLoginTimesPerMinute.ToString());
+            Write("Security", "MaxAPIQuery", Program.SecurityMaxApiQuery.ToString());
+
             Write("Skins", "Source", Program.SkinSource.ToString());
             switch (Program.SkinSource)
             {
@@ -109,10 +127,6 @@ namespace Mimir
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            Write("Security", "RegisterTimesPerMinute", Program.SecurityRegisterTimesPerMinute.ToString());
-            Write("Security", "LoginTimesPerMinute", Program.SecurityLoginTimesPerMinute.ToString());
-            Write("Security", "MaxAPIQuery", Program.SecurityMaxApiQuery.ToString());
 
             log.Info("Configs saved.");
         }
@@ -180,6 +194,12 @@ namespace Mimir
         {
             Mojang,
             Local
+        }
+
+        public enum SslCertSource
+        {
+            Own,
+            Generate
         }
     }
 }

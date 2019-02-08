@@ -114,6 +114,7 @@
     <Compile Include="SQL\Sqlite.cs" />
     <Compile Include="SQL\SqlProxy.cs" />
     <Compile Include="SQL\SqlSecurity.cs" />
+    <Compile Include="Util\CertWorker.cs" />
     <Compile Include="Util\RSAWorker.cs" />
     <Compile Include="SocketWorker.cs" />
     <Compile Include="Util\TimeWorker.cs" />

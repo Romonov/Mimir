@@ -16,11 +16,11 @@ namespace Mimir.CLI
                 case "help":
                 case "?":
                     Program.GetLogger().Info("--------------- Mimir Help ---------------");
-                    Program.GetLogger().Info("/help: To show this message.");
-                    Program.GetLogger().Info("/stop: To stop the server.");
-                    Program.GetLogger().Info("/user: To manage users in the database.");
-                    Program.GetLogger().Info("/version: To show the version of Mimir.");
-                    Program.GetLogger().Info("/dbinit: To initialize the database.");
+                    Program.GetLogger().Info("help: To show this message.");
+                    Program.GetLogger().Info("stop: To stop the server.");
+                    Program.GetLogger().Info("user: To manage users in the database.");
+                    Program.GetLogger().Info("version: To show the version of Mimir.");
+                    Program.GetLogger().Info("dbinit: To initialize the database.");
                     Program.GetLogger().Info("--------------- [ 1 / 1 ]  ---------------");
                     break;
                 case "stop":
@@ -31,9 +31,13 @@ namespace Mimir.CLI
                 case "version":
                 case "ver":
                 case "v":
+                    Program.GetLogger().Info($"Mimir version: {Program.Version}!");
                     break;
                 case "dbinit":
                     SqlProxy.Init();
+                    break;
+                case "ping":
+                    Program.GetLogger().Info($"啪！");
                     break;
                 default:
                     Program.GetLogger().Error("No such command.");
