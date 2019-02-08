@@ -61,13 +61,18 @@ namespace Mimir.Response.Users
 
             if (regData["password"] != regData["repeat_password"])
             {
-                return (200, "text/html", "Password not match!");
+                return (200, "text/html", "Password not match.");
             }
 
             if ((!SqlProxy.IsEmpty(SqlProxy.Query($"select * from `users` where `username` = '{SqlSecurity.Parse(regData["username"].ToLower())}' or `Email` = '{SqlSecurity.Parse(regData["email"])}';")))
                 || (!SqlProxy.IsEmpty(SqlProxy.Query($"select * from `profiles` where `Name` = '{SqlSecurity.Parse(regData["profile"])}';"))))
             {
-                return (200, "text/html", "Something repeated!");
+                return (200, "text/html", "Something repeated.");
+            }
+
+            if (int.Parse(SqlProxy.Query("select count(1) from `users`").Tables[0].Rows[0]["Count(1)"].ToString()) > Program.UserMaxRegistration)
+            {
+                return (200, "text/html", "Too many users.");
             }
 
             SqlProxy.Excute($"insert into `users` (`UUID`, `Username`, `Password`, `Email`, `Nickname`, `PreferredLanguage`, `LastLogin`, `CreateTime`) " +

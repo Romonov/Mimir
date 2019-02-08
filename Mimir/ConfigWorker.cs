@@ -166,7 +166,7 @@ namespace Mimir
         {
             try
             {
-                ini[section].GetKeyData(key).Comments.Add(commit);
+                ini[section].GetKeyData(key).Comments = new List<string>() { commit };
                 parser.WriteFile("config.ini", ini);
             }
             catch (Exception ex)
