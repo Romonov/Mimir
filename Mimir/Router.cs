@@ -47,7 +47,7 @@ namespace Mimir
                             #region Skins
                             case "/skins":
                                 (int status, string type, byte[] content) = Response.Skins.Root.OnGet(req.Get);
-                                Post(status, type, content, socket);
+                                Post(status, type, content, socket, sslStream);
                                 break;
                             #endregion
 

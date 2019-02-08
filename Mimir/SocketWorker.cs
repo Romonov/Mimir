@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -53,7 +54,7 @@ namespace Mimir
                 if (Program.SslIsEnable)
                 {
                     sslStream = new SslStream(new NetworkStream(new_client, true), false);
-                    sslStream.AuthenticateAsServer(Program.SslCert);
+                    sslStream.AuthenticateAsServer(Program.SslCert, false, SslProtocols.Tls12, false);
                     sslStream.ReadTimeout = 5000;
                     sslStream.WriteTimeout = 5000;
                     real_recv = sslStream.Read(recv_buffer, 0, recv_buffer.Length);
