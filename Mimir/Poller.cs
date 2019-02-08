@@ -33,6 +33,7 @@ namespace Mimir
             while (isRunning)
             {
                 SqlProxy.Excute("update `users` set `TryTimes` = 0");
+                Program.UserRegisterTimes = 0;
                 Thread.Sleep(60000);
             }
         }

@@ -30,11 +30,11 @@ namespace Mimir.Response.SessionServer.Session.Minecraft
                 return InvalidToken.GetResponse();
             }
 
-            DataSet dataSetProfile = SqlProxy.Query($"select * from `profiles` where `Name` = '{dataRowToken["BindUser"].ToString()}' and `UnsignedUUID` = '{SqlSecurity.Parse(request.selectedProfile)}';");
+            DataSet dataSetProfile = SqlProxy.Query($"select * from `profiles` where `Name` = '{dataRowToken["BindProfile"].ToString()}' and `UnsignedUUID` = '{SqlSecurity.Parse(request.selectedProfile)}';");
 
             if (dataSetProfile?.Tables[0]?.Rows?.Count >= 1)
             {
-                SqlProxy.Excute($"insert into `sessions` (`ServerID`, `AccessToken`, `ClientIP`, `ExpireTime`) values ('{SqlSecurity.Parse(request.serverId)}', '{SqlSecurity.Parse(request.accessToken)}', '{clientIP}', '{TimeWorker.GetTimeStamp(30000)}')");
+                SqlProxy.Excute($"insert into `sessions` (`ServerID`, `AccessToken`, `ClientIP`, `ExpireTime`) values ('{SqlSecurity.Parse(request.serverId)}', '{SqlSecurity.Parse(request.accessToken)}', '{clientIP}', '{TimeWorker.GetTimeStamp(30000)}');");
             }
             else
             {

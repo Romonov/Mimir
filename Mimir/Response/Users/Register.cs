@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Mimir.SQL;
+using Mimir.Util;
+using RUL.Encrypt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -26,9 +30,10 @@ namespace Mimir.Response.Users
 
         public static ValueTuple<int, string, string> OnPost(string postData)
         {
+            ++Program.UserRegisterTimes;
             if (Program.UserRegisterTimes > Program.UserRegisterTimesPerMinute)
             {
-                return (403, "text/plain", "Bad operation.");
+                return (403, "text/html", "Bad operation.");
             }
 
             string originData = HttpUtility.UrlDecode(postData, Encoding.Default);
@@ -49,10 +54,19 @@ namespace Mimir.Response.Users
                 || (!regData.ContainsKey("nickname")) 
                 || (!regData.ContainsKey("profile")))
             {
-                return (403, "text/plain", "Bad operation.");
+                return (403, "text/html", "Bad operation.");
             }
-            
 
+            if ((!SqlProxy.IsEmpty(SqlProxy.Query($"select * from `users` where `username` = '{SqlSecurity.Parse(regData["username"].ToLower())}' or `Email` = '{SqlSecurity.Parse(regData["email"])}';")))
+                || (!SqlProxy.IsEmpty(SqlProxy.Query($"select * from `profiles` where `Name` = '{SqlSecurity.Parse(regData["profile"])}';"))))
+            {
+                return (403, "text/html", "Something repeated.");
+            }
+
+            SqlProxy.Excute($"insert into `users` (`UUID`, `Username`, `Password`, `Email`, `Nickname`, `PreferredLanguage`, `LastLogin`, `CreateTime`) " +
+                $"value ('{UuidWorker.ToUnsignedUuid(UuidWorker.GenUuid())}', '{SqlSecurity.Parse(regData["username"].ToLower())}', '{SqlSecurity.Parse(HashWorker.MD5(regData["password"]))}', '{SqlSecurity.Parse(regData["email"])}', '{SqlSecurity.Parse(regData["nickname"])}', 'zh_CN', '{TimeWorker.GetTimeStamp()}', '{TimeWorker.GetTimeStamp()}');");
+            SqlProxy.Excute($"insert into `profiles` (`UserID`, `Name`, `UnsignedUUID`, `IsSelected`) " +
+                $"value ('{SqlSecurity.Parse(regData["username"].ToLower())}', '{SqlSecurity.Parse(regData["profile"])}', '{UuidWorker.ToUnsignedUuid(UuidWorker.GenUuid())}', 1);");
 
             return (200, "text/html", "Register successful!");
         }

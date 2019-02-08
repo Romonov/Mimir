@@ -59,7 +59,7 @@ namespace Mimir
                             default:
                                 #region SessionServer
                                 // Get /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
-                                if (req.Url.Split('/').Length == 5)
+                                if (req.Url.Split('/').Length == 6)
                                 {
                                     if (Guid.TryParse(req.Url.Split('/')[5], out Guid guid))
                                     {
@@ -155,7 +155,7 @@ namespace Mimir
             if (Program.IsDebug)
             {
                 log.Debug($"Response header: {responseHeader}");
-                log.Debug($"Response contect: {byteResponse}");
+                log.Debug($"Response contect: {Encoding.Default.GetString(byteResponse)}");
             }
 
             try
