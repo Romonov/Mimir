@@ -30,9 +30,11 @@ namespace Mimir
                     case Method.Get:
                         switch (req.Url)
                         {
+                            #region ExtendAPI
                             case "/":
                                 response = Root.OnGet();
                                 break;
+                            #endregion
 
                             #region SessionServer
                             case "/sessionserver/session/minecraft/hasJoined":
@@ -40,12 +42,22 @@ namespace Mimir
                                 break;
                             #endregion
 
+                            #region Skins
+                            case "/skins":
+                                (int status, string type, byte[] content) = Response.Skins.Root.OnGet(req.Get);
+                                Poster(status, type, content, socket);
+                                break;
+                            #endregion
+
                             default:
+                                #region SessionServer
                                 // Get /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
                                 if (Guid.TryParse(req.Url.Split('/')[5], out Guid guid))
                                 {
                                     response = Response.SessionServer.Session.Minecraft.Profile.Root.OnGet(req.Get, guid);
                                 }
+                                # endregion
+
                                 break;
                         }
                         break;
@@ -77,7 +89,7 @@ namespace Mimir
                                 break;
                             #endregion
 
-                            #region
+                            #region API
                             case "/api/profiles/minecraft":
                                 response = Response.API.Profiles.Minecraft.Root.OnPost(req.PostData);
                                 break;
@@ -101,9 +113,18 @@ namespace Mimir
 
         private static void Poster(int status, string responseType, string response, Socket socket)
         {
-            byte[] bcontect;
+            Post(status, responseType, Encoding.Default.GetBytes(response), socket);
+        }
+
+        private static void Poster(int status, string responseType, byte[] response, Socket socket)
+        {
+            Post(status, responseType, response, socket);
+        }
+
+        private static void Post(int status, string responseType, byte[] byteResponse, Socket socket)
+        {
             string responseHeader = "";
-            byte[] bresponse;
+            byte[] byteResponseHeader;
 
             Dictionary<string, string> header = new Dictionary<string, string>()
             {
@@ -113,21 +134,19 @@ namespace Mimir
                 { "X-Authlib-Injector-API-Location", "/"}
             };
 
-            // 发送返回
-            bcontect = Encoding.Default.GetBytes(response);
-            responseHeader = HttpProtocol.Build(status, responseType, bcontect.Length, header);
-            bresponse = Encoding.Default.GetBytes(responseHeader);
+            responseHeader = HttpProtocol.Build(status, responseType, byteResponse.Length, header);
+            byteResponseHeader = Encoding.Default.GetBytes(responseHeader);
 
             if (Program.IsDebug)
             {
                 log.Debug($"Response header: {responseHeader}");
-                log.Debug($"Response contect: {response}");
+                log.Debug($"Response contect: {byteResponse}");
             }
 
             try
             {
-                socket.Send(bresponse);
-                socket.Send(bcontect);
+                socket.Send(byteResponseHeader);
+                socket.Send(byteResponse);
             }
             catch (Exception e)
             {

@@ -17,7 +17,7 @@ namespace Mimir
     class Program
     {
         #region 定义变量
-        public const string Version = "0.7.1";
+        public const string Version = "0.7.3";
 
         public static string Path = Directory.GetCurrentDirectory();
                 
@@ -29,13 +29,18 @@ namespace Mimir
         public static bool IsRunning = false;
         public static bool IsDebug = false;
 
-        public static SqlConnectionType SqlType = SqlConnectionType.Sqlite;
+        public static SqlConnectionType SqlType = SqlConnectionType.MySql;
         public static string SqlDbName = "mimir";
         public static string SqlIp = "127.0.0.1";
         public static string SqlUsername = "root";
         public static string SqlPassword = "123456";
 
+        public static bool UserAllowRegister = false;
+        public static int UserMaxRegistration = 4567;
+
         public static string SkinPublicKey = "";
+        public static ConfigWorker.SkinSource SkinSource = ConfigWorker.SkinSource.Mojang;
+
         #endregion
 
         private static Logger log = new Logger("Main");
@@ -63,6 +68,7 @@ namespace Mimir
             catch (Exception ex)
             {
                 log.Error(ex);
+                log.Info("Init failed.");
                 CommandHandler.Stop(1);
             }
 
@@ -74,6 +80,7 @@ namespace Mimir
             catch (Exception ex)
             {
                 log.Fatal(ex);
+                log.Info("Init failed.");
                 CommandHandler.Stop(2);
             }
             

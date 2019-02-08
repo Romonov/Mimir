@@ -34,18 +34,30 @@ namespace Mimir
             bool.TryParse(Read("General", "IsDebug", Program.IsDebug.ToString()), out Program.IsDebug);
             int.TryParse(Read("General", "Port", Program.Port.ToString()), out Program.Port);
             int.TryParse(Read("General", "MaxConnection", Program.MaxConnection.ToString()), out Program.MaxConnection);
-            Enum.TryParse(Read("SQL", "Type", Program.SqlType.ToString(), true), out Program.SqlType);
 
+            Enum.TryParse(Read("SQL", "Type", Program.SqlType.ToString(), true), out Program.SqlType);
+            Program.SqlDbName = Read("SQL", "DatabaseName", Program.SqlDbName);
             switch (Program.SqlType)
             {
                 case SqlConnectionType.Sqlite:
-                    Program.SqlDbName = Read("SQL", "DatabaseName", Program.SqlDbName);
                     break;
                 case SqlConnectionType.MySql:
-                    Program.SqlDbName = Read("SQL", "DatabaseName", Program.SqlDbName);
                     Program.SqlIp = Read("SQL", "IP", Program.SqlIp);
                     Program.SqlUsername = Read("SQL", "Username", Program.SqlUsername);
                     Program.SqlPassword = Read("SQL", "Password", Program.SqlPassword, true);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            
+
+            Enum.TryParse(Read("Skins", "Source", Program.SkinSource.ToString(), true), out Program.SkinSource);
+            switch (Program.SkinSource)
+            {
+                case SkinSource.Mojang:
+                    break;
+                case SkinSource.Local:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -62,18 +74,28 @@ namespace Mimir
             Write("General", "IsDebug", Program.IsDebug.ToString());
             Write("General", "Port", Program.Port.ToString());
             Write("General", "MaxConnection", Program.MaxConnection.ToString());
+
             Write("SQL", "Type", Program.SqlType.ToString());
-            
+            Write("SQL", "DatabaseName", Program.SqlDbName);
             switch (Program.SqlType)
             {
                 case SqlConnectionType.Sqlite:
-                    Write("SQL", "DatabaseName", Program.SqlDbName);
                     break;
                 case SqlConnectionType.MySql:
-                    Write("SQL", "DatabaseName", Program.SqlDbName); ;
                     Write("SQL", "IP", Program.SqlIp);
                     Write("SQL", "Username", Program.SqlUsername);
                     Write("SQL", "Password", Program.SqlPassword);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            Write("Skins", "Source", Program.SkinSource.ToString());
+            switch (Program.SkinSource)
+            {
+                case SkinSource.Mojang:
+                    break;
+                case SkinSource.Local:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -125,6 +147,12 @@ namespace Mimir
                 log.Warn($"Can't write value {value} to key {key}.");
                 log.Error(ex);
             }
+        }
+
+        public enum SkinSource
+        {
+            Mojang,
+            Local
         }
     }
 }
