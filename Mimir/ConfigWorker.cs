@@ -51,8 +51,9 @@ namespace Mimir
             }
 
             bool.TryParse(Read("Users", "AllowRegister", Program.UserAllowRegister.ToString()), out Program.UserAllowRegister);
+            int.TryParse(Read("Users", "RegisterTimesPerMinute", Program.UserRegisterTimesPerMinute.ToString()), out Program.UserRegisterTimesPerMinute);
             int.TryParse(Read("Users", "MaxRegistration", Program.UserMaxRegistration.ToString()), out Program.UserMaxRegistration);
-            int.TryParse(Read("Users", "TryTimesPerMinutes", Program.UserTryTimesPerMinutes.ToString()), out Program.UserTryTimesPerMinutes);
+            int.TryParse(Read("Users", "LoginTryTimesPerMinute", Program.UserLoginTryTimesPerMinute.ToString()), out Program.UserLoginTryTimesPerMinute);
             int.TryParse(Read("Users", "MaxAPIQuery", Program.UserMaxApiQuery.ToString()), out Program.UserMaxApiQuery);
 
             Enum.TryParse(Read("Skins", "Source", Program.SkinSource.ToString(), true), out Program.SkinSource);
@@ -94,8 +95,9 @@ namespace Mimir
             }
 
             Write("Users", "AllowRegister", Program.UserAllowRegister.ToString());
+            Write("Users", "RegisterTimesPerMinute", Program.UserRegisterTimesPerMinute.ToString());
             Write("Users", "MaxRegistration", Program.UserMaxRegistration.ToString());
-            Write("Users", "TryTimesPerMinutes", Program.UserTryTimesPerMinutes.ToString());
+            Write("Users", "LoginTryTimesPerMinute", Program.UserLoginTryTimesPerMinute.ToString());
             Write("Users", "MaxAPIQuery", Program.UserMaxApiQuery.ToString());
 
             Write("Skins", "Source", Program.SkinSource.ToString());

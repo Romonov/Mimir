@@ -17,7 +17,7 @@ namespace Mimir
     class Program
     {
         #region 定义变量
-        public const string Version = "0.7.3";
+        public const string Version = "0.7.4";
 
         public static string Path = Directory.GetCurrentDirectory();
                 
@@ -36,8 +36,10 @@ namespace Mimir
         public static string SqlPassword = "123456";
 
         public static bool UserAllowRegister = false;
+        public static int UserRegisterTimesPerMinute = 5;
+        internal static int UserRegisterTimes = 0;
         public static int UserMaxRegistration = 4567;
-        public static int UserTryTimesPerMinutes = 5;
+        public static int UserLoginTryTimesPerMinute = 5;
         public static int UserMaxApiQuery = 2;
 
         public static string SkinPublicKey = "";
