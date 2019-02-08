@@ -13,7 +13,7 @@ namespace Mimir.Response.API.Profiles.Minecraft
 
             Request request = JsonConvert.DeserializeObject<Request>(postData);
 
-            if (request.name.Length > Program.UserMaxApiQuery)
+            if (request.name.Length > Program.SecurityMaxApiQuery)
             {
                 return ForbiddenOperation.GetResponse();
             }

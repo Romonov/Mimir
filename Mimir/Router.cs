@@ -115,6 +115,7 @@ namespace Mimir
                         }
                         break;
                     default:
+                        response = (405, "", "");
                         break;
                 }
             }
@@ -123,20 +124,20 @@ namespace Mimir
                 log.Error(ex);
             }
 
-            Poster(response.status, response.type, response.content, socket);
+            Post(response.status, response.type, response.content, socket);
         }
 
-        private static void Poster(int status, string responseType, string response, Socket socket)
+        private static void Post(int status, string responseType, string response, Socket socket)
         {
-            Post(status, responseType, Encoding.Default.GetBytes(response), socket);
+            InternalPost(status, responseType, Encoding.Default.GetBytes(response), socket);
         }
 
-        private static void Poster(int status, string responseType, byte[] response, Socket socket)
+        private static void Post(int status, string responseType, byte[] response, Socket socket)
         {
-            Post(status, responseType, response, socket);
+            InternalPost(status, responseType, response, socket);
         }
 
-        private static void Post(int status, string responseType, byte[] byteResponse, Socket socket)
+        private static void InternalPost(int status, string responseType, byte[] byteResponse, Socket socket)
         {
             string responseHeader = "";
             byte[] byteResponseHeader;

@@ -14,7 +14,7 @@ namespace Mimir.Response.AuthServer
             Request request = JsonConvert.DeserializeObject<Request>(PostData);
 
             // Login
-            DataSet dataSetUser = SqlProxy.Query($"select * from `users` where `Username` = '{SqlSecurity.Parse(request.username)}' and `Password` = '{HashWorker.MD5(request.password)}' and `TryTimes` <= {Program.UserLoginTryTimesPerMinute};");
+            DataSet dataSetUser = SqlProxy.Query($"select * from `users` where `Username` = '{SqlSecurity.Parse(request.username)}' and `Password` = '{HashWorker.MD5(request.password)}' and `TryTimes` <= {Program.SecurityLoginTimesPerMinute};");
 
             SqlProxy.Excute($"update `users` set `TryTimes` = `TryTimes` + 1 where `Email` = '{SqlSecurity.Parse(request.username)}'");
 

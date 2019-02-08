@@ -20,6 +20,7 @@ namespace Mimir.Response.Users
                 $"<p>{Program.ServerName} Register</p>" +
                 $"<p>Username *: <input type=\"text\" name=\"username\" required /></p>" +
                 $"<p>Password *: <input type=\"password\" name=\"password\" required /></p>" +
+                $"<p>Repeat password *: <input type=\"password\" name=\"repeat_password\" required /></p>" +
                 $"<p>Email *: <input type=\"text\" name=\"email\" required /></p>" +
                 $"<p>Nickname *: <input type=\"text\" name=\"nickname\" required /></p>" +
                 $"<p>Profile Name *: <input type=\"text\" name=\"profile\" required /></p>" +
@@ -30,10 +31,10 @@ namespace Mimir.Response.Users
 
         public static ValueTuple<int, string, string> OnPost(string postData)
         {
-            ++Program.UserRegisterTimes;
-            if (Program.UserRegisterTimes > Program.UserRegisterTimesPerMinute)
+            ++Program.SecurityRegisterTimes;
+            if (Program.SecurityRegisterTimes > Program.SecurityRegisterTimesPerMinute)
             {
-                return (403, "text/html", "Bad operation.");
+                return (429, "text/plain", "Too many requests.");
             }
 
             string originData = HttpUtility.UrlDecode(postData, Encoding.Default);
@@ -49,18 +50,24 @@ namespace Mimir.Response.Users
             }
 
             if ((!regData.ContainsKey("username")) 
-                || (!regData.ContainsKey("password")) 
+                || (!regData.ContainsKey("password"))
+                || (!regData.ContainsKey("repeat_password"))
                 || (!regData.ContainsKey("email")) 
                 || (!regData.ContainsKey("nickname")) 
                 || (!regData.ContainsKey("profile")))
             {
-                return (403, "text/html", "Bad operation.");
+                return (403, "text/plain", "Bad operation.");
+            }
+
+            if (regData["password"] != regData["repeat_password"])
+            {
+                return (200, "text/html", "Password not match!");
             }
 
             if ((!SqlProxy.IsEmpty(SqlProxy.Query($"select * from `users` where `username` = '{SqlSecurity.Parse(regData["username"].ToLower())}' or `Email` = '{SqlSecurity.Parse(regData["email"])}';")))
                 || (!SqlProxy.IsEmpty(SqlProxy.Query($"select * from `profiles` where `Name` = '{SqlSecurity.Parse(regData["profile"])}';"))))
             {
-                return (403, "text/html", "Something repeated.");
+                return (200, "text/html", "Something repeated!");
             }
 
             SqlProxy.Excute($"insert into `users` (`UUID`, `Username`, `Password`, `Email`, `Nickname`, `PreferredLanguage`, `LastLogin`, `CreateTime`) " +

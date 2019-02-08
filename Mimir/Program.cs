@@ -37,11 +37,12 @@ namespace Mimir
         public static string SqlPassword = "123456";
 
         public static bool UserAllowRegister = false;
-        public static int UserRegisterTimesPerMinute = 5;
-        internal static int UserRegisterTimes = 0;
         public static int UserMaxRegistration = 4567;
-        public static int UserLoginTryTimesPerMinute = 5;
-        public static int UserMaxApiQuery = 2;
+
+        public static int SecurityRegisterTimesPerMinute = 5;
+        internal static int SecurityRegisterTimes = 0;
+        public static int SecurityLoginTimesPerMinute = 5;
+        public static int SecurityMaxApiQuery = 2;
 
         public static string SkinPublicKey = "";
         public static ConfigWorker.SkinSource SkinSource = ConfigWorker.SkinSource.Mojang;

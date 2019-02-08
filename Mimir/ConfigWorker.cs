@@ -36,6 +36,7 @@ namespace Mimir
             int.TryParse(Read("General", "MaxConnection", Program.MaxConnection.ToString()), out Program.MaxConnection);
 
             Enum.TryParse(Read("SQL", "Type", Program.SqlType.ToString(), true), out Program.SqlType);
+            CommitWrite("SQL", "Type", "Allow value: Sqlite, MySql");
             Program.SqlDbName = Read("SQL", "DatabaseName", Program.SqlDbName);
             switch (Program.SqlType)
             {
@@ -51,12 +52,10 @@ namespace Mimir
             }
 
             bool.TryParse(Read("Users", "AllowRegister", Program.UserAllowRegister.ToString()), out Program.UserAllowRegister);
-            int.TryParse(Read("Users", "RegisterTimesPerMinute", Program.UserRegisterTimesPerMinute.ToString()), out Program.UserRegisterTimesPerMinute);
             int.TryParse(Read("Users", "MaxRegistration", Program.UserMaxRegistration.ToString()), out Program.UserMaxRegistration);
-            int.TryParse(Read("Users", "LoginTryTimesPerMinute", Program.UserLoginTryTimesPerMinute.ToString()), out Program.UserLoginTryTimesPerMinute);
-            int.TryParse(Read("Users", "MaxAPIQuery", Program.UserMaxApiQuery.ToString()), out Program.UserMaxApiQuery);
 
             Enum.TryParse(Read("Skins", "Source", Program.SkinSource.ToString(), true), out Program.SkinSource);
+            CommitWrite("Skins", "Source", "Allow value: Mojang, Local");
             switch (Program.SkinSource)
             {
                 case SkinSource.Mojang:
@@ -66,6 +65,10 @@ namespace Mimir
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            int.TryParse(Read("Security", "RegisterTimesPerMinute", Program.SecurityRegisterTimesPerMinute.ToString()), out Program.SecurityRegisterTimesPerMinute);
+            int.TryParse(Read("Security", "LoginTimesPerMinute", Program.SecurityLoginTimesPerMinute.ToString()), out Program.SecurityLoginTimesPerMinute);
+            int.TryParse(Read("Security", "MaxAPIQuery", Program.SecurityMaxApiQuery.ToString()), out Program.SecurityMaxApiQuery);
 
             log.Info("Configs loaded.");
         }
@@ -95,11 +98,7 @@ namespace Mimir
             }
 
             Write("Users", "AllowRegister", Program.UserAllowRegister.ToString());
-            Write("Users", "RegisterTimesPerMinute", Program.UserRegisterTimesPerMinute.ToString());
             Write("Users", "MaxRegistration", Program.UserMaxRegistration.ToString());
-            Write("Users", "LoginTryTimesPerMinute", Program.UserLoginTryTimesPerMinute.ToString());
-            Write("Users", "MaxAPIQuery", Program.UserMaxApiQuery.ToString());
-
             Write("Skins", "Source", Program.SkinSource.ToString());
             switch (Program.SkinSource)
             {
@@ -110,6 +109,10 @@ namespace Mimir
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            Write("Security", "RegisterTimesPerMinute", Program.SecurityRegisterTimesPerMinute.ToString());
+            Write("Security", "LoginTimesPerMinute", Program.SecurityLoginTimesPerMinute.ToString());
+            Write("Security", "MaxAPIQuery", Program.SecurityMaxApiQuery.ToString());
 
             log.Info("Configs saved.");
         }
@@ -154,7 +157,21 @@ namespace Mimir
             }
             catch (Exception ex)
             {
-                log.Warn($"Can't write value {value} to key {key}.");
+                log.Warn($"Can't write value '{value}' to key '{section}.{key}'.");
+                log.Error(ex);
+            }
+        }
+
+        private static void CommitWrite(string section, string key, string commit)
+        {
+            try
+            {
+                ini[section].GetKeyData(key).Comments.Add(commit);
+                parser.WriteFile("config.ini", ini);
+            }
+            catch (Exception ex)
+            {
+                log.Warn($"Can't write commit '{commit}' to key '{section}.{key}'.");
                 log.Error(ex);
             }
         }
