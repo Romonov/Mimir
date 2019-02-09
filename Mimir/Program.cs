@@ -19,7 +19,7 @@ namespace Mimir
     class Program
     {
         #region 定义变量
-        public const string Version = "0.7.4";
+        public const string Version = "0.7.5";
 
         public static string Path = Directory.GetCurrentDirectory();
                 
