@@ -37,7 +37,7 @@ namespace Mimir
         public static string SqlUsername = "root";
         public static string SqlPassword = "123456";
 
-        public static bool SslIsEnable = true;
+        public static bool SslIsEnable = false;
         public static ConfigWorker.SslCertSource SslCertSource = ConfigWorker.SslCertSource.Own;
         public static string SslCertName = "cert.pfx";
         public static string SslCertPassword = "******";
@@ -74,29 +74,32 @@ namespace Mimir
             RSAWorker.LoadKey();
             SkinPublicKey = RSAWorker.RSAPublicKeyConverter(RSAWorker.PublicKey.ToXmlString(false));
 
-            if (!File.Exists(SslCertName))
+            if (SslIsEnable)
             {
-                if (SslCertSource == ConfigWorker.SslCertSource.Own)
+                if (!File.Exists(SslCertName))
                 {
+                    if (SslCertSource == ConfigWorker.SslCertSource.Own)
+                    {
+                        log.Warn("SSL certificate can't load, disabling ssl mode.");
+                        SslIsEnable = false;
+                    }
+                    else if (SslCertSource == ConfigWorker.SslCertSource.Generate)
+                    {
+                        log.Warn("SSL certificate is missing, generating ssl certificate.");
+                        CertWorker.Gen();
+                    }
+                }
+                try
+                {
+                    SslCert = new X509Certificate2(SslCertName, SslCertPassword);
+                    log.Info("Ssl certificate loaded.");
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
                     log.Warn("SSL certificate can't load, disabling ssl mode.");
                     SslIsEnable = false;
                 }
-                else if (SslCertSource == ConfigWorker.SslCertSource.Generate)
-                {
-                    log.Warn("SSL certificate is missing, generating ssl certificate.");
-                    CertWorker.Gen();
-                }
-            }
-            try
-            {
-                SslCert = new X509Certificate2(SslCertName, SslCertPassword);
-                log.Info("Ssl certificate loaded.");
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-                log.Warn("SSL certificate can't load, disabling ssl mode.");
-                SslIsEnable = false;
             }
 
             try

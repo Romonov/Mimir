@@ -12,7 +12,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -61,13 +63,13 @@ namespace Mimir.Util
 
             var x509Certificate = certificateGenerator.Generate(keyPair.Private);
             byte[] pkcs12Bytes = DotNetUtilities.ToX509Certificate(x509Certificate).Export(X509ContentType.Pkcs12, Program.SslCertPassword);
-
+            
             using (FileStream fs = new FileStream(Program.SslCertName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
                 fs.Write(pkcs12Bytes, 0, pkcs12Bytes.Length);
                 fs.Flush();
             }
-            
+
         }
     }
 }
