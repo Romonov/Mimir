@@ -11,7 +11,10 @@ namespace Mimir
 {
     class Poller
     {
-        private static Thread thread = new Thread(Poll);
+        private static Thread threadUsersTrytimes = new Thread(PollUsersTrytimes);
+        private static Thread threadSecurityRegisterTimes = new Thread(PollSecurityRegisterTimes);
+        private static Thread threadIPSecurity = new Thread(PollIPSecurity);
+
         private static Logger log = new Logger("PollThread");
         private static bool isRunning = false;
 
@@ -19,7 +22,7 @@ namespace Mimir
         {
             log.Info("Starting poll thread.");
             isRunning = true;
-            thread.Start();
+            threadUsersTrytimes.Start();
         }
 
         public static void Stop()
@@ -28,12 +31,29 @@ namespace Mimir
             isRunning = false;
         }
 
-        private static void Poll()
+        private static void PollUsersTrytimes()
         {
             while (isRunning)
             {
                 SqlProxy.Excute("update `users` set `TryTimes` = 0");
+                Thread.Sleep(60000);
+            }
+        }
+
+        private static void PollSecurityRegisterTimes()
+        {
+            while (isRunning)
+            {
                 Program.SecurityRegisterTimes = 0;
+                Thread.Sleep(60000);
+            }
+        }
+
+        private static void PollIPSecurity()
+        {
+            while (isRunning)
+            {
+                Program.IPSecurity.Clear();
                 Thread.Sleep(60000);
             }
         }

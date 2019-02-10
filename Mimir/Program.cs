@@ -54,6 +54,8 @@ namespace Mimir
         public static string SkinPublicKey = "";
         public static ConfigWorker.SkinSource SkinSource = ConfigWorker.SkinSource.Mojang;
 
+        public static Dictionary<string, int> IPSecurity = new Dictionary<string, int>();
+
         #endregion
 
         private static Logger log = new Logger("Main");

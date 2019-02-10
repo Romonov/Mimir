@@ -1,5 +1,4 @@
-﻿using Mimir.Response;
-using Mimir.Response.AuthServer;
+﻿using Mimir.Response.AuthServer;
 using Mimir.Response.SessionServer.Session.Minecraft;
 using Mimir.Response.Users;
 using RUL;
@@ -25,6 +24,23 @@ namespace Mimir
 
             (int status, string type, string content) response = (403, "text/plain", "");
 
+            if (Program.IPSecurity.ContainsKey(socket.RemoteEndPoint.ToString().Split(':')[0]))
+            {
+                if (Program.IPSecurity[socket.RemoteEndPoint.ToString().Split(':')[0]] > 50)
+                {
+                    socket.Close();
+                    return;
+                }
+                else
+                {
+                    Program.IPSecurity[socket.RemoteEndPoint.ToString().Split(':')[0]]++;
+                }
+            }
+            else
+            {
+                Program.IPSecurity.Add(socket.RemoteEndPoint.ToString().Split(':')[0], 1);
+            }
+
             try
             {
                 switch (req.Method)
@@ -34,7 +50,7 @@ namespace Mimir
                         {
                             #region ExtendAPI
                             case "/":
-                                response = Root.OnGet();
+                                response = Response.Root.OnGet();
                                 break;
                             #endregion
 

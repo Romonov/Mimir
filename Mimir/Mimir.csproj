@@ -92,9 +92,11 @@
     <Compile Include="ConfigWorker.cs" />
     <Compile Include="Poller.cs" />
     <Compile Include="Response\API\Profiles\Minecraft\Root.cs" />
+    <Compile Include="Response\API\Root.cs" />
     <Compile Include="Response\AuthServer\Authenticate.cs" />
     <Compile Include="Response\AuthServer\Invalidate.cs" />
     <Compile Include="Response\AuthServer\Refresh.cs" />
+    <Compile Include="Response\AuthServer\Root.cs" />
     <Compile Include="Response\AuthServer\Signout.cs" />
     <Compile Include="Response\AuthServer\Validate.cs" />
     <Compile Include="Response\Common\GetName.cs" />
@@ -108,8 +110,10 @@
     <Compile Include="Response\SessionServer\Session\Minecraft\HasJoined.cs" />
     <Compile Include="Response\SessionServer\Session\Minecraft\Join.cs" />
     <Compile Include="Response\SessionServer\Session\Minecraft\Profile\Root.cs" />
+    <Compile Include="Response\SessionServer\Root.cs" />
     <Compile Include="Response\Skins\Root.cs" />
     <Compile Include="Response\Users\Register.cs" />
+    <Compile Include="Response\Users\Root.cs" />
     <Compile Include="Router.cs" />
     <Compile Include="SQL\MySql.cs" />
     <Compile Include="SQL\Sqlite.cs" />

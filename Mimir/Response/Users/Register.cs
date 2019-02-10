@@ -80,6 +80,8 @@ namespace Mimir.Response.Users
             SqlProxy.Excute($"insert into `profiles` (`UserID`, `Name`, `UnsignedUUID`, `IsSelected`) " +
                 $"value ('{SqlSecurity.Parse(regData["username"].ToLower())}', '{SqlSecurity.Parse(regData["profile"])}', '{UuidWorker.ToUnsignedUuid(UuidWorker.GenUuid())}', 1);");
 
+            Root.GetLogger().Info($"User {regData["username"]} with profile {regData["profile"]} was successfully registered.");
+
             return (200, "text/html", "Register successful!");
         }
     }
