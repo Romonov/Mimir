@@ -5,6 +5,7 @@ using RUL;
 using RUL.Net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -67,12 +68,6 @@ namespace Mimir
                                 break;
                             #endregion
 
-                            #region Users
-                            case "/users/register":
-                                response = Register.OnGet();
-                                break;
-                            #endregion
-
                             default:
                                 #region SessionServer
                                 // Get /sessionserver/session/minecraft/profile/{uuid}?unsigned={unsigned}
@@ -83,7 +78,54 @@ namespace Mimir
                                         response = Response.SessionServer.Session.Minecraft.Profile.Root.OnGet(req.Get, guid);
                                     }
                                 }
-                                # endregion
+                                #endregion
+
+                                #region HttpServer
+                                string reqFilePath = $@"Public/{req.Url}";
+                                FileInfo reqFileInfo = new FileInfo(reqFilePath);
+                                string reqFileInfoExt = Path.GetExtension(reqFileInfo.FullName);
+
+                                if (reqFileInfoExt == "")
+                                {
+                                    reqFilePath += ".html";
+                                    reqFileInfoExt = ".html";
+                                }
+
+                                if (File.Exists(reqFilePath))
+                                {
+                                    string reqFileContectType = "text/plain";
+                                    string reqFileContect = File.ReadAllText(reqFilePath);
+                                    byte[] reqFileContectBytes = Encoding.Default.GetBytes(reqFileContect);
+
+                                    switch (reqFileInfoExt)
+                                    {
+                                        case ".html":
+                                        case ".htm":
+                                            reqFileContectType = "text/html";
+                                            break;
+                                        case ".css":
+                                            reqFileContectType = "text/css";
+                                            break;
+                                        case ".js":
+                                            reqFileContectType = "application/javascript";
+                                            break;
+                                        case ".jpg":
+                                        case ".png":
+                                            reqFileContectType = "image";
+                                            reqFileContectBytes = File.ReadAllBytes(reqFilePath);
+                                            break;
+                                        case ".ico":
+                                            reqFileContectType = "image/x-icon";
+                                            reqFileContectBytes = File.ReadAllBytes(reqFilePath);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    Post(200, reqFileContectType, reqFileContectBytes, socket, sslStream);
+                                    return;
+                                }
+
+                                #endregion
                                 break;
                         }
                         break;
