@@ -11,12 +11,20 @@ using System.Threading.Tasks;
 
 namespace Mimir
 {
+    /// <summary>
+    /// Socket管理类
+    /// </summary>
     class SocketWorker
     {
         private readonly Logger log = new Logger("Socket");
 
         private readonly Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         
+        /// <summary>
+        /// 实例化SocketWorker
+        /// </summary>
+        /// <param name="port">监听端口</param>
+        /// <param name="listen">最大等待队列长度</param>
         public SocketWorker(int port, int listen)
         {
             try
@@ -31,12 +39,19 @@ namespace Mimir
             }
         }
 
+        /// <summary>
+        /// 启动Socket监听
+        /// </summary>
         public void Start()
         {
             socket.BeginAccept(new AsyncCallback(OnAccept), socket);
             log.Info("Socket is listing now.");
         }
 
+        /// <summary>
+        /// 在监听到有请求时触发方法
+        /// </summary>
+        /// <param name="ar">异步回调</param>
         public void OnAccept(IAsyncResult ar)
         {
             try

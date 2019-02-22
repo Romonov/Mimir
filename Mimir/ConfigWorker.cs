@@ -11,12 +11,18 @@ using System.Threading.Tasks;
 
 namespace Mimir
 {
+    /// <summary>
+    /// 配置文件管理类
+    /// </summary>
     class ConfigWorker
     {
         private static Logger log = new Logger("Config");
         private static readonly FileIniDataParser parser = new FileIniDataParser();
         private static IniData ini;
 
+        /// <summary>
+        /// 加载配置文件
+        /// </summary>
         public static void Load()
         {
             log.Info("Loading configs...");
@@ -80,6 +86,9 @@ namespace Mimir
             log.Info("Configs loaded.");
         }
 
+        /// <summary>
+        /// 保存配置文件
+        /// </summary>
         public static void Save()
         {
             log.Info("Saving configs...");
@@ -131,6 +140,14 @@ namespace Mimir
             log.Info("Configs saved.");
         }
 
+        /// <summary>
+        /// 读INI方法
+        /// </summary>
+        /// <param name="section">节点</param>
+        /// <param name="key">键</param>
+        /// <param name="defaultValue">默认值</param>
+        /// <param name="isHide">是否不向控制台显示值（用于密码等）</param>
+        /// <returns>值</returns>
         private static string Read(string section, string key, string defaultValue, bool isHide = false)
         {
             string value = defaultValue;
@@ -162,6 +179,12 @@ namespace Mimir
             return value;
         }
 
+        /// <summary>
+        /// 写INI方法
+        /// </summary>
+        /// <param name="section">节点</param>
+        /// <param name="key">键</param>
+        /// <param name="value">值</param>
         private static void Write(string section, string key, string value)
         {
             try
@@ -176,6 +199,12 @@ namespace Mimir
             }
         }
 
+        /// <summary>
+        /// 写注释方法
+        /// </summary>
+        /// <param name="section">节点</param>
+        /// <param name="key">键</param>
+        /// <param name="commit">注释值</param>
         private static void CommitWrite(string section, string key, string commit)
         {
             try
@@ -190,12 +219,18 @@ namespace Mimir
             }
         }
 
+        /// <summary>
+        /// 皮肤加载源
+        /// </summary>
         public enum SkinSource
         {
             Mojang,
             Local
         }
 
+        /// <summary>
+        /// Ssl证书加载类型
+        /// </summary>
         public enum SslCertSource
         {
             Own,

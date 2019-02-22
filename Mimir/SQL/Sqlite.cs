@@ -5,6 +5,9 @@ using System.Data.SQLite;
 
 namespace Mimir.SQL
 {
+    /// <summary>
+    /// Sqlite操作类
+    /// </summary>
     class Sqlite
     {
         public static bool IsConnected { set; get; }
@@ -12,6 +15,10 @@ namespace Mimir.SQL
         private static Logger log = new Logger("Sqlite");
         private static SQLiteConnection sqliteConnection = new SQLiteConnection($"data source={Program.SqlDbName}.db");
 
+        /// <summary>
+        /// 获得Sqlite链接
+        /// </summary>
+        /// <returns>Sqlite链接</returns>
         public static SQLiteConnection GetSqlConnection()
         {
             if (sqliteConnection == null)
@@ -34,6 +41,9 @@ namespace Mimir.SQL
             return sqliteConnection;
         }
 
+        /// <summary>
+        /// 打开Sqlite链接
+        /// </summary>
         public static void Open()
         {
             try
@@ -50,6 +60,9 @@ namespace Mimir.SQL
             }
         }
 
+        /// <summary>
+        /// 关闭Sqlite链接
+        /// </summary>
         public static void Close()
         {
             if (sqliteConnection.State != ConnectionState.Closed)

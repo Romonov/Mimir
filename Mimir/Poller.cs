@@ -1,14 +1,12 @@
 ﻿using Mimir.SQL;
 using RUL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mimir
 {
+    /// <summary>
+    /// 轮询管理类（这个实现不好）
+    /// </summary>
     class Poller
     {
         private static Thread threadUsersTrytimes = new Thread(PollUsersTrytimes);
@@ -18,6 +16,9 @@ namespace Mimir
         private static Logger log = new Logger("PollThread");
         private static bool isRunning = false;
 
+        /// <summary>
+        /// 启动轮询线程
+        /// </summary>
         public static void Start()
         {
             log.Info("Starting poll thread.");
@@ -25,12 +26,18 @@ namespace Mimir
             threadUsersTrytimes.Start();
         }
 
+        /// <summary>
+        /// 停止轮询线程
+        /// </summary>
         public static void Stop()
         {
             log.Info("Stopping poll thread.");
             isRunning = false;
         }
 
+        /// <summary>
+        /// 每分钟每个用户尝试登录次数
+        /// </summary>
         private static void PollUsersTrytimes()
         {
             while (isRunning)
@@ -40,6 +47,9 @@ namespace Mimir
             }
         }
 
+        /// <summary>
+        /// 每分钟全局注册次数
+        /// </summary>
         private static void PollSecurityRegisterTimes()
         {
             while (isRunning)
@@ -49,6 +59,9 @@ namespace Mimir
             }
         }
 
+        /// <summary>
+        /// 每分钟每IP请求次数
+        /// </summary>
         private static void PollIPSecurity()
         {
             while (isRunning)

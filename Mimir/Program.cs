@@ -22,7 +22,7 @@ namespace Mimir
         public const string Version = "0.7.5";
 
         public static string Path = Directory.GetCurrentDirectory();
-                
+
         public static string ServerName = "Mimir Server";
         
         public static int Port = 45672;
@@ -66,8 +66,10 @@ namespace Mimir
             log.Info($"Mimir version: {Version}, made by: Romonov! ");
             log.Info("Starting...");
 
+            // 加载配置文件
             ConfigWorker.Load();
 
+            // 加载RSA秘钥
             if (!File.Exists($@"{Path}\PublicKey.xml") || !File.Exists($@"{Path}\PrivateKey.xml"))
             {
                 log.Warn("Private key file is missing, and it will be generated now.");
@@ -76,6 +78,7 @@ namespace Mimir
             RSAWorker.LoadKey();
             SkinPublicKey = RSAWorker.RSAPublicKeyConverter(RSAWorker.PublicKey.ToXmlString(false));
 
+            // 加载SSL证书
             if (SslIsEnable)
             {
                 if (!File.Exists(SslCertName))
@@ -104,6 +107,7 @@ namespace Mimir
                 }
             }
 
+            // 打开Sql数据库链接
             try
             {
                 SqlProxy.Open();
@@ -115,6 +119,7 @@ namespace Mimir
                 CommandHandler.Stop(1);
             }
 
+            // 打开Socket监听
             try
             {
                 socket = new SocketWorker(Port, MaxConnection);
@@ -127,6 +132,7 @@ namespace Mimir
                 CommandHandler.Stop(2);
             }
 
+            // 打开轮询进程
             try
             {
                 Poller.Start();
@@ -138,11 +144,13 @@ namespace Mimir
                 CommandHandler.Stop(3);
             }
 
+            // 保存配置文件
             ConfigWorker.Save();
             
             log.Info("Welcome!!");
             log.Info("Input \"help\" for show help messages.");
             
+            // 主循环
             while (true)
             {
                 string input = Console.ReadLine();
@@ -151,6 +159,10 @@ namespace Mimir
             }
         }
 
+        /// <summary>
+        /// 获取Logger对象
+        /// </summary>
+        /// <returns>Logger对象</returns>
         public static Logger GetLogger()
         {
             return log;

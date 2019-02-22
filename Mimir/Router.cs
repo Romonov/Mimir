@@ -13,18 +13,30 @@ using System.Text;
 
 namespace Mimir
 {
+    /// <summary>
+    /// 路由类
+    /// </summary>
     class Router
     {
         private static Logger log = new Logger("Router");
 
+        /// <summary>
+        /// 路由方法
+        /// </summary>
+        /// <param name="httpReq">请求内容</param>
+        /// <param name="socket">Socket对象</param>
+        /// <param name="sslStream">SslStream对象</param>
         public static void Route(string httpReq, Socket socket, SslStream sslStream)
         {
+            // 解析请求
             HttpReq req = HttpProtocol.Solve(httpReq);
 
             log.Info($"Got request {req.Method} {req.Url} from {socket.RemoteEndPoint}.");
 
+            // 默认的返回ValueTuple结构
             (int status, string type, string content) response = (403, "text/plain", "");
 
+            // 防止CC攻击
             if (Program.IPSecurity.ContainsKey(socket.RemoteEndPoint.ToString().Split(':')[0]))
             {
                 if (Program.IPSecurity[socket.RemoteEndPoint.ToString().Split(':')[0]] > 50)
@@ -44,8 +56,10 @@ namespace Mimir
 
             try
             {
+                // 路由请求
                 switch (req.Method)
                 {
+                    // 当请求是Get时
                     case Method.Get:
                         switch (req.Url)
                         {
@@ -80,6 +94,7 @@ namespace Mimir
                                 }
                                 #endregion
 
+                                // 这个实现不好，不能作为Http服务器发送图片
                                 #region HttpServer
                                 string reqFilePath = $@"Public/{req.Url}";
                                 FileInfo reqFileInfo = new FileInfo(reqFilePath);
@@ -97,6 +112,7 @@ namespace Mimir
                                     string reqFileContect = File.ReadAllText(reqFilePath);
                                     byte[] reqFileContectBytes = Encoding.Default.GetBytes(reqFileContect);
 
+                                    // 这里是MIME类型的switch
                                     switch (reqFileInfoExt)
                                     {
                                         case ".html":
@@ -121,14 +137,15 @@ namespace Mimir
                                         default:
                                             break;
                                     }
+
                                     Post(200, reqFileContectType, reqFileContectBytes, socket, sslStream);
                                     return;
                                 }
-
                                 #endregion
                                 break;
                         }
                         break;
+                    // 当请求是Post时
                     case Method.Post:
                         switch (req.Url)
                         {
@@ -167,12 +184,16 @@ namespace Mimir
                             case "/users/register":
                                 response = Register.OnPost(req.PostData);
                                 break;
+                            case "/users/changepassword":
+                                //response = ChangePassword.OnPost(req.PostData);
+                                break;
                             #endregion
 
                             default:
                                 break;
                         }
                         break;
+                    // 当请求是其他方法时
                     default:
                         response = (405, "", "");
                         break;
@@ -186,16 +207,40 @@ namespace Mimir
             Post(response.status, response.type, response.content, socket, sslStream);
         }
 
+        /// <summary>
+        /// Post方法（当返回类型是string时）
+        /// </summary>
+        /// <param name="status">Http状态码</param>
+        /// <param name="responseType">返回MIME类型</param>
+        /// <param name="response">返回内容</param>
+        /// <param name="socket">Socket对象</param>
+        /// <param name="sslStream">SslStream对象</param>
         private static void Post(int status, string responseType, string response, Socket socket, SslStream sslStream)
         {
             InternalPost(status, responseType, Encoding.Default.GetBytes(response), socket, sslStream);
         }
 
+        /// <summary>
+        /// Post方法（当返回类型是byte[]时）
+        /// </summary>
+        /// <param name="status">Http状态码</param>
+        /// <param name="responseType">返回MIME类型</param>
+        /// <param name="response">返回内容</param>
+        /// <param name="socket">Socket对象</param>
+        /// <param name="sslStream">SslStream对象</param>
         private static void Post(int status, string responseType, byte[] response, Socket socket, SslStream sslStream)
         {
             InternalPost(status, responseType, response, socket, sslStream);
         }
 
+        /// <summary>
+        /// 内部Post封装方法
+        /// </summary>
+        /// <param name="status">Http状态码</param>
+        /// <param name="responseType">返回MIME类型</param>
+        /// <param name="byteResponse">返回内容</param>
+        /// <param name="socket">Socket对象</param>
+        /// <param name="sslStream">SslStream对象</param>
         private static void InternalPost(int status, string responseType, byte[] byteResponse, Socket socket, SslStream sslStream)
         {
             string responseHeader = "";

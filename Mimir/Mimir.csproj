@@ -112,6 +112,7 @@
     <Compile Include="Response\SessionServer\Session\Minecraft\Profile\Root.cs" />
     <Compile Include="Response\SessionServer\Root.cs" />
     <Compile Include="Response\Skins\Root.cs" />
+    <Compile Include="Response\Users\ChangePassword.cs" />
     <Compile Include="Response\Users\Register.cs" />
     <Compile Include="Response\Users\Root.cs" />
     <Compile Include="Router.cs" />
@@ -133,6 +134,7 @@
     <Content Include="Public\css\style.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Public\users\changepassword.html" />
     <Content Include="Public\users\register.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

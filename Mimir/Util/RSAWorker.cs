@@ -13,6 +13,9 @@ using System.Xml;
 
 namespace Mimir.Util
 {
+    /// <summary>
+    /// RSA秘钥管理类
+    /// </summary>
     class RSAWorker
     {
         private static Logger log = new Logger("RSAWorker");
@@ -20,6 +23,9 @@ namespace Mimir.Util
         public static RSACryptoServiceProvider PublicKey = new RSACryptoServiceProvider();
         public static RSACryptoServiceProvider PrivateKey = new RSACryptoServiceProvider();
 
+        /// <summary>
+        /// 生成RSA秘钥对
+        /// </summary>
         public static void GenKey()
         {
             try
@@ -46,6 +52,9 @@ namespace Mimir.Util
             }
         }
 
+        /// <summary>
+        /// 加载RSA秘钥对
+        /// </summary>
         public static void LoadKey()
         {
             try
@@ -62,6 +71,11 @@ namespace Mimir.Util
             }
         }
 
+        /// <summary>
+        /// 使用RSA私钥给数据签名
+        /// </summary>
+        /// <param name="data">要签名的数据</param>
+        /// <returns>签名结果</returns>
         public static string Sign(string data)
         {
             byte[] byteData = Encoding.Default.GetBytes(data);
@@ -69,6 +83,11 @@ namespace Mimir.Util
             return Convert.ToBase64String(signedData);
         }
 
+        /// <summary>
+        /// 把XML格式的秘钥转为Java格式
+        /// </summary>
+        /// <param name="XML"></param>
+        /// <returns></returns>
         public static string RSAPublicKeyConverter(string XML)
         {
             XmlDocument xmlDocument = new XmlDocument();

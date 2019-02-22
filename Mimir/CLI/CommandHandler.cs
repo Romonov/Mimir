@@ -7,8 +7,17 @@ using System.Threading.Tasks;
 
 namespace Mimir.CLI
 {
+    // Todo
+    /// <summary>
+    /// 控制台命令处理类
+    /// </summary>
     class CommandHandler
     {
+        // Todo
+        /// <summary>
+        /// 处理控制台命令方法
+        /// </summary>
+        /// <param name="args">控制台命令</param>
         public static void Handle(string[] args)
         {
             switch (args[0])
@@ -45,6 +54,11 @@ namespace Mimir.CLI
             }
         }
 
+        // 这个位置不好
+        /// <summary>
+        /// 停止程序方法
+        /// </summary>
+        /// <param name="exitCode">退出码</param>
         public static void Stop(int exitCode)
         {
             Poller.Stop();
