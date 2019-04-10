@@ -30,7 +30,7 @@ namespace Mimir.Response.AuthServer
             }
 
             // Signout
-            SqlProxy.Excute($"update `tokens` set `Status` = 0 where `BindUser` = {dataRowUser["Username"].ToString()}");
+            SqlProxy.Excute($"update `tokens` set `Status` = 0 where `BindUser` = '{dataRowUser["Username"].ToString()}'");
 
             return (204, "text/plain", "");
         }
