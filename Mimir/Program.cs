@@ -1,171 +1,24 @@
-﻿using Mimir.CLI;
-using Mimir.SQL;
-using Mimir.Util;
-using RUL;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Mimir
 {
-    class Program
+    public class Program
     {
-        #region 定义变量
-        public const string Version = "0.7.5";
-
-        public static string Path = Directory.GetCurrentDirectory();
-
-        public static string ServerName = "Mimir Server";
-        
-        public static int Port = 45672;
-        public static int MaxConnection = 233;
-
-        public static bool IsRunning = false;
-        public static bool IsDebug = false;
-
-        public static SqlConnectionType SqlType = SqlConnectionType.MySql;
-        public static string SqlDbName = "mimir";
-        public static string SqlIp = "127.0.0.1";
-        public static string SqlUsername = "root";
-        public static string SqlPassword = "123456";
-
-        public static bool SslIsEnable = false;
-        public static ConfigWorker.SslCertSource SslCertSource = ConfigWorker.SslCertSource.Own;
-        public static string SslCertName = "cert.pfx";
-        public static string SslCertPassword = "******";
-        public static X509Certificate2 SslCert = null;
-
-        public static bool UserAllowRegister = false;
-        public static int UserMaxRegistration = 4567;
-
-        public static int SecurityRegisterTimesPerMinute = 5;
-        public static int SecurityRegisterTimes = 0;
-        public static int SecurityLoginTimesPerMinute = 5;
-        public static int SecurityMaxApiQuery = 2;
-
-        public static string SkinPublicKey = "";
-        public static ConfigWorker.SkinSource SkinSource = ConfigWorker.SkinSource.Mojang;
-
-        public static Dictionary<string, int> IPSecurity = new Dictionary<string, int>();
-
-        #endregion
-
-        private static Logger log = new Logger("Main");
-        private static SocketWorker socket;
-
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            log.Info($"Mimir version: {Version}, made by: Romonov! ");
-            log.Info("Starting...");
-
-            // 加载配置文件
-            ConfigWorker.Load();
-
-            // 加载RSA秘钥
-            if (!File.Exists($@"{Path}\PublicKey.xml") || !File.Exists($@"{Path}\PrivateKey.xml"))
-            {
-                log.Warn("Private key file is missing, and it will be generated now.");
-                RSAWorker.GenKey();
-            }
-            RSAWorker.LoadKey();
-            SkinPublicKey = RSAWorker.RSAPublicKeyConverter(RSAWorker.PublicKey.ToXmlString(false));
-
-            // 加载SSL证书
-            if (SslIsEnable)
-            {
-                if (!File.Exists(SslCertName))
-                {
-                    if (SslCertSource == ConfigWorker.SslCertSource.Own)
-                    {
-                        log.Warn("SSL certificate can't load, disabling ssl mode.");
-                        SslIsEnable = false;
-                    }
-                    else if (SslCertSource == ConfigWorker.SslCertSource.Generate)
-                    {
-                        log.Warn("SSL certificate is missing, generating ssl certificate.");
-                        CertWorker.Gen();
-                    }
-                }
-                try
-                {
-                    SslCert = new X509Certificate2(SslCertName, SslCertPassword);
-                    log.Info("Ssl certificate loaded.");
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex);
-                    log.Warn("SSL certificate can't load, disabling ssl mode.");
-                    SslIsEnable = false;
-                }
-            }
-
-            // 打开Sql数据库链接
-            try
-            {
-                SqlProxy.Open();
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-                log.Info("Init failed.");
-                CommandHandler.Stop(1);
-            }
-
-            // 打开Socket监听
-            try
-            {
-                socket = new SocketWorker(Port, MaxConnection);
-                socket.Start();
-            }
-            catch (Exception ex)
-            {
-                log.Fatal(ex);
-                log.Info("Init failed.");
-                CommandHandler.Stop(2);
-            }
-
-            // 打开轮询进程
-            try
-            {
-                Poller.Start();
-            }
-            catch (Exception ex)
-            {
-                log.Fatal(ex);
-                log.Info("Init failed.");
-                CommandHandler.Stop(3);
-            }
-
-            // 保存配置文件
-            ConfigWorker.Save();
-            
-            log.Info("Welcome!!");
-            log.Info("Input \"help\" for show help messages.");
-            
-            // 主循环
-            while (true)
-            {
-                string input = Console.ReadLine();
-                log.WriteToFile(input);
-                CommandHandler.Handle(input.Split(' '));
-            }
+            CreateWebHostBuilder(args).Build().Run();
         }
 
-        /// <summary>
-        /// 获取Logger对象
-        /// </summary>
-        /// <returns>Logger对象</returns>
-        public static Logger GetLogger()
-        {
-            return log;
-        }
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>();
     }
 }
