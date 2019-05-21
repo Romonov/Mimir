@@ -90,8 +90,8 @@ namespace Mimir
                     out Program.SecurityLoginTryTimes);
                 bool.TryParse((from options in db.Options where options.Option == "IsEnableMultiProfiles" select options.Value).First(),
                     out Program.IsEnableMultiProfiles);
-                int.TryParse((from options in db.Options where options.Option == "MaxTokensPerUser" select options.Value).First(),
-                    out Program.MaxTokensPerUser);
+                int.TryParse((from options in db.Options where options.Option == "MaxTokensPerProfile" select options.Value).First(),
+                    out Program.MaxTokensPerProfile);
                 int.TryParse((from options in db.Options where options.Option == "TokensExpireDaysLimit" select options.Value).First(),
                     out Program.TokensExpireDaysLimit);
             }

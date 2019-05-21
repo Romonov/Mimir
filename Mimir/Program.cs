@@ -30,7 +30,7 @@ namespace Mimir
         internal static string ServerDomain = "";
         internal static int SecurityLoginTryTimes = 5;
         internal static bool IsEnableMultiProfiles = true;
-        internal static int MaxTokensPerUser = 10;
+        internal static int MaxTokensPerProfile = 10;
         internal static int TokensExpireDaysLimit = 15;
         #endregion
 

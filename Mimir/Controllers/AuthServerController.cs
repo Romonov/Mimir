@@ -175,7 +175,9 @@ namespace Mimir.Controllers
         [HttpPost]
         public ActionResult<string> Refresh([FromBody] PostRefreshRequest request)
         {
-            // Check token
+            var isAlreadyBindProfile = false;
+
+            // Check token.
             IQueryable<Tokens> tokens = null;
             if (request.clientToken != null)
             {
@@ -192,47 +194,92 @@ namespace Mimir.Controllers
             }
 
             // Invaild token.
+            int? profileId = null;
+            int? userId = null;
             var token = tokens.First();
+            if (token.BindProfileId != null)
+            {
+                profileId = token.BindProfileId;
+                isAlreadyBindProfile = true;
+            }
+            else
+            {
+                var profiles = from p in db.Profiles where p.Id == profileId select p;
+                userId = profiles.First().Uid;
+            }
             token.Status = 0;
             db.SaveChanges();
 
-            // Check others invaild tokens.
+            // Check others temp invaild tokens.
             var time = long.Parse(TimeWorker.GetJavaTimeStamp());
-            var invaildTokens = from t in db.Tokens where (long.Parse(t.CreateTime) + Program.TokensExpireDaysLimit * 24 * 60 * 60) <= time select t;
-            foreach (var item in invaildTokens)
+            var tempInvaildTokens = from t in db.Tokens where (long.Parse(t.CreateTime) + Program.TokensExpireDaysLimit * 24 * 60 * 60) <= time select t;
+            foreach (var t in tempInvaildTokens)
             {
-                item.Status = 1;
+                t.Status = 1;
             }
             db.SaveChanges();
 
             // Delete invaild tokens.
-            invaildTokens = from t in db.Tokens where t.Status == 0 select t;
-            foreach (var item in invaildTokens)
+            var invaildTokens = from t in db.Tokens where t.Status == 0 select t;
+            foreach (var t in invaildTokens)
             {
-                db.Tokens.Remove(item);
+                db.Tokens.Remove(t);
             }
             db.SaveChanges();
 
             // Bind profile.
+            PostRefreshResponse response = new PostRefreshResponse();
+
             Tokens tokenNew = new Tokens();
             if (request.selectedProfile != null)
             {
-                var profiles = from p in db.Profiles where p.Uuid == request.selectedProfile.Value.id select p;
-                if (profiles.Count() == 1)
+                if (isAlreadyBindProfile)
                 {
+                    return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.AlreadyBind());
+                }
+                else
+                {
+                    var profiles = from p in db.Profiles where p.Uuid == request.selectedProfile.Value.id select p;
                     var profile = profiles.First();
-                    profile.IsSelected = 1;
-                    tokenNew.BindProfileId = profile.Id;
+                    if (profiles.Count() == 1)
+                    {
+                        profile.IsSelected = 1;
+                        profileId = profile.Id;
+                        tokenNew.BindProfileId = profile.Id;
+                        response.selectedProfile = request.selectedProfile;
+                    };
+                    userId = profile.Uid;
+                    profiles = from p in db.Profiles where p.Uid == profile.Uid select p;
+                    foreach (var p in profiles)
+                    {
+                        if (p.Id != profileId && p.IsSelected == 1)
+                        {
+                            p.IsSelected = 0;
+                        }
+                    }
+                    db.SaveChanges();
                 }
             }
 
             // Check if token reach the limit.
-
+            tokens = from t in db.Tokens where t.BindProfileId == profileId && t.Status == 1 select t;
+            if (tokens.Count() > Program.MaxTokensPerProfile)
+            {
+                long createTime = long.MaxValue;
+                foreach (var t in tokens)
+                {
+                    if (long.Parse(t.CreateTime) <= createTime)
+                    {
+                        createTime = long.Parse(t.CreateTime);
+                    }
+                }
+                tokens = from t in db.Tokens where t.BindProfileId == profileId && t.CreateTime == createTime.ToString() select t;
+                tokens.First().Status = 0;
+                db.SaveChanges();
+            }
 
             // Build response and hand the new token out.
-            PostRefreshResponse response = new PostRefreshResponse();
-
-            response.accessToken = UuidWorker.GetUuid();
+            response.accessToken = tokenNew.AccessToken = UuidWorker.GetUuid();
             if (request.clientToken != null)
             {
                 response.clientToken = tokenNew.ClientToken = request.clientToken;
@@ -246,15 +293,10 @@ namespace Mimir.Controllers
             db.Tokens.Add(tokenNew);
             db.SaveChanges();
 
-            if (request.selectedProfile != null)
+            // User info.
+            if (request.selectedProfile == null && request.requestUser)
             {
-                
-            }
-            
-            /*
-            if (request.requestUser)
-            {
-                var users = from u in db.Users where u.Id == uid select u;
+                var users = from u in db.Users where u.Id == userId select u;
                 var user = users.First();
 
                 var properties = new Properties()
@@ -267,7 +309,6 @@ namespace Mimir.Controllers
                     id = user.Username
                 };
             }
-            */
 
             return JsonConvert.SerializeObject(response);
         }
