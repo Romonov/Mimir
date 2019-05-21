@@ -7,13 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Mimir.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ApiController : ControllerBase
+    public class SessionServerController : ControllerBase
     {
-        public ActionResult Index()
-        {
-            return NotFound();
-        }
     }
 }

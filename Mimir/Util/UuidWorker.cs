@@ -17,7 +17,7 @@ namespace Mimir.Util
         /// <returns>无符号Uuid</returns>
         public static string GetUuid()
         {
-            return Guid.NewGuid().ToString("");
+            return Guid.NewGuid().ToString("N");
         }
 
         /// <summary>
