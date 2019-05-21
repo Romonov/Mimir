@@ -27,13 +27,14 @@ namespace Mimir.Controllers
         [HttpPost]
         public ActionResult<string> Authenticate([FromBody] PostAuthrnticateRequest request)
         {
-            log.Info($"[ID: {HttpContext.Connection.Id}]Got login request from {HttpContext.Connection.RemoteIpAddress}:{HttpContext.Connection.RemotePort} with user {request.username}.");
+            log.Info($"[ID: {HttpContext.Connection.Id}]Got login request from {HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} with user {request.username}.");
 
+            // Check if user exists.
             var users = from u in db.Users where u.Email == request.username select u;
             if (users.Count() != 1)
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]Request user is not exists.");
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvaildUsername());
+                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidUsername());
             }
 
             // Cooldown check.
@@ -58,7 +59,7 @@ namespace Mimir.Controllers
             var cooldown = cooldowns.First();
             if (Convert.ToDecimal(cooldown.CooldownTime) > Convert.ToDecimal(time))
             {
-                log.Info($"[ID: {HttpContext.Connection.Id}]User {request.username} already in cooldown.");
+                log.Info($"[ID: {HttpContext.Connection.Id}]User {user.Username} already in cooldown.");
                 return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.TooManyTryTimes());
             }
             else
@@ -68,7 +69,7 @@ namespace Mimir.Controllers
                     cooldown.CooldownLevel++;
                     cooldown.CooldownTime = time + cooldown.CooldownLevel * cooldown.CooldownLevel * 5 * 60;
                     db.SaveChanges();
-                    log.Info($"[ID: {HttpContext.Connection.Id}]User {request.username} got into cooldown.");
+                    log.Info($"[ID: {HttpContext.Connection.Id}]User {user.Username} got into cooldown.");
                     return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.TooManyTryTimes());
                 }
                 cooldown.LastTryTime = time;
@@ -83,7 +84,7 @@ namespace Mimir.Controllers
             if (user.Password != passwordHashed)
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]IP address {HttpContext.Connection.RemoteIpAddress}:{HttpContext.Connection.RemotePort} try to login with user {request.username} but wrong password.");
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvaildPassword());
+                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidPassword());
             }
 
             // Update cooldown.
@@ -175,6 +176,7 @@ namespace Mimir.Controllers
         [HttpPost]
         public ActionResult<string> Refresh([FromBody] PostRefreshRequest request)
         {
+            log.Info($"[ID: {HttpContext.Connection.Id}]{HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} tried to refresh token.");
             var isAlreadyBindProfile = false;
 
             // Check token.
@@ -190,10 +192,11 @@ namespace Mimir.Controllers
 
             if (tokens.Count() != 1)
             {
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvaildToken());
+                log.Info($"[ID: {HttpContext.Connection.Id}]Token invalid.");
+                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidToken());
             }
 
-            // Invaild token.
+            // Invalid token.
             int? profileId = null;
             int? userId = null;
             var token = tokens.First();
@@ -205,23 +208,27 @@ namespace Mimir.Controllers
             else
             {
                 var profiles = from p in db.Profiles where p.Id == profileId select p;
-                userId = profiles.First().Uid;
+                if (profiles.Count() == 1)
+                {
+                    userId = profiles.First().Uid;
+                }
             }
             token.Status = 0;
             db.SaveChanges();
+            log.Info($"[ID: {HttpContext.Connection.Id}]Access token {token.AccessToken} has invalided.");
 
-            // Check others temp invaild tokens.
+            // Check others temp invalid tokens.
             var time = long.Parse(TimeWorker.GetJavaTimeStamp());
-            var tempInvaildTokens = from t in db.Tokens where (long.Parse(t.CreateTime) + Program.TokensExpireDaysLimit * 24 * 60 * 60) <= time select t;
-            foreach (var t in tempInvaildTokens)
+            var tempInvalidTokens = from t in db.Tokens where (long.Parse(t.CreateTime) + Program.TokensExpireDaysLimit * 24 * 60 * 60) <= time select t;
+            foreach (var t in tempInvalidTokens)
             {
                 t.Status = 1;
             }
             db.SaveChanges();
 
-            // Delete invaild tokens.
-            var invaildTokens = from t in db.Tokens where t.Status == 0 select t;
-            foreach (var t in invaildTokens)
+            // Delete invalid tokens.
+            var invalidTokens = from t in db.Tokens where t.Status == 0 select t;
+            foreach (var t in invalidTokens)
             {
                 db.Tokens.Remove(t);
             }
@@ -258,6 +265,7 @@ namespace Mimir.Controllers
                         }
                     }
                     db.SaveChanges();
+                    log.Info($"[ID: {HttpContext.Connection.Id}]Bind profile {profile.Name}.");
                 }
             }
 
@@ -314,21 +322,113 @@ namespace Mimir.Controllers
         }
 
         [HttpPost]
-        public ActionResult<string> Vaildate()
+        public ActionResult<string> Validate([FromBody] PostValidateRequest request)
         {
-            return NotFound();
+            IQueryable<Tokens> tokens = null;
+            if (request.clientToken == null)
+            {
+                tokens = from t in db.Tokens where t.AccessToken == request.accessToken && t.Status == 2 select t;
+            }
+            else
+            {
+                tokens = from t in db.Tokens where t.AccessToken == request.accessToken && t.ClientToken == request.clientToken && t.Status == 2 select t;
+            }
+
+            if (tokens.Count() != 1)
+            {
+                log.Info($"[ID: {HttpContext.Connection.Id}]{HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} vaild token failed.");
+                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidToken());
+            }
+            else
+            {
+                log.Info($"[ID: {HttpContext.Connection.Id}]{HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} vaild token successful.");
+                return StatusCode((int)HttpStatusCode.NoContent);
+            }
         }
 
         [HttpPost]
-        public ActionResult<string> Invaildate()
+        public ActionResult<string> Invalidate([FromBody] PostInvalidateRequest request)
         {
-            return NotFound();
+            var tokens = from t in db.Tokens where t.AccessToken == request.accessToken select t;
+            if (tokens.Count() == 1)
+            {
+                tokens.First().Status = 0;
+                db.SaveChanges();
+            }
+            log.Info($"[ID: {HttpContext.Connection.Id}]{HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} with token {request.accessToken} was invalidated.");
+            return StatusCode((int)HttpStatusCode.NoContent);
         }
 
         [HttpPost]
-        public ActionResult<string> Signout()
+        public ActionResult<string> Signout([FromBody] PostSignoutRequest request)
         {
-            return NotFound();
+            log.Info($"[ID: {HttpContext.Connection.Id}]Got logout request from {HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} with user {request.username}.");
+
+            // Check if user exists.
+            var users = from u in db.Users where u.Email == request.username select u;
+            if (users.Count() != 1)
+            {
+                log.Info($"[ID: {HttpContext.Connection.Id}]Request user is not exists.");
+                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidUsername());
+            }
+
+            // Cooldown check.
+            var user = users.First();
+            var time = TimeWorker.GetJavaTimeStamp();
+            var cooldowns = from c in db.Cooldown where c.Uid == user.Id select c;
+            if (cooldowns.Count() != 1)
+            {
+                db.Cooldown.Add(new Cooldown()
+                {
+                    Uid = user.Id,
+                    TryTimes = 0,
+                    LastTryTime = time,
+                    LastLoginTime = user.CreateTime,
+                    CooldownLevel = 0,
+                    CooldownTime = time
+                });
+                db.SaveChanges();
+            }
+
+            cooldowns = from c in db.Cooldown where c.Uid == user.Id select c;
+            var cooldown = cooldowns.First();
+            if (Convert.ToDecimal(cooldown.CooldownTime) > Convert.ToDecimal(time))
+            {
+                log.Info($"[ID: {HttpContext.Connection.Id}]User {request.username} already in cooldown.");
+                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.TooManyTryTimes());
+            }
+            else
+            {
+                if (cooldown.TryTimes >= Program.SecurityLoginTryTimes)
+                {
+                    cooldown.CooldownLevel++;
+                    cooldown.CooldownTime = time + cooldown.CooldownLevel * cooldown.CooldownLevel * 5 * 60;
+                    db.SaveChanges();
+                    log.Info($"[ID: {HttpContext.Connection.Id}]User {request.username} got into cooldown.");
+                    return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.TooManyTryTimes());
+                }
+                cooldown.LastTryTime = time;
+                cooldown.TryTimes++;
+                db.SaveChanges();
+            }
+
+            // Password check.
+            var salt = user.CreateTime;
+            var passwordHashed = HashWorker.HashPassword(request.password, salt);
+
+            if (user.Password != passwordHashed)
+            {
+                log.Info($"[ID: {HttpContext.Connection.Id}]IP address {HttpContext.Connection.RemoteIpAddress}:{HttpContext.Connection.RemotePort} try to login with user {request.username} but wrong password.");
+                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidPassword());
+            }
+
+            // Update cooldown.
+            cooldown.LastLoginTime = time;
+            cooldown.TryTimes = 0;
+            db.SaveChanges();
+            log.Info($"[ID: {HttpContext.Connection.Id}]Cooldown of user {user.Username} has reseted.");
+
+            return StatusCode((int)HttpStatusCode.NoContent);
         }
 
         public struct Profile
@@ -386,6 +486,24 @@ namespace Mimir.Controllers
             public string clientToken;
             public Profile? selectedProfile;
             public User? user;
+        }
+
+        public struct PostValidateRequest
+        {
+            public string accessToken;
+            public string clientToken;
+        }
+
+        public struct PostInvalidateRequest
+        {
+            public string accessToken;
+            public string clientToken;
+        }
+
+        public struct PostSignoutRequest
+        {
+            public string username;
+            public string password;
         }
     }
 }

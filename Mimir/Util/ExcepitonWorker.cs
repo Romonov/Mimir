@@ -12,7 +12,7 @@ namespace Mimir.Util
     /// </summary>
     public static class ExcepitonWorker
     {
-        public static string InvaildToken()
+        public static string InvalidToken()
         {
             Result result = new Result();
             result.error = "ForbiddenOperationException";
@@ -21,7 +21,7 @@ namespace Mimir.Util
             return JsonConvert.SerializeObject(result);
         }
 
-        public static string InvaildPassword()
+        public static string InvalidPassword()
         {
             Result result = new Result();
             result.error = "ForbiddenOperationException";
@@ -30,7 +30,7 @@ namespace Mimir.Util
             return JsonConvert.SerializeObject(result);
         }
 
-        public static string InvaildUsername()
+        public static string InvalidUsername()
         {
             Result result = new Result();
             result.error = "ForbiddenOperationException";
