@@ -10,69 +10,69 @@ namespace Mimir.Util
     /// 业务异常工具类
     /// Todo: I18n
     /// </summary>
-    public static class ExcepitonWorker
+    public static class ExceptionWorker
     {
-        public static string InvalidToken()
+        public static Result InvalidToken()
         {
             Result result = new Result();
             result.error = "ForbiddenOperationException";
             result.errorMessage = "Invalid token.";
             result.cause = "Invalid token.";
-            return JsonConvert.SerializeObject(result);
+            return result;
         }
 
-        public static string InvalidPassword()
+        public static Result InvalidPassword()
         {
             Result result = new Result();
             result.error = "ForbiddenOperationException";
             result.errorMessage = "Invalid credentials. Invalid username or password.";
             result.cause = "Invalid password.";
-            return JsonConvert.SerializeObject(result);
+            return result;
         }
 
-        public static string InvalidUsername()
+        public static Result InvalidUsername()
         {
             Result result = new Result();
             result.error = "ForbiddenOperationException";
             result.errorMessage = "Invalid credentials. Invalid username or password.";
             result.cause = "Invalid username.";
-            return JsonConvert.SerializeObject(result);
+            return result;
         }
 
-        public static string BadProfile()
+        public static Result BadProfile()
         {
             Result result = new Result();
             result.error = "ForbiddenOperationException";
             result.errorMessage = "Invalid token.";
             result.cause = "Bad profile.";
-            return JsonConvert.SerializeObject(result);
+            return result;
         }
 
-        public static string TooManyTryTimes()
+        public static Result TooManyTryTimes()
         {
             Result result = new Result();
             result.error = "ForbiddenOperationException";
             result.errorMessage = "Invalid credentials. Invalid username or password.";
             result.cause = "Too many try times.";
-            return JsonConvert.SerializeObject(result);
+            return result;
         }
 
-        public static string ProfileNotAllowed()
+        public static Result ProfileNotAllowed()
         {
             Result result = new Result();
             result.error = "ForbiddenOperationException";
             result.errorMessage = "Profile not belong to this user.";
             result.cause = "Profile not belong to this user.";
-            return JsonConvert.SerializeObject(result);
+            return result;
         }
 
-        public static string AlreadyBind()
+        public static Result AlreadyBind()
         {
             Result result = new Result();
             result.error = "IllegalArgumentException";
             result.errorMessage = "Access token already has a profile assigned.";
             result.cause = "This token already has a profile.";
-            return JsonConvert.SerializeObject(result);
+            return result;
         }
 
         public struct Result

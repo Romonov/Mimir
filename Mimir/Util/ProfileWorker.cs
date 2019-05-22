@@ -86,7 +86,7 @@ namespace Mimir.Util
         /// <param name="containProperties">是否包含属性</param>
         /// <param name="isUnsigned">是否不签名</param>
         /// <returns>角色信息</returns>
-        public static string GetProfile(MimirContext db, string name, bool containProperties = false, bool isUnsigned = true)
+        public static Profile? GetProfile(MimirContext db, string name, bool containProperties = false, bool isUnsigned = true)
         {
             var profiles = from p in db.Profiles where p.Name == name select p;
             if (profiles.Count() != 1)
@@ -102,6 +102,7 @@ namespace Mimir.Util
             if (containProperties)
             {
                 var textures = new Textures();
+                var properties = new Properties();
 
                 if (profile.SkinUrl != null && profile.SkinUrl != string.Empty)
                 {
@@ -120,52 +121,53 @@ namespace Mimir.Util
                     textures.SKIN.metadata = metadata;
                     if (Program.IsHttps)
                     {
-                        textures.SKIN.url = "https://" + Program.ServerDomain + profile.SkinUrl;
+                        textures.SKIN.url = $"https://{Program.ServerDomain}/textures/{profile.SkinUrl}";
                     }
                     else
                     {
-                        textures.SKIN.url = "http://" + Program.ServerDomain + profile.SkinUrl;
+                        textures.SKIN.url = $"http://{Program.ServerDomain}/textures/{profile.SkinUrl}";
                     }
-                }
 
-                if (profile.CapeUrl != null && profile.CapeUrl != string.Empty)
-                {
-                    var cape = new Skin();
-                    if (Program.IsHttps)
+                    if (profile.CapeUrl != null && profile.CapeUrl != string.Empty)
                     {
-                        cape.url = "https://" + Program.ServerDomain + profile.CapeUrl;
+                        var cape = new Skin();
+                        if (Program.IsHttps)
+                        {
+                            cape.url = $"https://{Program.ServerDomain}/textures/{profile.CapeUrl}";
+                        }
+                        else
+                        {
+                            cape.url = $"https://{Program.ServerDomain}/textures/{profile.CapeUrl}";
+                        }
+                        textures.CAPE = cape;
+                    }
+
+                    var texture = new Texture();
+                    texture.timestamp = TimeWorker.GetJavaTimeStamp();
+                    texture.profileId = profile.Uuid;
+                    texture.profileName = profile.Name;
+                    texture.textures = textures;
+
+                    properties.name = "textures";
+                    var value = EncodeWorker.Base64Encoder(JsonConvert.SerializeObject(texture));
+                    properties.value = value;
+
+                    if (!isUnsigned)
+                    {
+                        properties.signature = SignatureWorker.Sign(value);
                     }
                     else
                     {
-                        cape.url = "http://" + Program.ServerDomain + profile.CapeUrl;
+                        properties.signature = "";
                     }
-                    textures.CAPE = cape;
                 }
-
-                var texture = new Texture();
-                texture.timestamp = TimeWorker.GetJavaTimeStamp();
-                texture.profileId = profile.Uuid;
-                texture.profileName = profile.Name;
-                texture.textures = textures;
-
-                var properties = new Properties();
-                properties.name = "textures";
-                var value = EncodeWorker.Base64Encoder(JsonConvert.SerializeObject(texture));
-                properties.value = value;
-
-                if (!isUnsigned)
-                {
-                    properties.signature = SignatureWorker.Sign(value);
-                }
-                else
-                {
-                    properties.signature = "";
-                }
-
                 result.properties = new Properties?[] { properties };
             }
-
-            return JsonConvert.SerializeObject(result);
+            else
+            {
+                result.properties = new Properties?[] { new Properties() };
+            }
+            return result;
         }
 
         /// <summary>
@@ -176,7 +178,7 @@ namespace Mimir.Util
         /// <param name="containProperties">是否包含属性</param>
         /// <param name="isUnsigned">是否不签名</param>
         /// <returns>角色信息</returns>
-        public static string GetProfile(MimirContext db, Guid uuid, bool containProperties = false, bool isUnsigned = true)
+        public static Profile? GetProfile(MimirContext db, Guid uuid, bool containProperties = false, bool isUnsigned = true)
         {
             var name = GetNameFormUuid(db, uuid);
             if (name == null)

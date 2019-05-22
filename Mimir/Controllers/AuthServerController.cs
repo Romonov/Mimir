@@ -25,7 +25,7 @@ namespace Mimir.Controllers
         }
 
         [HttpPost]
-        public ActionResult<string> Authenticate([FromBody] PostAuthrnticateRequest request)
+        public JsonResult Authenticate([FromBody] PostAuthrnticateRequest request)
         {
             log.Info($"[ID: {HttpContext.Connection.Id}]Got login request from {HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} with user {request.username}.");
 
@@ -34,7 +34,10 @@ namespace Mimir.Controllers
             if (users.Count() != 1)
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]Request user is not exists.");
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidUsername());
+                return new JsonResult(ExceptionWorker.InvalidUsername())
+                {
+                    StatusCode = (int)HttpStatusCode.Forbidden
+                };
             }
 
             // Cooldown check.
@@ -60,7 +63,10 @@ namespace Mimir.Controllers
             if (Convert.ToDecimal(cooldown.CooldownTime) > Convert.ToDecimal(time))
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]User {user.Username} already in cooldown.");
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.TooManyTryTimes());
+                return new JsonResult(ExceptionWorker.TooManyTryTimes())
+                {
+                    StatusCode = (int)HttpStatusCode.Forbidden
+                };
             }
             else
             {
@@ -70,7 +76,10 @@ namespace Mimir.Controllers
                     cooldown.CooldownTime = time + cooldown.CooldownLevel * cooldown.CooldownLevel * 5 * 60;
                     db.SaveChanges();
                     log.Info($"[ID: {HttpContext.Connection.Id}]User {user.Username} got into cooldown.");
-                    return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.TooManyTryTimes());
+                    return new JsonResult(ExceptionWorker.TooManyTryTimes())
+                    {
+                        StatusCode = (int)HttpStatusCode.Forbidden
+                    };
                 }
                 cooldown.LastTryTime = time;
                 cooldown.TryTimes++;
@@ -84,7 +93,10 @@ namespace Mimir.Controllers
             if (user.Password != passwordHashed)
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]IP address {HttpContext.Connection.RemoteIpAddress}:{HttpContext.Connection.RemotePort} try to login with user {request.username} but wrong password.");
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidPassword());
+                return new JsonResult(ExceptionWorker.InvalidPassword())
+                {
+                    StatusCode = (int)HttpStatusCode.Forbidden
+                };
             }
 
             // Update cooldown.
@@ -166,15 +178,15 @@ namespace Mimir.Controllers
                 };
                 response.user = new User()
                 {
-                    id = user.Username
+                    id = user.Username,
+                    properties = new Properties[] { properties }
                 };
             }
-
-            return JsonConvert.SerializeObject(response);
+            return new JsonResult(response);
         }
 
         [HttpPost]
-        public ActionResult<string> Refresh([FromBody] PostRefreshRequest request)
+        public JsonResult Refresh([FromBody] PostRefreshRequest request)
         {
             log.Info($"[ID: {HttpContext.Connection.Id}]{HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} tried to refresh token.");
             var isAlreadyBindProfile = false;
@@ -193,7 +205,10 @@ namespace Mimir.Controllers
             if (tokens.Count() != 1)
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]Token invalid.");
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidToken());
+                return new JsonResult(ExceptionWorker.InvalidToken())
+                {
+                    StatusCode = (int)HttpStatusCode.Forbidden
+                };
             }
 
             // Invalid token.
@@ -242,7 +257,10 @@ namespace Mimir.Controllers
             {
                 if (isAlreadyBindProfile)
                 {
-                    return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.AlreadyBind());
+                    return new JsonResult(ExceptionWorker.AlreadyBind())
+                    {
+                        StatusCode = (int)HttpStatusCode.Forbidden
+                    };
                 }
                 else
                 {
@@ -318,11 +336,11 @@ namespace Mimir.Controllers
                 };
             }
 
-            return JsonConvert.SerializeObject(response);
+            return new JsonResult(response);
         }
 
         [HttpPost]
-        public ActionResult<string> Validate([FromBody] PostValidateRequest request)
+        public JsonResult Validate([FromBody] PostValidateRequest request)
         {
             IQueryable<Tokens> tokens = null;
             if (request.clientToken == null)
@@ -337,17 +355,23 @@ namespace Mimir.Controllers
             if (tokens.Count() != 1)
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]{HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} vaild token failed.");
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidToken());
+                return new JsonResult(ExceptionWorker.InvalidToken())
+                {
+                    StatusCode = (int)HttpStatusCode.Forbidden
+                };
             }
             else
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]{HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} vaild token successful.");
-                return StatusCode((int)HttpStatusCode.NoContent);
+                return new JsonResult(null)
+                {
+                    StatusCode = (int)HttpStatusCode.NoContent
+                };
             }
         }
 
         [HttpPost]
-        public ActionResult<string> Invalidate([FromBody] PostInvalidateRequest request)
+        public JsonResult Invalidate([FromBody] PostInvalidateRequest request)
         {
             var tokens = from t in db.Tokens where t.AccessToken == request.accessToken select t;
             if (tokens.Count() == 1)
@@ -356,11 +380,14 @@ namespace Mimir.Controllers
                 db.SaveChanges();
             }
             log.Info($"[ID: {HttpContext.Connection.Id}]{HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} with token {request.accessToken} was invalidated.");
-            return StatusCode((int)HttpStatusCode.NoContent);
+            return new JsonResult(null)
+            {
+                StatusCode = (int)HttpStatusCode.NoContent
+            };
         }
 
         [HttpPost]
-        public ActionResult<string> Signout([FromBody] PostSignoutRequest request)
+        public JsonResult Signout([FromBody] PostSignoutRequest request)
         {
             log.Info($"[ID: {HttpContext.Connection.Id}]Got logout request from {HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} with user {request.username}.");
 
@@ -369,7 +396,10 @@ namespace Mimir.Controllers
             if (users.Count() != 1)
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]Request user is not exists.");
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidUsername());
+                return new JsonResult(ExceptionWorker.InvalidUsername())
+                {
+                    StatusCode = (int)HttpStatusCode.Forbidden
+                };
             }
 
             // Cooldown check.
@@ -395,7 +425,10 @@ namespace Mimir.Controllers
             if (Convert.ToDecimal(cooldown.CooldownTime) > Convert.ToDecimal(time))
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]User {request.username} already in cooldown.");
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.TooManyTryTimes());
+                return new JsonResult(ExceptionWorker.TooManyTryTimes())
+                {
+                    StatusCode = (int)HttpStatusCode.Forbidden
+                };
             }
             else
             {
@@ -405,7 +438,10 @@ namespace Mimir.Controllers
                     cooldown.CooldownTime = time + cooldown.CooldownLevel * cooldown.CooldownLevel * 5 * 60;
                     db.SaveChanges();
                     log.Info($"[ID: {HttpContext.Connection.Id}]User {request.username} got into cooldown.");
-                    return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.TooManyTryTimes());
+                    return new JsonResult(ExceptionWorker.TooManyTryTimes())
+                    {
+                        StatusCode = (int)HttpStatusCode.Forbidden
+                    };
                 }
                 cooldown.LastTryTime = time;
                 cooldown.TryTimes++;
@@ -419,7 +455,10 @@ namespace Mimir.Controllers
             if (user.Password != passwordHashed)
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]IP address {HttpContext.Connection.RemoteIpAddress}:{HttpContext.Connection.RemotePort} try to login with user {request.username} but wrong password.");
-                return StatusCode((int)HttpStatusCode.Forbidden, ExcepitonWorker.InvalidPassword());
+                return new JsonResult(ExceptionWorker.InvalidPassword())
+                {
+                    StatusCode = (int)HttpStatusCode.Forbidden
+                };
             }
 
             // Update cooldown.
@@ -428,7 +467,10 @@ namespace Mimir.Controllers
             db.SaveChanges();
             log.Info($"[ID: {HttpContext.Connection.Id}]Cooldown of user {user.Username} has reseted.");
 
-            return StatusCode((int)HttpStatusCode.NoContent);
+            return new JsonResult(null)
+            {
+                StatusCode = (int)HttpStatusCode.NoContent
+            };
         }
 
         public struct Profile

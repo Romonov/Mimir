@@ -1,26 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mimir.Models;
+using Mimir.Util;
 using Newtonsoft.Json;
+using NLog;
 
 namespace Mimir.Controllers
 {
-    [Route("api/")]
     public class ApiController : ControllerBase
     {
         private MimirContext db = null;
+        private ILogger log = null;
 
         public ApiController(MimirContext context)
         {
             db = context;
+            log = LogManager.GetLogger("Yggdrasil");
         }
 
         [HttpGet]
-        public ActionResult<string> Index()
+        public JsonResult Index()
         {
             GetIndexResponse response = new GetIndexResponse();
 
@@ -30,23 +34,40 @@ namespace Mimir.Controllers
             response.skinDomains = Program.SkinDomains;
             response.signaturePublickey = $"-----BEGIN PUBLIC KEY-----\n{Program.PublicKey}\n-----END PUBLIC KEY-----\n";
 
-            return JsonConvert.SerializeObject(response);
+            return new JsonResult(response);
         }
 
-        [Route("api/profiles/minecraft")]
-        public ActionResult<string> Profiles()
+        [HttpPost]
+        public JsonResult Profiles([FromBody] string[] request)
         {
-            return "";
+            if (request.Length > Program.MaxProfileCountPerQuery)
+            {
+                log.Info($"[ID: {HttpContext.Connection.Id}]IP {HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} tried to query profiles over the limit.");
+                return new JsonResult(StatusCode((int)HttpStatusCode.Forbidden));
+            }
+
+            var profiles = new List<ProfileWorker.Profile>();
+            foreach (var item in request)
+            {
+                var result = ProfileWorker.GetProfile(db, item);
+                if (result != null)
+                {
+                    profiles.Add(result.Value);
+                }
+            }
+
+            log.Info($"[ID: {HttpContext.Connection.Id}]IP {HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{HttpContext.Connection.RemotePort} queried profiles.");
+            return new JsonResult(profiles);
         }
 
-        struct GetIndexResponse
+        public struct GetIndexResponse
         {
             public GetIndexMeta meta;
             public string[] skinDomains;
             public string signaturePublickey;
         }
 
-        struct GetIndexMeta
+        public struct GetIndexMeta
         {
             public string serverName;
             public string implementationName;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
@@ -19,7 +20,7 @@ namespace Mimir
         internal static string SqlIP = "127.0.0.1";
         internal static int SqlPort = 3306;
         internal static string SqlUsername = "root";
-        internal static string SqlPassword = "123456";
+        internal static string SqlPassword = "123";
         internal static string SqlDatabaseName = "mimir";
 
         internal readonly static string Version = "1.0.0";
@@ -35,6 +36,7 @@ namespace Mimir
         internal static long SessionsExpireSeconds = 30;
         internal static bool IsHttps = true;
         internal static string[] SkinDomains = null;
+        internal static int MaxProfileCountPerQuery = 2;
         #endregion
 
         public static void Main(string[] args)
@@ -45,6 +47,28 @@ namespace Mimir
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseKestrel(options =>
+                {
+                    var config = (IConfiguration)options.ApplicationServices.GetService(typeof(IConfiguration));
+
+                    // Load database configs.
+                    Enum.TryParse(config["Database:Type"], out SqlType);
+                    SqlIP = config["Database:IP"];
+                    int.TryParse(config["Database:Port"], out SqlPort);
+                    SqlUsername = config["Database:User"];
+                    SqlPassword = config["Database:Password"];
+                    SqlDatabaseName = config["Database:Name"];
+
+                    options.Listen(IPAddress.Any, int.Parse(config["Listen:Http:Port"]), opt =>
+                    {
+                        opt.UseConnectionLogging();
+                    });
+                    options.Listen(IPAddress.Any, int.Parse(config["Listen:Https:Port"]), opt =>
+                    {
+                        opt.UseHttps(config["Listen:Https:Cert"], config["Listen:Https:Password"]);
+                        opt.UseConnectionLogging();
+                    });
+                })
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();

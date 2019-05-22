@@ -67,16 +67,6 @@ namespace Mimir
                 app.UseExceptionHandler("/Index/Error");
             }
 
-            // Load database configs.
-            log.Info("Loading database configs.");
-            Enum.TryParse(Configuration["Database:Type"], out Program.SqlType);
-            Program.SqlIP = Configuration["Database:IP"];
-            int.TryParse(Configuration["Database:Port"], out Program.SqlPort);
-            Program.SqlUsername = Configuration["Database:User"];
-            Program.SqlPassword = Configuration["Database:Password"];
-            Program.SqlDatabaseName = Configuration["Database:Name"];
-            log.Info("Database configs loaded.");
-
             // Load logic configs.
             log.Info("Loading logic configs.");
             try
@@ -103,6 +93,8 @@ namespace Mimir
                 bool.TryParse((from o in db.Options where o.Option == "IsHttps" select o.Value).First(),
                     out Program.IsHttps);
                 Program.SkinDomains = (from o in db.Options where o.Option == "SkinDomains" select o.Value).First().Split(",");
+                int.TryParse((from o in db.Options where o.Option == "MaxProfileCountPerQuery" select o.Value).First(),
+                    out Program.MaxProfileCountPerQuery);
             }
             catch (Exception)
             {
@@ -114,15 +106,19 @@ namespace Mimir
             app.UseSession();
 
             //app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                ServeUnknownFileTypes = true,
+                DefaultContentType = "image/png"
+            });
 
-            // Add ALI.
             app.Use(next =>
             {
                 return async context =>
                 {
                     context.Response.OnStarting(() =>
                     {
+                        // Add ALI.
                         if (Program.IsHttps)
                         {
                             context.Response.Headers.Add("X-Authlib-Injector-API-Location", "https://" + Program.ServerDomain + "/api/");
@@ -131,6 +127,9 @@ namespace Mimir
                         {
                             context.Response.Headers.Add("X-Authlib-Injector-API-Location", "http://" + Program.ServerDomain + "/api/");
                         }
+
+                        context.Response.Headers["Server"] = "Mimir";
+                        context.Response.Headers.Add("Author", "Romonov");
                         return Task.CompletedTask;
                     });
                     await next(context);
@@ -155,6 +154,10 @@ namespace Mimir
 
             app.UseMvc(routes =>
             {
+                routes.MapRoute(
+                    name: "profiles_query",
+                    template: "api/api/profiles/minecraft", 
+                    defaults: new { controller = "Api", action = "Profiles" });
                 routes.MapRoute(
                     name: "yggdrasil",
                     template: "api/{controller=Api}/{action=Index}");
