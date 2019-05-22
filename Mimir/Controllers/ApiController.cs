@@ -27,7 +27,7 @@ namespace Mimir.Controllers
             response.meta.serverName = Program.ServerName;
             response.meta.implementationName = "Mimir";
             response.meta.implementationVersion = Program.Version;
-            response.skinDomains = new string[] { $"{Program.ServerDomain}" };
+            response.skinDomains = Program.SkinDomains;
             response.signaturePublickey = $"-----BEGIN PUBLIC KEY-----\n{Program.PublicKey}\n-----END PUBLIC KEY-----\n";
 
             return JsonConvert.SerializeObject(response);

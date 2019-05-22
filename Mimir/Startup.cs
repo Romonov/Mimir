@@ -81,21 +81,28 @@ namespace Mimir
             log.Info("Loading logic configs.");
             try
             {
-                Program.ServerName = (from options in db.Options where options.Option == "ServerName" select options.Value).First();
+                Program.ServerName = (from o in db.Options where o.Option == "ServerName" select o.Value).First();
+                if ((from o in db.Options where o.Option == "PrivateKeyXml" select o.Value).First() == string.Empty)
+                {
+                    SignatureWorker.GenKey(db);
+                }
                 RSACryptoServiceProviderExtensions.FromXmlString(Program.PrivateKeyProvider, 
-                    (from options in db.Options where options.Option == "PrivateKeyXml" select options.Value).First());
-                Program.PublicKey = (from options in db.Options where options.Option == "PublicKey" select options.Value).First();
-                Program.ServerDomain = (from options in db.Options where options.Option == "ServerDomain" select options.Value).First();
-                int.TryParse((from options in db.Options where options.Option == "SecurityLoginTryTimes" select options.Value).First(), 
+                    (from o in db.Options where o.Option == "PrivateKeyXml" select o.Value).First());
+                Program.PublicKey = (from o in db.Options where o.Option == "PublicKey" select o.Value).First();
+                Program.ServerDomain = (from o in db.Options where o.Option == "ServerDomain" select o.Value).First();
+                int.TryParse((from o in db.Options where o.Option == "SecurityLoginTryTimes" select o.Value).First(), 
                     out Program.SecurityLoginTryTimes);
-                bool.TryParse((from options in db.Options where options.Option == "IsEnableMultiProfiles" select options.Value).First(),
+                bool.TryParse((from o in db.Options where o.Option == "IsEnableMultiProfiles" select o.Value).First(),
                     out Program.IsEnableMultiProfiles);
-                int.TryParse((from options in db.Options where options.Option == "MaxTokensPerProfile" select options.Value).First(),
+                int.TryParse((from o in db.Options where o.Option == "MaxTokensPerProfile" select o.Value).First(),
                     out Program.MaxTokensPerProfile);
-                int.TryParse((from options in db.Options where options.Option == "TokensExpireDaysLimit" select options.Value).First(),
+                int.TryParse((from o in db.Options where o.Option == "TokensExpireDaysLimit" select o.Value).First(),
                     out Program.TokensExpireDaysLimit);
-                long.TryParse((from options in db.Options where options.Option == "SessionsExpireSeconds" select options.Value).First(),
+                long.TryParse((from o in db.Options where o.Option == "SessionsExpireSeconds" select o.Value).First(),
                     out Program.SessionsExpireSeconds);
+                bool.TryParse((from o in db.Options where o.Option == "IsHttps" select o.Value).First(),
+                    out Program.IsHttps);
+                Program.SkinDomains = (from o in db.Options where o.Option == "SkinDomains" select o.Value).First().Split(",");
             }
             catch (Exception)
             {
@@ -108,12 +115,33 @@ namespace Mimir
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
-            
+
+            // Add ALI.
+            app.Use(next =>
+            {
+                return async context =>
+                {
+                    context.Response.OnStarting(() =>
+                    {
+                        if (Program.IsHttps)
+                        {
+                            context.Response.Headers.Add("X-Authlib-Injector-API-Location", "https://" + Program.ServerDomain + "/api/");
+                        }
+                        else
+                        {
+                            context.Response.Headers.Add("X-Authlib-Injector-API-Location", "http://" + Program.ServerDomain + "/api/");
+                        }
+                        return Task.CompletedTask;
+                    });
+                    await next(context);
+                };
+            });
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "get_profile",
-                    template: "/sessionserver/session/minecraft/profile/{uuid}", 
+                    template: "api/sessionserver/session/minecraft/profile/{uuid}", 
                     defaults: new { controller = "SessionServer", action = "Profile"});
                 routes.MapRoute(
                     name: "session_join",

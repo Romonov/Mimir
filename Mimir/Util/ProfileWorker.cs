@@ -118,13 +118,27 @@ namespace Mimir.Util
                     }
                     textures.SKIN = new Skin();
                     textures.SKIN.metadata = metadata;
-                    textures.SKIN.url = Program.ServerDomain + profile.SkinUrl;
+                    if (Program.IsHttps)
+                    {
+                        textures.SKIN.url = "https://" + Program.ServerDomain + profile.SkinUrl;
+                    }
+                    else
+                    {
+                        textures.SKIN.url = "http://" + Program.ServerDomain + profile.SkinUrl;
+                    }
                 }
 
                 if (profile.CapeUrl != null && profile.CapeUrl != string.Empty)
                 {
                     var cape = new Skin();
-                    cape.url = Program.ServerDomain + profile.CapeUrl;
+                    if (Program.IsHttps)
+                    {
+                        cape.url = "https://" + Program.ServerDomain + profile.CapeUrl;
+                    }
+                    else
+                    {
+                        cape.url = "http://" + Program.ServerDomain + profile.CapeUrl;
+                    }
                     textures.CAPE = cape;
                 }
 
@@ -136,11 +150,16 @@ namespace Mimir.Util
 
                 var properties = new Properties();
                 properties.name = "textures";
-                properties.value = EncodeWorker.Base64Encoder(JsonConvert.SerializeObject(texture));
+                var value = EncodeWorker.Base64Encoder(JsonConvert.SerializeObject(texture));
+                properties.value = value;
 
                 if (!isUnsigned)
                 {
-                    properties.signature = SignatureWorker.Sign(properties.value);
+                    properties.signature = SignatureWorker.Sign(value);
+                }
+                else
+                {
+                    properties.signature = "";
                 }
 
                 result.properties = new Properties?[] { properties };

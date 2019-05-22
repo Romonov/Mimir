@@ -68,11 +68,11 @@ namespace Mimir.Util
         /// <summary>
         /// 使用RSA私钥给数据签名
         /// </summary>
-        /// <param name="value">要签名的数据</param>
+        /// <param name="str">要签名的数据</param>
         /// <returns>签名结果</returns>
-        public static string Sign(string value)
+        public static string Sign(string str)
         {
-            byte[] byteData = Encoding.UTF8.GetBytes(value);
+            byte[] byteData = Encoding.UTF8.GetBytes(str);
             byte[] signedData = Program.PrivateKeyProvider.SignData(byteData, new SHA1CryptoServiceProvider());
             return Convert.ToBase64String(signedData);
         }

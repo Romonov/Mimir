@@ -33,6 +33,8 @@ namespace Mimir
         internal static int MaxTokensPerProfile = 10;
         internal static int TokensExpireDaysLimit = 15;
         internal static long SessionsExpireSeconds = 30;
+        internal static bool IsHttps = true;
+        internal static string[] SkinDomains = null;
         #endregion
 
         public static void Main(string[] args)

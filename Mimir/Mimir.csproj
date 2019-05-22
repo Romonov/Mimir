@@ -29,7 +29,6 @@
     <Folder Include="Views\Admin\" />
     <Folder Include="Views\User\" />
     <Folder Include="Views\Install\" />
-    <Folder Include="wwwroot\textures\" />
   </ItemGroup>
 
 

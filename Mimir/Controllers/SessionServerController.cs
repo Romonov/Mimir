@@ -57,9 +57,18 @@ namespace Mimir.Controllers
             return StatusCode((int)HttpStatusCode.NoContent);
         }
 
-        [HttpGet("{username}/{serverId}/{ip}")]
-        public ActionResult<string> HasJoined(string username, string serverId, string ip)
+        [HttpGet]
+        public ActionResult<string> HasJoined()
         {
+            string username = Request.Query["username"];
+            string serverId = Request.Query["serverId"];
+            string ip = Request.Query["ip"];
+
+            if (username == null || username == string.Empty || serverId == null || serverId == string.Empty)
+            {
+                return StatusCode((int)HttpStatusCode.NoContent);
+            }
+
             var profiles = from p in db.Profiles where p.Name == username select p;
             if (profiles.Count() != 1)
             {
@@ -100,10 +109,17 @@ namespace Mimir.Controllers
             }
         }
 
-        [HttpGet("unsigned")]
-        public ActionResult<string> Profile(string uuid, string unsigned)
+        [HttpGet]
+        public ActionResult<string> Profile(string uuid)
         {
-            if (bool.TryParse(unsigned, out var isUnsigned) && Guid.TryParse(uuid, out var guid))
+            string unsigned = Request.Query["unsigned"];
+
+            if (unsigned == null || unsigned == string.Empty)
+            {
+                unsigned = true.ToString();
+            }
+
+            if (Guid.TryParse(uuid, out var guid) && bool.TryParse(unsigned, out var isUnsigned))
             {
                 return ProfileWorker.GetProfile(db, guid, true, isUnsigned);
             }
