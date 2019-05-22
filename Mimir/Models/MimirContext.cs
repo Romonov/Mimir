@@ -145,7 +145,8 @@ namespace Mimir.Models
 
                 entity.Property(e => e.AccessToken)
                     .IsRequired()
-                    .HasColumnType("char(32)");
+                    .HasColumnName("AccessToken")
+                    .IsUnicode(false);
 
                 entity.Property(e => e.ClientIp)
                     .IsRequired()
@@ -155,6 +156,11 @@ namespace Mimir.Models
                 entity.Property(e => e.ServerId)
                     .IsRequired()
                     .HasColumnName("ServerID")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ExpireTime)
+                    .IsRequired()
+                    .HasColumnName("ExpireTime")
                     .IsUnicode(false);
             });
 

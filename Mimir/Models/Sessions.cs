@@ -9,5 +9,6 @@ namespace Mimir.Models
         public string ServerId { get; set; }
         public string AccessToken { get; set; }
         public string ClientIp { get; set; }
+        public string ExpireTime { get; set; }
     }
 }

@@ -32,6 +32,7 @@ namespace Mimir
         internal static bool IsEnableMultiProfiles = true;
         internal static int MaxTokensPerProfile = 10;
         internal static int TokensExpireDaysLimit = 15;
+        internal static long SessionsExpireSeconds = 30;
         #endregion
 
         public static void Main(string[] args)

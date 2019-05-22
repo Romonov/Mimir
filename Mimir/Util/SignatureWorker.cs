@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -62,6 +63,18 @@ namespace Mimir.Util
             SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(pub);
             byte[] serializedPublicBytes = publicKeyInfo.ToAsn1Object().GetDerEncoded();
             return Convert.ToBase64String(serializedPublicBytes);
+        }
+
+        /// <summary>
+        /// 使用RSA私钥给数据签名
+        /// </summary>
+        /// <param name="value">要签名的数据</param>
+        /// <returns>签名结果</returns>
+        public static string Sign(string value)
+        {
+            byte[] byteData = Encoding.UTF8.GetBytes(value);
+            byte[] signedData = Program.PrivateKeyProvider.SignData(byteData, new SHA1CryptoServiceProvider());
+            return Convert.ToBase64String(signedData);
         }
     }
 }

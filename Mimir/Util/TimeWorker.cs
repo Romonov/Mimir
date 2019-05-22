@@ -40,5 +40,16 @@ namespace Mimir.Util
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
             return ((long)(ts.TotalSeconds)).ToString();
         }
+
+        /// <summary>
+        /// 获得10位时间戳（Java格式时间戳，带偏移）
+        /// </summary>
+        /// <param name="offset">偏移的毫秒数</param>
+        /// <returns>获得的10位时间戳</returns>
+        public static string GetJavaTimeStamp(long offset)
+        {
+            TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
+            return ((long)(ts.TotalSeconds) + offset).ToString();
+        }
     }
 }

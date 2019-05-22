@@ -94,6 +94,8 @@ namespace Mimir
                     out Program.MaxTokensPerProfile);
                 int.TryParse((from options in db.Options where options.Option == "TokensExpireDaysLimit" select options.Value).First(),
                     out Program.TokensExpireDaysLimit);
+                long.TryParse((from options in db.Options where options.Option == "SessionsExpireSeconds" select options.Value).First(),
+                    out Program.SessionsExpireSeconds);
             }
             catch (Exception)
             {
@@ -110,8 +112,12 @@ namespace Mimir
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "get_profile",
+                    template: "/sessionserver/session/minecraft/profile/{uuid}", 
+                    defaults: new { controller = "SessionServer", action = "Profile"});
+                routes.MapRoute(
                     name: "session_join",
-                    template: "api/sessionserver/session/minecraft/join/{uuid?}", 
+                    template: "api/sessionserver/session/minecraft/join", 
                     defaults: new { controller = "SessionServer", action = "Join"});
                 routes.MapRoute(
                     name: "session_has_joined",
