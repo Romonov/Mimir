@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Mimir.Controllers;
 using Mimir.Models;
 using Mimir.Util;
+using Newtonsoft.Json;
 using NLog;
 
 namespace Mimir
@@ -51,7 +52,12 @@ namespace Mimir
 
             services.AddSession();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

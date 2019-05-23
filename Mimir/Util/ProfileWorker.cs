@@ -106,19 +106,14 @@ namespace Mimir.Util
 
                 if (profile.SkinUrl != null && profile.SkinUrl != string.Empty)
                 {
-                    var metadata = new Metadata();
-                    switch (profile.SkinModel)
-                    {
-                        case 1:
-                            metadata.model = "slim";
-                            break;
-                        case 0:
-                        default:
-                            metadata.model = "default";
-                            break;
-                    }
                     textures.SKIN = new Skin();
-                    textures.SKIN.metadata = metadata;
+                    if (profile.SkinModel == 1)
+                    {
+                        var metadata = new Metadata();
+                        metadata.model = "slim";
+                        textures.SKIN.metadata = metadata;
+                    }
+                    
                     if (Program.IsHttps)
                     {
                         textures.SKIN.url = $"https://{Program.ServerDomain}/textures/{profile.SkinUrl}";
@@ -149,16 +144,15 @@ namespace Mimir.Util
                     texture.textures = textures;
 
                     properties.name = "textures";
-                    var value = EncodeWorker.Base64Encoder(JsonConvert.SerializeObject(texture));
+                    var value = EncodeWorker.Base64Encoder(JsonConvert.SerializeObject(texture, Formatting.None, new JsonSerializerSettings
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            }));
                     properties.value = value;
 
                     if (!isUnsigned)
                     {
                         properties.signature = SignatureWorker.Sign(value);
-                    }
-                    else
-                    {
-                        properties.signature = "";
                     }
                 }
                 result.properties = new Properties?[] { properties };
