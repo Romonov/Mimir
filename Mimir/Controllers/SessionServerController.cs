@@ -58,13 +58,13 @@ namespace Mimir.Controllers
             {
                 AccessToken = request.accessToken,
                 ServerId = request.serverId,
-                ExpireTime = TimeWorker.GetJavaTimeStamp(Program.SessionsExpireSeconds),
+                ExpireTime = TimeWorker.GetTimeStamp10(Program.SessionsExpireSeconds),
                 ClientIp = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString()
             });
             db.SaveChanges();
 
             // Clean expired sessions.
-            var time = long.Parse(TimeWorker.GetJavaTimeStamp());
+            var time = long.Parse(TimeWorker.GetTimeStamp10());
             var sessions = from s in db.Sessions where long.Parse(s.ExpireTime) < time select s;
             foreach (var item in sessions)
             {
@@ -115,7 +115,7 @@ namespace Mimir.Controllers
             }
             var token = tokens.First();
 
-            var time = long.Parse(TimeWorker.GetJavaTimeStamp());
+            var time = long.Parse(TimeWorker.GetTimeStamp10());
             IQueryable<Sessions> sessions = null;
             if (ip != null && ip != string.Empty)
             {

@@ -14,7 +14,7 @@ namespace Mimir.Util
         /// 获得13位时间戳
         /// </summary>
         /// <returns>当前的13位时间戳</returns>
-        public static string GetTimeStamp()
+        public static string GetTimeStamp13()
         {
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
             return ((long)(ts.TotalMilliseconds)).ToString();
@@ -25,28 +25,28 @@ namespace Mimir.Util
         /// </summary>
         /// <param name="offset">偏移的毫秒数</param>
         /// <returns>获得的13位时间戳</returns>
-        public static string GetTimeStamp(long offset)
+        public static string GetTimeStamp13(long offset)
         {
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
             return ((long)(ts.TotalMilliseconds) + offset).ToString();
         }
 
         /// <summary>
-        /// 获得10位时间戳（Java格式时间戳）
+        /// 获得10位时间戳
         /// </summary>
         /// <returns>当前的10位时间戳</returns>
-        public static string GetJavaTimeStamp()
+        public static string GetTimeStamp10()
         {
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
             return ((long)(ts.TotalSeconds)).ToString();
         }
 
         /// <summary>
-        /// 获得10位时间戳（Java格式时间戳，带偏移）
+        /// 获得10位时间戳（带偏移）
         /// </summary>
         /// <param name="offset">偏移的毫秒数</param>
         /// <returns>获得的10位时间戳</returns>
-        public static string GetJavaTimeStamp(long offset)
+        public static string GetTimeStamp10(long offset)
         {
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
             return ((long)(ts.TotalSeconds) + offset).ToString();

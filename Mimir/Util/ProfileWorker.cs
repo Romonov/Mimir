@@ -137,13 +137,13 @@ namespace Mimir.Util
                         }
                         else
                         {
-                            cape.url = $"https://{Program.ServerDomain}/textures/{profile.CapeUrl}";
+                            cape.url = $"http://{Program.ServerDomain}/textures/{profile.CapeUrl}";
                         }
                         textures.CAPE = cape;
                     }
 
                     var texture = new Texture();
-                    texture.timestamp = TimeWorker.GetJavaTimeStamp();
+                    texture.timestamp = long.Parse(TimeWorker.GetTimeStamp13());
                     texture.profileId = profile.Uuid;
                     texture.profileName = profile.Name;
                     texture.textures = textures;
@@ -219,7 +219,7 @@ namespace Mimir.Util
         /// </summary>
         public struct Texture
         {
-            public string timestamp;
+            public long timestamp;
             public string profileId;
             public string profileName;
             public Textures textures;

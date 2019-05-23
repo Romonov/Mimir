@@ -42,7 +42,7 @@ namespace Mimir.Controllers
 
             // Cooldown check.
             var user = users.First();
-            var time = TimeWorker.GetJavaTimeStamp();
+            var time = TimeWorker.GetTimeStamp10();
             var cooldowns = from c in db.Cooldown where c.Uid == user.Id select c;
             if (cooldowns.Count() != 1)
             {
@@ -233,7 +233,7 @@ namespace Mimir.Controllers
             log.Info($"[ID: {HttpContext.Connection.Id}]Access token {token.AccessToken} has invalided.");
 
             // Check others temp invalid tokens.
-            var time = long.Parse(TimeWorker.GetJavaTimeStamp());
+            var time = long.Parse(TimeWorker.GetTimeStamp10());
             var tempInvalidTokens = from t in db.Tokens where (long.Parse(t.CreateTime) + Program.TokensExpireDaysLimit * 24 * 60 * 60) <= time select t;
             foreach (var t in tempInvalidTokens)
             {
@@ -404,7 +404,7 @@ namespace Mimir.Controllers
 
             // Cooldown check.
             var user = users.First();
-            var time = TimeWorker.GetJavaTimeStamp();
+            var time = TimeWorker.GetTimeStamp10();
             var cooldowns = from c in db.Cooldown where c.Uid == user.Id select c;
             if (cooldowns.Count() != 1)
             {

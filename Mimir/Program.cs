@@ -59,15 +59,22 @@ namespace Mimir
                     SqlPassword = config["Database:Password"];
                     SqlDatabaseName = config["Database:Name"];
 
-                    options.Listen(IPAddress.Any, int.Parse(config["Listen:Http:Port"]), opt =>
+                    if (bool.Parse(config["Listen:Http:Enable"]))
                     {
-                        opt.UseConnectionLogging();
-                    });
-                    options.Listen(IPAddress.Any, int.Parse(config["Listen:Https:Port"]), opt =>
+                        options.Listen(IPAddress.Any, int.Parse(config["Listen:Http:Port"]), opt =>
+                        {
+                            opt.UseConnectionLogging();
+                        });
+                    }
+
+                    if (bool.Parse(config["Listen:Https:Enable"]))
                     {
-                        opt.UseHttps(config["Listen:Https:Cert"], config["Listen:Https:Password"]);
-                        opt.UseConnectionLogging();
-                    });
+                        options.Listen(IPAddress.Any, int.Parse(config["Listen:Https:Port"]), opt =>
+                        {
+                            opt.UseHttps(config["Listen:Https:Cert"], config["Listen:Https:Password"]);
+                            opt.UseConnectionLogging();
+                        });
+                    }
                 })
                 .ConfigureLogging(logging =>
                 {
