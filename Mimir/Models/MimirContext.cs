@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Mimir.Models
 {
-    public partial class MimirContext : DbContext
+    public partial class mimirContext : DbContext
     {
-        public MimirContext()
+        public mimirContext()
         {
         }
 
-        public MimirContext(DbContextOptions<MimirContext> options)
+        public mimirContext(DbContextOptions<mimirContext> options)
             : base(options)
         {
         }
@@ -22,7 +22,7 @@ namespace Mimir.Models
         public virtual DbSet<Sessions> Sessions { get; set; }
         public virtual DbSet<Tokens> Tokens { get; set; }
         public virtual DbSet<Users> Users { get; set; }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
@@ -145,7 +145,6 @@ namespace Mimir.Models
 
                 entity.Property(e => e.AccessToken)
                     .IsRequired()
-                    .HasColumnName("AccessToken")
                     .IsUnicode(false);
 
                 entity.Property(e => e.ClientIp)
@@ -153,14 +152,13 @@ namespace Mimir.Models
                     .HasColumnName("ClientIP")
                     .IsUnicode(false);
 
+                entity.Property(e => e.ExpireTime)
+                    .IsRequired()
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ServerId)
                     .IsRequired()
                     .HasColumnName("ServerID")
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ExpireTime)
-                    .IsRequired()
-                    .HasColumnName("ExpireTime")
                     .IsUnicode(false);
             });
 
@@ -210,9 +208,13 @@ namespace Mimir.Models
                     .IsRequired()
                     .IsUnicode(false);
 
+                entity.Property(e => e.IsEmailVerified).HasColumnType("tinyint(1)");
+
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .IsUnicode(false);
+
+                entity.Property(e => e.PermissionLevel).HasColumnType("tinyint(1)");
 
                 entity.Property(e => e.PreferredLanguage)
                     .IsRequired()

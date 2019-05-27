@@ -12,5 +12,7 @@ namespace Mimir.Models
         public string PreferredLanguage { get; set; }
         public string CreateIp { get; set; }
         public string CreateTime { get; set; }
+        public byte PermissionLevel { get; set; }
+        public byte IsEmailVerified { get; set; }
     }
 }

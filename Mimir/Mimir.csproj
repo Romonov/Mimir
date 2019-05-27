@@ -29,7 +29,6 @@
     <Folder Include="Properties\" />
     <Folder Include="Views\Admin\" />
     <Folder Include="Views\User\" />
-    <Folder Include="Views\Install\" />
   </ItemGroup>
 
 
