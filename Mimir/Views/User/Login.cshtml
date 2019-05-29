@@ -1,0 +1,13 @@
+﻿@using Mimir.Models
+@model LoginModel
+@{
+    ViewData["Title"] = "登录";
+}
+
+<h1>这里应该是一个登录页</h1>
+
+<form action="/user" method="post">
+    <input type="text" name="Username" value="" placeholder="请在此输入用户名" required />
+    <input type="password" name="Password" value="" placeholder="请在此输入密码" required />
+    <button type="submit">登录</button>
+</form>

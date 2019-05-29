@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Mimir.Models
 {
-    public partial class mimirContext : DbContext
+    public partial class MimirContext : DbContext
     {
-        public mimirContext()
+        public MimirContext()
         {
         }
 
-        public mimirContext(DbContextOptions<mimirContext> options)
+        public MimirContext(DbContextOptions<MimirContext> options)
             : base(options)
         {
         }

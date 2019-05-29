@@ -11,6 +11,7 @@ namespace Mimir.Controllers
     {
         public IActionResult Index()
         {
+            ViewData["ServerName"] = Program.ServerName;
             return View();
         }
     }
