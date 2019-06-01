@@ -50,14 +50,18 @@ namespace Mimir
                 }
             });
 
-            services.AddSession();
-
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(options =>
                 {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(60);
+                options.Cookie.Name = ".Mimir.Session";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,7 +74,7 @@ namespace Mimir
             }
             else
             {
-                app.UseExceptionHandler("/Index/Error");
+                app.UseExceptionHandler("/error");
             }
 
             // Load logic configs.
@@ -145,32 +149,29 @@ namespace Mimir
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                    name: "get_profile",
-                    template: "api/sessionserver/session/minecraft/profile/{uuid}", 
-                    defaults: new { controller = "SessionServer", action = "Profile"});
+                    name: "yggdrasil_sessionserver_get_profile",
+                    template: "api/sessionserver/session/minecraft/profile/{uuid}",
+                    defaults: new { controller = "SessionServer", action = "Profile" });
                 routes.MapRoute(
-                    name: "session_join",
-                    template: "api/sessionserver/session/minecraft/join", 
-                    defaults: new { controller = "SessionServer", action = "Join"});
+                    name: "yggdrasil_sessionserver_join",
+                    template: "api/sessionserver/session/minecraft/join",
+                    defaults: new { controller = "SessionServer", action = "Join" });
                 routes.MapRoute(
-                    name: "session_has_joined",
+                    name: "yggdrasil_sessionserver_has_joined",
                     template: "api/sessionserver/session/minecraft/hasJoined",
                     defaults: new { controller = "SessionServer", action = "HasJoined" });
-            });
-
-            app.UseMvc(routes =>
-            {
                 routes.MapRoute(
-                    name: "profiles_query",
+                    name: "yggdrasil_api_profiles_query",
                     template: "api/api/profiles/minecraft", 
                     defaults: new { controller = "Api", action = "Profiles" });
                 routes.MapRoute(
-                    name: "yggdrasil",
-                    template: "api/{controller=Api}/{action=Index}");
-            });
-
-            app.UseMvc(routes =>
-            {
+                    name: "yggdrasil_authserver",
+                    template: "api/authserver/{action}",
+                    defaults: new { controller = "AuthServer" });
+                routes.MapRoute(
+                    name: "yggdrasil_index",
+                    template: "api", 
+                    defaults: new { controller = "Api", action = "Index"});
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Index}/{action=Index}/{id?}");

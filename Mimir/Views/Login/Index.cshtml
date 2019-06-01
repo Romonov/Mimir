@@ -1,0 +1,21 @@
+﻿@model LoginModel
+@{
+    ViewData["Title"] = "登录";
+}
+
+<h1>这里应该是一个登录页</h1>
+
+<form asp-controller="Login" asp-action="Index" method="post">
+    <div>
+        <input asp-for="Username" type="text" name="Username" value="" placeholder="请在此输入用户名" />
+        <span asp-validation-for="Username"></span>
+        <br />
+    </div>
+    <div>
+        <input asp-for="Password" type="password" name="Password" value="" placeholder="请在此输入密码" />
+        <span asp-validation-for="Password"></span>
+        <br />
+    </div>
+    <button type="submit">登录</button><br />
+    <div asp-validation-summary="ModelOnly"></div>
+</form>
