@@ -10,6 +10,8 @@ namespace Mimir.Controllers
     {
         public IActionResult Index()
         {
+            ViewData["ServerName"] = Program.ServerName;
+            ViewData["Title"] = "注册";
             return View();
         }
     }

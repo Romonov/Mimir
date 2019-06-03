@@ -13,7 +13,8 @@ namespace Mimir.Models
 
         [Required(ErrorMessage = "密码不能为空！")]
         [DataType(DataType.Password)]
-        [Compare("RepeatPassword")]
+        [MaxLength(30, ErrorMessage = "你的密码太长了！")]
+        [MinLength(6, ErrorMessage = "你的密码太短了！")]
         public string Password { get; set; }
 
         [Required(ErrorMessage = "重复密码不能为空！")]
@@ -21,5 +22,11 @@ namespace Mimir.Models
         [Compare("Password")]
         public string RepeatPassword { get; set; }
 
+        [Required(ErrorMessage = "邮箱不能为空！")]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "邮箱验证码不能为空！")]
+        public string VerificationCode { get; set; }
     }
 }

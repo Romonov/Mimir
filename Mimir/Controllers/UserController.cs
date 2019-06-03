@@ -20,6 +20,7 @@ namespace Mimir.Controllers
         public IActionResult Index()
         {
             ViewData["ServerName"] = Program.ServerName;
+            ViewData["Title"] = "用户信息";
             return View();
         }
     }

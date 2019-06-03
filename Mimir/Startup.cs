@@ -100,11 +100,19 @@ namespace Mimir
                     out Program.TokensExpireDaysLimit);
                 long.TryParse((from o in db.Options where o.Option == "SessionsExpireSeconds" select o.Value).First(),
                     out Program.SessionsExpireSeconds);
-                bool.TryParse((from o in db.Options where o.Option == "IsHttps" select o.Value).First(),
-                    out Program.IsHttps);
                 Program.SkinDomains = (from o in db.Options where o.Option == "SkinDomains" select o.Value).First().Split(",");
                 int.TryParse((from o in db.Options where o.Option == "MaxProfileCountPerQuery" select o.Value).First(),
                     out Program.MaxProfileCountPerQuery);
+                bool.TryParse((from o in db.Options where o.Option == "IsEnableLandingPage" select o.Value).First(),
+                    out Program.IsEnableLandingPage);
+                bool.TryParse((from o in db.Options where o.Option == "IsEnableSmtp" select o.Value).First(),
+                    out Program.IsEnableSmtp);
+                Program.SmtpDomain = (from o in db.Options where o.Option == "SmtpDomain" select o.Value).First();
+                int.TryParse((from o in db.Options where o.Option == "SmtpPort" select o.Value).First(),
+                    out Program.SmtpPort);
+                Program.SmtpEmail = (from o in db.Options where o.Option == "SmtpEmail" select o.Value).First();
+                Program.SmtpName = (from o in db.Options where o.Option == "SmtpName" select o.Value).First();
+                Program.SmtpPassword = (from o in db.Options where o.Option == "SmtpPassword" select o.Value).First();
             }
             catch (Exception)
             {
@@ -129,7 +137,7 @@ namespace Mimir
                     context.Response.OnStarting(() =>
                     {
                         // Add ALI.
-                        if (Program.IsHttps)
+                        if (context.Request.IsHttps)
                         {
                             context.Response.Headers.Add("X-Authlib-Injector-API-Location", "https://" + Program.ServerDomain + "/api/");
                         }

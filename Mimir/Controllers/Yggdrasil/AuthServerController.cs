@@ -11,7 +11,7 @@ using Mimir.Util;
 using Newtonsoft.Json;
 using NLog;
 
-namespace Mimir.Controllers
+namespace Mimir.Controllers.Yggdrasil
 {
     public class AuthServerController : ControllerBase
     {

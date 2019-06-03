@@ -34,9 +34,15 @@ namespace Mimir
         internal static int MaxTokensPerProfile = 10;
         internal static int TokensExpireDaysLimit = 15;
         internal static long SessionsExpireSeconds = 30;
-        internal static bool IsHttps = true;
         internal static string[] SkinDomains = null;
         internal static int MaxProfileCountPerQuery = 2;
+        internal static bool IsEnableLandingPage = true;
+        internal static bool IsEnableSmtp = false;
+        internal static string SmtpDomain = string.Empty;
+        internal static int SmtpPort = 465;
+        internal static string SmtpEmail = string.Empty;
+        internal static string SmtpName = string.Empty;
+        internal static string SmtpPassword = string.Empty;
         #endregion
 
         public static void Main(string[] args)

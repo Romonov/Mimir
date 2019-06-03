@@ -10,7 +10,7 @@ using Mimir.Util;
 using Newtonsoft.Json;
 using NLog;
 
-namespace Mimir.Controllers
+namespace Mimir.Controllers.Yggdrasil
 {
     public class ApiController : ControllerBase
     {
@@ -49,7 +49,7 @@ namespace Mimir.Controllers
             var profiles = new List<ProfileWorker.Profile>();
             foreach (var item in request)
             {
-                var result = ProfileWorker.GetProfile(db, item);
+                var result = ProfileWorker.GetProfile(db, item, HttpContext);
                 if (result != null)
                 {
                     profiles.Add(result.Value);

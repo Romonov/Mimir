@@ -19,6 +19,8 @@ namespace Mimir.Controllers
 
         public IActionResult Index()
         {
+            ViewData["ServerName"] = Program.ServerName;
+            ViewData["Title"] = "登录";
             return View();
         }
 
@@ -26,6 +28,7 @@ namespace Mimir.Controllers
         public IActionResult Index([FromForm] LoginModel model)
         {
             ViewData["ServerName"] = Program.ServerName;
+            ViewData["Title"] = "登录";
             if (ModelState.IsValid)
             {
                 var users = from u in db.Users where u.Username == model.Username select u;

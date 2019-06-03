@@ -1,8 +1,8 @@
-﻿@model LoginModel
+﻿@model RegisterModel
 
-<h1>这里应该是一个登录页</h1>
+<h1>这里应该是一个注册页</h1>
 
-<form asp-controller="Login" asp-action="Index" method="post">
+<form asp-controller="User" asp-action="Index">
     <div>
         <input asp-for="Username" type="text" name="Username" value="" placeholder="请在此输入用户名" />
         <span asp-validation-for="Username"></span>
@@ -13,6 +13,12 @@
         <span asp-validation-for="Password"></span>
         <br />
     </div>
-    <button type="submit">登录</button><br /><a asp-controller="Register" asp-action="Index">没有账号？点我注册！</a>
+    <div>
+        <input asp-for="RepeatPassword" type="password" name="Password" value="" placeholder="请在此重复密码" />
+        <span asp-validation-for="RepeatPassword"></span>
+        <br />
+    </div>
+    <button type="submit">注册</button><br /><a asp-controller="Login" asp-action="Index">已有账号？点我登录！</a>
     <div asp-validation-summary="ModelOnly"></div>
 </form>
+

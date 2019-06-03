@@ -7,11 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Mimir.Controllers
 {
-    public class IndexController : Controller
+    public class IndexController : IndexControllerBase
     {
         public IActionResult Index()
         {
             ViewData["ServerName"] = Program.ServerName;
+            ViewData["Title"] = "首页";
             return View();
         }
     }
