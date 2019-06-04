@@ -44,6 +44,7 @@ namespace Mimir
         internal static string SmtpName = string.Empty;
         internal static string SmtpPassword = string.Empty;
         internal static bool SmtpIsSsl = false;
+        internal static int MaxProfileCountPerUser = 1;
         #endregion
 
         public static void Main(string[] args)

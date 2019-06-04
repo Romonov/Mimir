@@ -1,0 +1,13 @@
+﻿@model ProfileCreateModel
+
+<h1>这里应该是角色创建页</h1>
+
+<form asp-controller="Profile" asp-action="Create" method="post">
+    <div>
+        <input asp-for="Name" type="text" name="Name" value="" placeholder="请在此输入角色名" />
+        <span asp-validation-for="Name"></span>
+        <br />
+    </div>
+    <button type="submit">创建</button><br />
+    <div asp-validation-summary="ModelOnly"></div>
+</form>

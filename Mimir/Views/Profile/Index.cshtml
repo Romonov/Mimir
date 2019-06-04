@@ -1,0 +1,10 @@
+﻿@model ProfileIndexModel
+
+<h1>这里应该是角色列表页</h1>
+
+<ul>
+    @foreach (var item in Model.Profiles)
+    {
+        <li><a asp-controller="Profile" asp-action="Manage" asp-route-name="@item.Name">@item.Name</a></li>
+    }
+</ul>

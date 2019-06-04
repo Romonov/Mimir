@@ -115,6 +115,8 @@ namespace Mimir
                 Program.SmtpPassword = (from o in db.Options where o.Option == "SmtpPassword" select o.Value).First();
                 bool.TryParse((from o in db.Options where o.Option == "SmtpIsSsl" select o.Value).First(),
                     out Program.SmtpIsSsl);
+                int.TryParse((from o in db.Options where o.Option == "MaxProfileCountPerUser" select o.Value).First(),
+                    out Program.MaxProfileCountPerUser);
             }
             catch (Exception)
             {

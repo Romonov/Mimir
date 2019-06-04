@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Mimir.Models
+namespace Mimir.ViewModels
 {
     public class RegisterModel
     {
