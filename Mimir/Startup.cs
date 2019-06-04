@@ -113,6 +113,8 @@ namespace Mimir
                 Program.SmtpEmail = (from o in db.Options where o.Option == "SmtpEmail" select o.Value).First();
                 Program.SmtpName = (from o in db.Options where o.Option == "SmtpName" select o.Value).First();
                 Program.SmtpPassword = (from o in db.Options where o.Option == "SmtpPassword" select o.Value).First();
+                bool.TryParse((from o in db.Options where o.Option == "SmtpIsSsl" select o.Value).First(),
+                    out Program.SmtpIsSsl);
             }
             catch (Exception)
             {

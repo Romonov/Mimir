@@ -16,6 +16,7 @@ namespace Mimir.Util
             mail.IsBodyHtml = isHtml;
             mail.Body = content;
             SmtpClient smtp = new SmtpClient(Program.SmtpDomain, Program.SmtpPort);
+            smtp.EnableSsl = Program.SmtpIsSsl;
             smtp.Credentials = new NetworkCredential(Program.SmtpEmail, Program.SmtpPassword);
             smtp.Send(mail);
         }

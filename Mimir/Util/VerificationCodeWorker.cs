@@ -1,16 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Mimir.Util
 {
     public class VerificationCodeWorker
     {
-        public static void Send(HttpContext context)
+        public static void Send(HttpContext context, string email)
         {
-            context.Session.SetString("VerificationCode", "");
+            var VerificationCode = new Random().Next(100000, 999999);
+            context.Session.SetString("VerificationCode", VerificationCode.ToString());
+            MailWorker.Send(email, "请验证你的邮箱！", $"你的验证码是：{VerificationCode}");
         }
     }
 }

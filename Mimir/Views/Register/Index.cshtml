@@ -2,7 +2,7 @@
 
 <h1>这里应该是一个注册页</h1>
 
-<form asp-controller="User" asp-action="Index">
+<form asp-controller="Register" asp-action="Register">
     <div>
         <input asp-for="Username" type="text" name="Username" value="" placeholder="请在此输入用户名" />
         <span asp-validation-for="Username"></span>
@@ -14,11 +14,22 @@
         <br />
     </div>
     <div>
-        <input asp-for="RepeatPassword" type="password" name="Password" value="" placeholder="请在此重复密码" />
+        <input asp-for="RepeatPassword" type="password" name="RepeatPassword" value="" placeholder="请在此重复密码" />
         <span asp-validation-for="RepeatPassword"></span>
         <br />
     </div>
-    <button type="submit">注册</button><br /><a asp-controller="Login" asp-action="Index">已有账号？点我登录！</a>
+    <div>
+        <input asp-for="Email" type="email" name="Email" id="Email" value="" placeholder="请在此输入邮箱"  />
+        <span asp-validation-for="Email"></span>
+        <button id="SendEmail" type="button" onclick="if (document.getElementById('Email').value !== '') { $.get('/register/sendemail/', { 'Email': document.getElementById('Email').value }); document.getElementById('SendEmail').disabled = true;}">点我发送邮件验证码</button>
+        <br />
+    </div>
+    <div>
+        <input asp-for="VerificationCode" type="number" name="VerificationCode" value="" placeholder="请在此输入邮箱验证码" />
+        <span asp-validation-for="VerificationCode"></span>
+        <br />
+    </div>
+    <button type="submit">注册</button><a asp-controller="Login" asp-action="Index">已有账号？点我登录！</a><br />
     <div asp-validation-summary="ModelOnly"></div>
 </form>
 

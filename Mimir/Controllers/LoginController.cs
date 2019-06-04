@@ -45,6 +45,7 @@ namespace Mimir.Controllers
                     return View(model);
                 }
                 HttpContext.Session.Set("User", ByteConverter.ToBytes(user));
+                HttpContext.Response.Redirect("/User");
                 return View("Index");
             }
             else

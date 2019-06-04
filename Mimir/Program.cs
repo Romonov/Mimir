@@ -43,6 +43,7 @@ namespace Mimir
         internal static string SmtpEmail = string.Empty;
         internal static string SmtpName = string.Empty;
         internal static string SmtpPassword = string.Empty;
+        internal static bool SmtpIsSsl = false;
         #endregion
 
         public static void Main(string[] args)
