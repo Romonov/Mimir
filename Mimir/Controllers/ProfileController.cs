@@ -18,7 +18,14 @@ namespace Mimir.Controllers
         public IActionResult Create()
         {
             ViewData["ServerName"] = Program.ServerName;
-            ViewData["Title"] = "创建角色";
+            ViewData["Title"] = "角色创建";
+            return View();
+        }
+
+        public IActionResult Manage(string name)
+        {
+            ViewData["ServerName"] = Program.ServerName;
+            ViewData["Title"] = "角色管理";
             return View();
         }
     }

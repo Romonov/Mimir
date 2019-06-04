@@ -30,6 +30,7 @@
   <ItemGroup>
     <Folder Include="Properties\" />
     <Folder Include="Views\Admin\" />
+    <Folder Include="ViewModels\" />
   </ItemGroup>
 
 

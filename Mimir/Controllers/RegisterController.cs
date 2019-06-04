@@ -49,7 +49,7 @@ namespace Mimir.Controllers
                     });
                     db.SaveChanges();
                 }
-                HttpContext.Response.Redirect("/User");
+                return RedirectToAction(actionName: "Index", controllerName: "User");
             }
             return View("Index", model);
         }
