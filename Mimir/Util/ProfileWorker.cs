@@ -87,7 +87,7 @@ namespace Mimir.Util
         /// <param name="containProperties">是否包含属性</param>
         /// <param name="isUnsigned">是否不签名</param>
         /// <returns>角色信息</returns>
-        public static Profile? GetProfile(MimirContext db, string name, HttpContext context, bool containProperties = false, bool isUnsigned = true)
+        public static Profile? GetProfile(MimirContext db, string name, bool containProperties = false, bool isUnsigned = true)
         {
             var profiles = from p in db.Profiles where p.Name == name select p;
             if (profiles.Count() != 1)
@@ -115,7 +115,7 @@ namespace Mimir.Util
                         textures.SKIN.metadata = metadata;
                     }
                     
-                    if (context.Request.IsHttps)
+                    if (Program.IsHttps)
                     {
                         textures.SKIN.url = $"https://{Program.ServerDomain}/textures/{profile.SkinUrl}";
                     }
@@ -127,7 +127,7 @@ namespace Mimir.Util
                     if (profile.CapeUrl != null && profile.CapeUrl != string.Empty)
                     {
                         var cape = new Skin();
-                        if (context.Request.IsHttps)
+                        if (Program.IsHttps)
                         {
                             cape.url = $"https://{Program.ServerDomain}/textures/{profile.CapeUrl}";
                         }
@@ -173,14 +173,14 @@ namespace Mimir.Util
         /// <param name="containProperties">是否包含属性</param>
         /// <param name="isUnsigned">是否不签名</param>
         /// <returns>角色信息</returns>
-        public static Profile? GetProfile(MimirContext db, Guid uuid, HttpContext context, bool containProperties = false, bool isUnsigned = true)
+        public static Profile? GetProfile(MimirContext db, Guid uuid, bool containProperties = false, bool isUnsigned = true)
         {
             var name = GetNameFormUuid(db, uuid);
             if (name == null)
             {
                 return null;
             }
-            return GetProfile(db, name, context, containProperties, isUnsigned);
+            return GetProfile(db, name, containProperties, isUnsigned);
         }
 
 

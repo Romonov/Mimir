@@ -133,7 +133,7 @@ namespace Mimir.Controllers.Yggdrasil
                 };
             }
 
-            var result = ProfileWorker.GetProfile(db, profile.Name, HttpContext, true, false);
+            var result = ProfileWorker.GetProfile(db, profile.Name, true, false);
             if (result != null)
             {
                 log.Info($"[ID: {HttpContext.Connection.Id}]Player {profile.Name} login successfully.");
@@ -162,7 +162,7 @@ namespace Mimir.Controllers.Yggdrasil
 
             if (Guid.TryParse(uuid, out var guid) && bool.TryParse(unsigned, out var isUnsigned))
             {
-                var result = ProfileWorker.GetProfile(db, guid, HttpContext, true, isUnsigned);
+                var result = ProfileWorker.GetProfile(db, guid, true, isUnsigned);
                 if (result != null)
                 {
                     return new JsonResult(result);

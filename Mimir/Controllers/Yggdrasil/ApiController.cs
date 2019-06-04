@@ -49,7 +49,7 @@ namespace Mimir.Controllers.Yggdrasil
             var profiles = new List<ProfileWorker.Profile>();
             foreach (var item in request)
             {
-                var result = ProfileWorker.GetProfile(db, item, HttpContext);
+                var result = ProfileWorker.GetProfile(db, item);
                 if (result != null)
                 {
                     profiles.Add(result.Value);

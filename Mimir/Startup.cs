@@ -117,6 +117,8 @@ namespace Mimir
                     out Program.SmtpIsSsl);
                 int.TryParse((from o in db.Options where o.Option == "MaxProfileCountPerUser" select o.Value).First(),
                     out Program.MaxProfileCountPerUser);
+                bool.TryParse((from o in db.Options where o.Option == "IsHttps" select o.Value).First(),
+                    out Program.IsHttps);
             }
             catch (Exception)
             {
@@ -141,7 +143,7 @@ namespace Mimir
                     context.Response.OnStarting(() =>
                     {
                         // Add ALI.
-                        if (context.Request.IsHttps)
+                        if (Program.IsHttps)
                         {
                             context.Response.Headers.Add("X-Authlib-Injector-API-Location", "https://" + Program.ServerDomain + "/api/");
                         }

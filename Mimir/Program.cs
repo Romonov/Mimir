@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
@@ -45,6 +46,7 @@ namespace Mimir
         internal static string SmtpPassword = string.Empty;
         internal static bool SmtpIsSsl = false;
         internal static int MaxProfileCountPerUser = 1;
+        internal static bool IsHttps = false;
         #endregion
 
         public static void Main(string[] args)
@@ -54,6 +56,7 @@ namespace Mimir
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseContentRoot(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location))
                 .UseStartup<Startup>()
                 .UseKestrel(options =>
                 {
