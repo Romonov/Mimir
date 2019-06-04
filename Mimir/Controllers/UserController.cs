@@ -8,7 +8,7 @@ using Mimir.Util;
 
 namespace Mimir.Controllers
 {
-    public class UserController : Controller
+    public class UserController : AuthControllerBase
     {
         private MimirContext db = null;
 
@@ -20,7 +20,16 @@ namespace Mimir.Controllers
         public IActionResult Index()
         {
             ViewData["ServerName"] = Program.ServerName;
-            ViewData["Title"] = "用户信息";
+            ViewData["Title"] = "用户";
+            if (HttpContext.Request.IsHttps)
+            {
+                ViewData["HttpOrHttps"] = "https";
+            }
+            else
+            {
+                ViewData["HttpOrHttps"] = "http";
+            }
+            ViewData["ServerDomain"] = Program.ServerDomain;
             return View();
         }
     }

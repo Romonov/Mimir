@@ -1,7 +1,16 @@
-﻿
-@{
-    ViewData["Title"] = "用户";
-}
-
-<h1>这里应该是用户页。</h1>
-
+﻿<h1>这里应该是用户页</h1>
+<p>
+    用户页能做些什么呢？哈哈，我也不知道~（一个游戏搞那么严肃干嘛）<br />
+    不如……<a asp-controller="Profile" asp-action="Create">创建角色</a>？<br />
+    还是……<a asp-controller="Profile" asp-action="Index">管理角色</a>？<br />
+    创建完角色就可以尝试登录啦，推荐使用HMCL启动器，添加验证服务器地址为 @ViewData["HttpOrHttps"]://@ViewData["ServerDomain"]/api/ 。<br />
+    管理角色里面可以给角色添加皮肤什么的，也可以看看哦~<br />
+    <small><span draggable="true" ondragstart="dragstart(event);">偷偷说一句，把我拖进HMCL就可以自动添加验证服务器。</span></small>
+</p>
+<script>
+    function dragstart(event) {
+        let apiRoot = "@ViewData["HttpOrHttps"]://@ViewData["ServerDomain"]/api/";
+	    event.dataTransfer.setData("text/plain", "authlib-injector:yggdrasil-server:" + encodeURIComponent(apiRoot));
+        event.dataTransfer.dropEffect = "copy";
+    }
+</script>
