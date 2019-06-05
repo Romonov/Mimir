@@ -20,8 +20,8 @@
     </div>
     <div>
         <input asp-for="Email" type="email" name="Email" id="Email" value="" placeholder="请在此输入邮箱"  />
-        <span asp-validation-for="Email"></span>
-        <button id="SendEmail" type="button" onclick="if (document.getElementById('Email').value !== '') { $.get('/Register/SendEmail/', { 'Email': document.getElementById('Email').value }); document.getElementById('SendEmail').disabled = true;}">点我发送邮件验证码</button>
+        <span asp-validation-for="Email" id="EmailSendResult"></span>
+        <button id="SendEmail" type="button" onclick="if (document.getElementById('Email').value !== '') { $.get('/Register/SendEmail/', { 'Email': document.getElementById('Email').value }, function (result) { if (result == true) { $('EmailSendResult').value = result; } }); document.getElementById('SendEmail').disabled = true; }">点我发送邮件验证码</button>
         <br />
     </div>
     <div>

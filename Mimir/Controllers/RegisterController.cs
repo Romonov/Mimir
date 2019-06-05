@@ -60,8 +60,12 @@ namespace Mimir.Controllers
         [HttpGet]
         public IActionResult SendEmail(string email)
         {
-            VerificationCodeWorker.Send(HttpContext, email);
-            return View("Index");
+            var result = VerificationCodeWorker.Send(HttpContext, email);
+            if (result != string.Empty)
+            {
+                return Json(result);
+            }
+            return Json(true);
         }
 
         public IActionResult VerifyEmail(string email)
