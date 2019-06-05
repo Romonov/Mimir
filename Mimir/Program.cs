@@ -56,7 +56,7 @@ namespace Mimir
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseContentRoot(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location))
+                //.UseContentRoot(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location))
                 .UseStartup<Startup>()
                 .UseKestrel(options =>
                 {

@@ -106,7 +106,7 @@ namespace Mimir.Controllers.Yggdrasil
             var profile = profiles.First();
 
             var tokens = from t in db.Tokens where t.BindProfileId == profile.Id && t.Status == 2 select t;
-            if (tokens.Count() != 1)
+            if (tokens.Count() < 1)
             {
                 return new JsonResult(null)
                 {
@@ -125,7 +125,7 @@ namespace Mimir.Controllers.Yggdrasil
             {
                 sessions = from s in db.Sessions where long.Parse(s.ExpireTime) >= time && s.AccessToken == token.AccessToken && s.ServerId == serverId select s;
             }
-            if (sessions.Count() != 1)
+            if (sessions.Count() < 1)
             {
                 return new JsonResult(null)
                 {
