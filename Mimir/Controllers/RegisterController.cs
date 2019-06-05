@@ -46,8 +46,13 @@ namespace Mimir.Controllers
                         IsEmailVerified = 1
                     });
                     db.SaveChanges();
+                    return RedirectToAction(actionName: "Index", controllerName: "User");
                 }
-                return RedirectToAction(actionName: "Index", controllerName: "User");
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "验证码不正确！");
+                    return View("Index", model);
+                }
             }
             return View("Index", model);
         }

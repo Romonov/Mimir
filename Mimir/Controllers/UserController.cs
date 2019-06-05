@@ -21,7 +21,7 @@ namespace Mimir.Controllers
         {
             ViewData["ServerName"] = Program.ServerName;
             ViewData["Title"] = "用户";
-            if (HttpContext.Request.IsHttps)
+            if (Program.IsHttps)
             {
                 ViewData["HttpOrHttps"] = "https";
             }
