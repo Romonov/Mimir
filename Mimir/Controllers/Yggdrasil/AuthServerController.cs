@@ -159,6 +159,12 @@ namespace Mimir.Controllers.Yggdrasil
                 availableProfiles.Add(playerProfile);
             }
 
+
+            var tokens = from t in db.Tokens where t.BindProfileId == token.BindProfileId select t;
+            foreach (var t in tokens)
+            {
+                t.Status = 1;
+            }
             db.Tokens.Add(token);
             db.SaveChanges();
 

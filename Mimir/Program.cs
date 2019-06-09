@@ -24,7 +24,7 @@ namespace Mimir
         internal static string SqlPassword = "123";
         internal static string SqlDatabaseName = "mimir";
 
-        internal readonly static string Version = "1.0.0";
+        internal readonly static string Version = "1.0.1";
 
         internal static string ServerName = "Mimir Server";
         internal static RSACryptoServiceProvider PrivateKeyProvider = new RSACryptoServiceProvider();
